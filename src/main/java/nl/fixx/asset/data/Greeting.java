@@ -1,4 +1,4 @@
-package nl.fixx.asset.dto;
+package nl.fixx.asset.data;
 
 public class Greeting {
     private final long id;
