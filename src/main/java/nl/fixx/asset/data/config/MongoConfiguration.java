@@ -30,7 +30,7 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
     
     @Override
     protected String getMappingBasePackage() {
-        return "com.lishman.springdata.domain";
+        return "nl.fixx.data";
     }
     
     @Bean
