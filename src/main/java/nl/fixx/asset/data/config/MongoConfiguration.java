@@ -10,12 +10,9 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 
-import nl.fixx.asset.data.repository.RepositoryPackage;
-import nl.fixx.asset.data.template.TemplatePackage;
-
 @Configuration
-@EnableMongoRepositories(basePackageClasses=RepositoryPackage.class)
-@ComponentScan(basePackageClasses=TemplatePackage.class)
+@EnableMongoRepositories(basePackages = "nl.fixx.asset.data.repository")
+@ComponentScan(basePackages = "nl.fixx.asset.data.template")
 public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @Override
