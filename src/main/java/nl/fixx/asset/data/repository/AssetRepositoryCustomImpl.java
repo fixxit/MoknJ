@@ -3,24 +3,25 @@ package nl.fixx.asset.data.repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.repository.support.QuerydslRepositorySupport;
+import static org.springframework.data.mongodb.core.query.Query.query;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 import nl.fixx.asset.data.domain.Asset;
 
-public class AssetRepositoryCustomImpl extends QuerydslRepositorySupport implements AssetRepositoryCustom{
+public class AssetRepositoryCustomImpl implements AssetRepositoryCustom {
     
+    @Autowired 
     private MongoOperations operations;
-    
-    public AssetRepositoryCustomImpl(MongoOperations operations) {
-	super(operations);
-	this.operations = operations;
+
+    public AssetRepositoryCustomImpl() {
     }
 
     @Override
-    public List<Asset> findAllExpensiveAssets(BigDecimal price, Asset asset) {
+    public List<Asset> findAllByPrice(BigDecimal price, Asset asset) {
 	//example to to implemented
-	return null;
+	return operations.find(query(where("").is("")), Asset.class);
     }
 
 }

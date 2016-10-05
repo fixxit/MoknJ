@@ -1,5 +1,7 @@
 package nl.fixx.asset.data;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -18,8 +20,8 @@ public class AssetController {
     private AssetRepository assetRepository;
 
     @RequestMapping("/addAsset")
-    public void testMongo(@RequestParam(value = "name", defaultValue = "") String name) {
-	assetRepository.save(new Asset("Laptop", name));
+    public void testMongo(@RequestParam(value = "name", defaultValue = "") String name, BigDecimal price, Date purchaseDate) {
+	assetRepository.save(new Asset("Laptop", name, price, purchaseDate));
     }
     
     @RequestMapping("/showassets")
