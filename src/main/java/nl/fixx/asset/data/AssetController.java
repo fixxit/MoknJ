@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.repository.AssetRepository;
 
+@CrossOrigin //added for cors, allow access from another web server
 @RestController()
 public class AssetController {
 
@@ -22,7 +23,6 @@ public class AssetController {
 	assetRepository.save(new Asset("Laptop", name, price, purchaseDate));
     }
 
-    @CrossOrigin(origins = "http://localhost") //added for cors, allow access from another web server
     @RequestMapping("/showassets")
     public List<Asset> showAssets() {
 	return assetRepository.findAll();
