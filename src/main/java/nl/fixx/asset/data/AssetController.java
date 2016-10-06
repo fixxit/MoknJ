@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.repository.AssetRepository;
@@ -23,9 +21,11 @@ public class AssetController {
     public void testMongo(@RequestParam(value = "name", defaultValue = "") String name, BigDecimal price, Date purchaseDate) {
 	assetRepository.save(new Asset("Laptop", name, price, purchaseDate));
     }
-    
+
+    @CrossOrigin(origins = "http://localhost") //added for cors, allow access from another web server
     @RequestMapping("/showassets")
     public List<Asset> showAssets() {
 	return assetRepository.findAll();
     }
+    
 }
