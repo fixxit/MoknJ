@@ -13,60 +13,75 @@ public class Asset {
     private String description;
     private BigDecimal price;
     private Date purchaseDate;
+    private AssetType assetType;
 
     public Asset() {
     }
 
     public Asset(String name, String description, BigDecimal price, Date purchaseDate) {
-	this.name = name;
-	this.description = description;
-	this.price = price;
-	this.purchaseDate = purchaseDate;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.purchaseDate = purchaseDate;
     }
 
     @Override
     public String toString() {
-	return "Asset [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price + ", purchaseDate=" + purchaseDate + "]";
+        return "Asset{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", purchaseDate=" + purchaseDate +
+                ", assetType=" + assetType +
+                '}';
     }
 
     public String getId() {
-	return id;
+        return id;
     }
 
     public void setId(String id) {
-	this.id = id;
+        this.id = id;
     }
 
     public String getName() {
-	return name;
+        return name;
     }
 
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     public String getDescription() {
-	return description;
+        return description;
     }
 
     public void setDescription(String description) {
-	this.description = description;
+        this.description = description;
     }
 
     public BigDecimal getPrice() {
-	return price;
+        return price;
     }
 
     public void setPrice(BigDecimal price) {
-	this.price = price;
+        this.price = price;
     }
 
     public Date getPurchaseDate() {
-	return purchaseDate;
+        return purchaseDate;
     }
 
     public void setPurchaseDate(Date purchaseDate) {
-	this.purchaseDate = purchaseDate;
+        this.purchaseDate = purchaseDate;
     }
 
+    public AssetType getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(AssetType assetType) {
+        this.assetType = assetType;
+    }
 }
