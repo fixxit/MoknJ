@@ -37,8 +37,8 @@ public class AssetController {
         return assetResponse;
     }
 
-    @RequestMapping("/showAssets")
-    public List<Asset> showAssets() {
+    @RequestMapping("/getAllAssets")
+    public List<Asset> getAllAssets() {
         return assetRepository.findAll();
     }
 

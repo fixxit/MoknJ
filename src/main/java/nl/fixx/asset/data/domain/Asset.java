@@ -13,7 +13,6 @@ public class Asset {
     private String description;
     private BigDecimal price;
     private Date purchaseDate;
-    private AssetType assetType;
 
     public Asset() {
     }
@@ -33,7 +32,6 @@ public class Asset {
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", purchaseDate=" + purchaseDate +
-                ", assetType=" + assetType +
                 '}';
     }
 
@@ -77,11 +75,4 @@ public class Asset {
         this.purchaseDate = purchaseDate;
     }
 
-    public AssetType getAssetType() {
-        return assetType;
-    }
-
-    public void setAssetType(AssetType assetType) {
-        this.assetType = assetType;
-    }
 }
