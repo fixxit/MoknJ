@@ -18,28 +18,26 @@ public class AssetController {
 
     @RequestMapping(value = "/addAsset", method = RequestMethod.POST)
     public AssetResponse addAsset(@RequestBody Asset asset) {
-        System.out.println(asset.toString());
-        AssetResponse assetResponse = new AssetResponse();
+	System.out.println(asset.toString());
+	AssetResponse assetResponse = new AssetResponse();
+	assetResponse.setAction("POST");
+	assetResponse.setMethod("/addAsset");
 
-        try {
-            Asset savedAsset = this.assetRepository.save(asset);
-            assetResponse.setSuccess(true);
-            assetResponse.setAction("POST");
-            assetResponse.setMethod("/addAsset");
-            assetResponse.setMessage(savedAsset.getId());
-        } catch (IllegalArgumentException ex) {
-            assetResponse.setSuccess(false);
-            assetResponse.setAction("POST");
-            assetResponse.setMethod("/addAsset");
-            assetResponse.setMessage(ex.getMessage());
-        }
+	try {
+	    Asset savedAsset = this.assetRepository.save(asset);
+	    assetResponse.setSuccess(true);
+	    assetResponse.setMessage(savedAsset.getId());
+	} catch (IllegalArgumentException ex) {
+	    assetResponse.setSuccess(false);
+	    assetResponse.setMessage(ex.getMessage());
+	}
 
-        return assetResponse;
+	return assetResponse;
     }
 
     @RequestMapping("/getAllAssets")
     public List<Asset> getAllAssets() {
-        return assetRepository.findAll();
+	return assetRepository.findAll();
     }
 
 }
