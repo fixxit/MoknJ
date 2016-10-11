@@ -1,16 +1,15 @@
 package nl.fixx.asset.data;
 
 import java.util.List;
-
+import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.info.AssetResponse;
+import nl.fixx.asset.data.repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import nl.fixx.asset.data.domain.Asset;
-import nl.fixx.asset.data.repository.AssetRepository;
-
 @CrossOrigin // added for cors, allow access from another web server
 @RestController()
+@RequestMapping(value = "/asset")
 public class AssetController {
 
     @Autowired
