@@ -15,7 +15,7 @@ import org.springframework.data.annotation.Id;
 public class Asset {
 
     @Id
-    private long id;
+    private String id;
     private long typeId;
     private ArrayList<AssetField> values;
 
@@ -27,7 +27,7 @@ public class Asset {
     /**
      * @return the id
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 

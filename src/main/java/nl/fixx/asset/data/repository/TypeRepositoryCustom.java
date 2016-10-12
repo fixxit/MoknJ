@@ -5,13 +5,10 @@
  */
 package nl.fixx.asset.data.repository;
 
-import nl.fixx.asset.data.domain.AssetType;
-import org.springframework.data.mongodb.repository.MongoRepository;
-
 /**
  *
  * @author adriaan
  */
-public interface AssetTypeRepository extends MongoRepository<AssetType, String>, AssetTypeRepositoryCustom {
+public interface TypeRepositoryCustom {
 
 }

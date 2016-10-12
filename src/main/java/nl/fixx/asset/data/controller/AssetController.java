@@ -6,7 +6,13 @@ import nl.fixx.asset.data.domain.AssetField;
 import nl.fixx.asset.data.info.Response;
 import nl.fixx.asset.data.repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @CrossOrigin // added for cors, allow access from another web server
 @RestController
@@ -14,25 +20,25 @@ import org.springframework.web.bind.annotation.*;
 public class AssetController {
 
     @Autowired
-    private AssetRepository assetRepository;
+    private AssetRepository resp;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Response addAsset(@RequestBody Asset asset) {
         System.out.println(asset.toString());
-        Response assetResponse = new Response();
-        assetResponse.setAction("POST");
-        assetResponse.setMethod("/add");
+        Response response = new Response();
+        response.setAction("POST");
+        response.setMethod("/add");
 
         try {
-            Asset savedAsset = this.assetRepository.save(asset);
-            assetResponse.setSuccess(true);
-            assetResponse.setMessage("saved asset[" + savedAsset.getId() + "]");
+            Asset savedAsset = resp.save(asset);
+            response.setSuccess(true);
+            response.setMessage("saved asset[" + savedAsset.getId() + "]");
         } catch (IllegalArgumentException ex) {
-            assetResponse.setSuccess(false);
-            assetResponse.setMessage(ex.getMessage());
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
         }
 
-        return assetResponse;
+        return response;
     }
 
     @GetMapping("/asset")
@@ -51,7 +57,7 @@ public class AssetController {
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public ArrayList<Asset> getAllAssets() {
         ArrayList list = new ArrayList<>();
-        list.addAll(assetRepository.findAll());
+        list.addAll(resp.findAll());
         return list;
     }
 

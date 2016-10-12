@@ -1,10 +1,10 @@
 package nl.fixx.asset.data.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.repository.query.Param;
-
 import nl.fixx.asset.data.domain.Asset;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-public interface AssetRepository extends MongoRepository<Asset, String>, AssetRepositoryCustom{
-    public Asset findByName(@Param("name") String name);
+@Repository
+public interface AssetRepository extends MongoRepository<Asset, String>, AssetRepositoryCustom {
+
 }

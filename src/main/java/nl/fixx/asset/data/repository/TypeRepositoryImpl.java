@@ -12,11 +12,9 @@ import org.springframework.data.mongodb.core.MongoOperations;
  *
  * @author adriaan
  */
-public class AssetTypeRepositoryCustomImpl implements AssetTypeRepositoryCustom {
+public class TypeRepositoryImpl implements TypeRepositoryCustom {
 
     @Autowired
     private MongoOperations operations;
-
-
 
 }

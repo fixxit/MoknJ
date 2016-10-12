@@ -9,6 +9,6 @@ package nl.fixx.asset.data.repository;
  *
  * @author adriaan
  */
-public interface AssetTypeRepositoryCustom {
+public interface RepositoryPackage {
 
 }
