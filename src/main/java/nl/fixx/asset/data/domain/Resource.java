@@ -2,6 +2,9 @@ package nl.fixx.asset.data.domain;
 
 import org.springframework.data.annotation.Id;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Colin on 10/12/2016 1:57 PM
  */
@@ -14,6 +17,7 @@ public class Resource {
     private String email;
     private String contactNumber; //decided on string so we can save dashes, +country code and leading zeros if required
     private String placedAtClient; //current client where resource is working
+    private List<Asset> assetList = new ArrayList<>();
 
     @Override
     public String toString() {
@@ -73,5 +77,13 @@ public class Resource {
 
     public void setPlacedAtClient(String placedAtClient) {
         this.placedAtClient = placedAtClient;
+    }
+
+    public List<Asset> getAssetList() {
+        return assetList;
+    }
+
+    public void setAssetList(List<Asset> assetList) {
+        this.assetList = assetList;
     }
 }
