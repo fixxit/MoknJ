@@ -3,7 +3,7 @@ package nl.fixx.asset.data.info;
 /**
  * Created by colin on 07/10/16 14:42
  */
-public class AssetResponse {
+public class Response {
     private boolean success;
     private String action;
     private String method;

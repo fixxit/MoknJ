@@ -1,10 +1,9 @@
-package nl.fixx.asset.data;
+package nl.fixx.asset.data.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import nl.fixx.asset.data.domain.Asset;
-import nl.fixx.asset.data.info.AssetResponse;
+import nl.fixx.asset.data.domain.AssetField;
+import nl.fixx.asset.data.info.Response;
 import nl.fixx.asset.data.repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +17,16 @@ public class AssetController {
     private AssetRepository assetRepository;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public AssetResponse addAsset(@RequestBody Asset asset) {
+    public Response addAsset(@RequestBody Asset asset) {
         System.out.println(asset.toString());
-        AssetResponse assetResponse = new AssetResponse();
+        Response assetResponse = new Response();
         assetResponse.setAction("POST");
         assetResponse.setMethod("/add");
 
         try {
             Asset savedAsset = this.assetRepository.save(asset);
             assetResponse.setSuccess(true);
-            assetResponse.setMessage(savedAsset.getId());
+            assetResponse.setMessage("saved asset[" + savedAsset.getId() + "]");
         } catch (IllegalArgumentException ex) {
             assetResponse.setSuccess(false);
             assetResponse.setMessage(ex.getMessage());
@@ -39,16 +38,19 @@ public class AssetController {
     @GetMapping("/asset")
     public Asset asset() throws Exception {
         Asset asset = new Asset();
-        asset.setDescription("description");
-        asset.setName("name");
-        asset.setPrice(BigDecimal.ONE);
-        asset.setPurchaseDate(new Date());
+        asset.setValues(new ArrayList<AssetField>());
+
+        AssetField field = new AssetField();
+        field.setFieldDetailId(1);
+        field.setValue("1231231232333");
+
+        asset.getValues().add(field);
         return asset;
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public ArrayList<Asset> getAllAssets() {
-        ArrayList list = new ArrayList<Asset>();
+        ArrayList list = new ArrayList<>();
         list.addAll(assetRepository.findAll());
         return list;
     }
