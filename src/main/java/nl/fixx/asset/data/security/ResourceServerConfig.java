@@ -5,6 +5,7 @@
  */
 package nl.fixx.asset.data.security;
 
+import nl.fixx.asset.data.util.PropertiesManager;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -20,7 +21,7 @@ import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHand
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
-    private static final String RESOURCE_ID = "my_rest_api";
+    private static final String RESOURCE_ID = PropertiesManager.getProperty("security.resource_id");
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
