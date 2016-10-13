@@ -1,0 +1,12 @@
+/target/
+.classpath
+.classpath
+.project
+.settings
+.idea
+*.iml
+data
+out
+bin
+build
+target
