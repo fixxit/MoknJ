@@ -1,4 +1,4 @@
-package nl.fixx.asset.data.repository;
+package nl.fixx.asset.data.repository.custom;
 
 import java.math.BigDecimal;
 import java.util.List;
