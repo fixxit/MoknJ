@@ -5,9 +5,11 @@
  */
 package nl.fixx.asset.data.security;
 
+import nl.fixx.asset.data.util.PropertiesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,8 +24,6 @@ import org.springframework.security.oauth2.provider.request.DefaultOAuth2Request
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
-import nl.fixx.asset.data.util.PropertiesManager;
-
 /**
  *
  * @author Riaan Schoeman
@@ -34,7 +34,7 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private ClientDetailsService clientDetailsService;
-    
+
     /**
      * Define user access to user roles here
      *
@@ -85,4 +85,8 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
         return store;
     }
 
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
+    }
 }
