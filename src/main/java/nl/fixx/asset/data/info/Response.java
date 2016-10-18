@@ -3,11 +3,11 @@ package nl.fixx.asset.data.info;
 /**
  * Created by colin on 07/10/16 14:42
  */
-public class Response {
-    private boolean success;
-    private String action;
-    private String method;
-    private String message;
+public abstract class Response {
+    protected boolean success;
+    protected String action;
+    protected String method;
+    protected String message;
 
     public boolean isSuccess() {
         return success;
@@ -42,12 +42,5 @@ public class Response {
     }
 
     @Override
-    public String toString() {
-        return "response{" +
-                "success=" + success +
-                ", action='" + action + '\'' +
-                ", method='" + method + '\'' +
-                ", message='" + message + '\'' +
-                '}';
-    }
+    public abstract String toString();
 }
