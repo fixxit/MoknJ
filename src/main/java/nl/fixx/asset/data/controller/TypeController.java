@@ -5,15 +5,17 @@
  */
 package nl.fixx.asset.data.controller;
 
+import java.util.ArrayList;
+import nl.fixx.asset.data.domain.AssetFieldType;
 import nl.fixx.asset.data.domain.AssetType;
-import nl.fixx.asset.data.info.Response;
+import nl.fixx.asset.data.info.TypeResponse;
+import nl.fixx.asset.data.repository.TypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import nl.fixx.asset.data.repository.TypeRepository;
 
 /**
  *
@@ -28,32 +30,41 @@ public class TypeController {
     private TypeRepository resp;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Response addAsset(@RequestBody AssetType payload) {
+    public TypeResponse add(@RequestBody AssetType payload) {
         System.out.println(payload.toString());
-        Response response = new Response();
+        TypeResponse response = new TypeResponse();
         response.setAction("POST");
         response.setMethod("/add");
-        if (payload != null) {
-            if (payload.getDetails() == null
-                    && payload.getDetails().isEmpty()) {
-                response.setMessage("No field types recieved to save. "
-                        + "Aborting insert due to empty type!");
-                return response;
-            }
 
-            try {
-                AssetType type = this.resp.save(payload);
-                response.setSuccess(type != null);
-                response.setMessage("Saved type[" + type.getId() + "]");
-            } catch (IllegalArgumentException ex) {
-                response.setSuccess(false);
-                response.setMessage(ex.getMessage());
-            }
-        } else {
-            response.setSuccess(false);
-            response.setMessage("Type is null. Aborting insert due to empty type!");
+        if (payload.getDetails() == null
+                && payload.getDetails().isEmpty()) {
+            response.setMessage("No field types recieved to save. "
+                    + "Aborting insert due to empty type!");
+            return response;
         }
 
+        try {
+            AssetType type = this.resp.save(payload);
+            response.setSuccess(type != null);
+            response.setMessage("Saved type[" + type.getId() + "]");
+            response.setType(type);
+        } catch (IllegalArgumentException ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+        }
+
+        return response;
+    }
+
+    @RequestMapping(value = "/type", method = RequestMethod.GET)
+    public TypeResponse types() {
+        TypeResponse response = new TypeResponse();
+        AssetFieldType[] fieldTypes = AssetFieldType.values();
+        ArrayList<String> types = new ArrayList<>();
+        for (AssetFieldType type : fieldTypes) {
+            types.add(type.name());
+        }
+        response.setFieldTypes(types);
         return response;
     }
 

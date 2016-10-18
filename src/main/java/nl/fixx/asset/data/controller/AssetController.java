@@ -3,7 +3,7 @@ package nl.fixx.asset.data.controller;
 import java.util.ArrayList;
 import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.domain.AssetField;
-import nl.fixx.asset.data.info.Response;
+import nl.fixx.asset.data.info.AssetResponse;
 import nl.fixx.asset.data.repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 
 @CrossOrigin // added for cors, allow access from another web server
 @RestController
@@ -23,9 +22,8 @@ public class AssetController {
     private AssetRepository resp;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Response addAsset(@RequestBody Asset asset) {
-        System.out.println(asset.toString());
-        Response response = new Response();
+    public AssetResponse addAsset(@RequestBody Asset asset) {
+        AssetResponse response = new AssetResponse();
         response.setAction("POST");
         response.setMethod("/add");
 
@@ -42,7 +40,8 @@ public class AssetController {
     }
 
     @GetMapping("/asset")
-    public Asset asset() throws Exception {
+    public AssetResponse asset() throws Exception {
+        AssetResponse response = new AssetResponse();
         Asset asset = new Asset();
         asset.setValues(new ArrayList<AssetField>());
 
@@ -51,14 +50,17 @@ public class AssetController {
         field.setValue("1231231232333");
 
         asset.getValues().add(field);
-        return asset;
+        response.setAsset(asset);
+        return response;
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.POST)
-    public ArrayList<Asset> getAllAssets() {
-        ArrayList list = new ArrayList<>();
-        list.addAll(resp.findAll());
-        return list;
+    public AssetResponse getAllAssets() {
+        AssetResponse response = new AssetResponse();
+        ArrayList assets = new ArrayList<>();
+        assets.addAll(resp.findAll());
+        response.setAssets(assets);
+        return response;
     }
 
 }
