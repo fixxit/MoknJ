@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -51,13 +50,13 @@ public class TestResourceRepository {
 
 	//update
 	resource.setSurname("Uber Dog");
-	this.repository.save(resource);
+	resource = this.repository.save(resource);
 	assertSame(id, resource.getId());
 	assertSame("Uber Dog", resource.getSurname());
 	
 	//restore
 	resource.setSurname("Cowardly Dog");
-	this.repository.save(resource);
+	resource = this.repository.save(resource);
 	assertSame(id, resource.getId());
 	assertSame("Cowardly Dog", resource.getSurname());
     }
