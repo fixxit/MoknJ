@@ -21,4 +21,10 @@ public class ResourceRepositoryImpl implements ResourceRepositoryCustom {
 	Query query = new Query(new Criteria().where("id").is(id));
 	return operations.findOne(query, Resource.class);
     }
+
+    @Override
+    public Resource findByEmail(String email) {
+	Query query = new Query(new Criteria().where("email").is(email));
+	return operations.findOne(query, Resource.class);
+    }
 }
