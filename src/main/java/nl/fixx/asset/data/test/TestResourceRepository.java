@@ -3,6 +3,8 @@ package nl.fixx.asset.data.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,6 +42,25 @@ public class TestResourceRepository {
 
 	assertNotNull(resourceRet.getId());
     }
+    
+    @Test
+    public void updateTest(){
+	Resource resource = this.repository.findByEmail("junit_test@fixx.it");
+	String id = resource.getId();
+	assertNotNull(resource);
+
+	//update
+	resource.setSurname("Uber Dog");
+	this.repository.save(resource);
+	assertSame(id, resource.getId());
+	assertSame("Uber Dog", resource.getSurname());
+	
+	//restore
+	resource.setSurname("Cowardly Dog");
+	this.repository.save(resource);
+	assertSame(id, resource.getId());
+	assertSame("Cowardly Dog", resource.getSurname());
+    }
 
     @Test
     public void findByIdEmailTest() {
@@ -49,7 +70,7 @@ public class TestResourceRepository {
 
 	resource = this.repository.findById(resource.getId());
 	assertEquals("0644010101", resource.getContactNumber());
-	assertEquals("test@fixx.it", resource.getEmail());
+	assertEquals("junit_test@fixx.it", resource.getEmail());
 	assertEquals("Courage", resource.getFirstName());
 	assertEquals("Cowardly Dog", resource.getSurname());
     }
@@ -81,7 +102,7 @@ public class TestResourceRepository {
     /*
      * { "_id" : ObjectId("58073ae0194e922778916055"), "_class" :
      * "nl.fixx.asset.data.domain.Resource", "firstName" : "Courage", "surname"
-     * : "Cowardly Dog", "email" : "test@fixx.it", "contactNumber" :
+     * : "Cowardly Dog", "email" : "junit_test@fixx.it", "contactNumber" :
      * "0644010101", "assetList" : [] }
      */
 }
