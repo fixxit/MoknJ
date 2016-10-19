@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenStoreUserApprovalHandler;
+import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
@@ -65,6 +66,11 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public TokenStore tokenStore() {
         return new InMemoryTokenStore();
+    }
+
+    @Bean
+    public OAuth2AccessDeniedHandler accessDeniedHandler() {
+        return new OAuth2AccessDeniedHandler();
     }
 
     @Bean

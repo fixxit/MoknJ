@@ -29,7 +29,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     private static final String RESOURCE_ID = PropertiesManager.getProperty("security.resource_id");
 
-    public String getFullURL(HttpServletRequest request) {
+    public static String getFullURL(HttpServletRequest request) {
         StringBuffer requestURL = request.getRequestURL();
         String queryString = request.getQueryString();
 
@@ -46,14 +46,21 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 System.out.println("Incomming request from : " + getFullURL(request));
-                return super.getCorsConfiguration(request); //To change body of generated methods, choose Tools | Templates.
+                return super.getCorsConfiguration(request);
             }
         };
+
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
+        config.addAllowedMethod("OPTIONS");
+        config.addAllowedMethod("HEAD");
+        config.addAllowedMethod("GET");
+        config.addAllowedMethod("PUT");
+        config.addAllowedMethod("POST");
+        config.addAllowedMethod("DELETE");
+        config.addAllowedMethod("PATCH");
         source.registerCorsConfiguration("/**", config);
         FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
         bean.setOrder(0);
@@ -63,7 +70,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.resourceId(RESOURCE_ID).stateless(false);
+        resources.resourceId(RESOURCE_ID).stateless(false).authenticationEntryPoint(new CustomAuthenticationEntryPoint());
     }
 
     @Override
