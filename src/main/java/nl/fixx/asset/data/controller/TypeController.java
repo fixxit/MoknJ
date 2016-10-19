@@ -56,7 +56,7 @@ public class TypeController {
         return response;
     }
 
-    @RequestMapping(value = "/type", method = RequestMethod.GET)
+    @RequestMapping(value = "/fields", method = RequestMethod.POST)
     public TypeResponse types() {
         TypeResponse response = new TypeResponse();
         AssetFieldType[] fieldTypes = AssetFieldType.values();
