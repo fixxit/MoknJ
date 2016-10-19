@@ -6,8 +6,10 @@
 package nl.fixx.asset.data.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 import nl.fixx.asset.data.domain.AssetFieldType;
 import nl.fixx.asset.data.domain.AssetType;
+import nl.fixx.asset.data.domain.FieldType;
 import nl.fixx.asset.data.info.TypeResponse;
 import nl.fixx.asset.data.repository.TypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -30,7 +33,8 @@ public class TypeController {
     private TypeRepository resp;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public TypeResponse add(@RequestBody AssetType payload) {
+    public @ResponseBody
+    TypeResponse add(@RequestBody AssetType payload) {
         System.out.println(payload.toString());
         TypeResponse response = new TypeResponse();
         response.setAction("POST");
@@ -57,12 +61,13 @@ public class TypeController {
     }
 
     @RequestMapping(value = "/fields", method = RequestMethod.POST)
-    public TypeResponse types() {
+    public @ResponseBody
+    TypeResponse types() {
         TypeResponse response = new TypeResponse();
         AssetFieldType[] fieldTypes = AssetFieldType.values();
-        ArrayList<String> types = new ArrayList<>();
+        List<FieldType> types = new ArrayList<>();
         for (AssetFieldType type : fieldTypes) {
-            types.add(type.name());
+            types.add(new FieldType(type.name(), type.getType()));
         }
         response.setFieldTypes(types);
         return response;

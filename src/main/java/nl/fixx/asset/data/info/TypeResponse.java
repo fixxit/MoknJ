@@ -5,8 +5,9 @@
  */
 package nl.fixx.asset.data.info;
 
-import java.util.ArrayList;
+import java.util.List;
 import nl.fixx.asset.data.domain.AssetType;
+import nl.fixx.asset.data.domain.FieldType;
 
 /**
  *
@@ -15,7 +16,21 @@ import nl.fixx.asset.data.domain.AssetType;
 public class TypeResponse extends Response {
 
     private AssetType type;
-    private ArrayList<String> fieldTypes;
+    private List<FieldType> fieldTypes;
+
+    /**
+     * @return the fieldTypes
+     */
+    public List<FieldType> getFieldTypes() {
+        return fieldTypes;
+    }
+
+    /**
+     * @param fieldTypes the fieldTypes to set
+     */
+    public void setFieldTypes(List<FieldType> fieldTypes) {
+        this.fieldTypes = fieldTypes;
+    }
 
     /**
      * @return the type
@@ -31,23 +46,9 @@ public class TypeResponse extends Response {
         this.type = type;
     }
 
-    /**
-     * @return the fieldTypes
-     */
-    public ArrayList<String> getFieldTypes() {
-        return fieldTypes;
-    }
-
-    /**
-     * @param fieldTypes the fieldTypes to set
-     */
-    public void setFieldTypes(ArrayList<String> fieldTypes) {
-        this.fieldTypes = fieldTypes;
-    }
-
     @Override
     public String toString() {
-        return "TypeResponse{" + "type=" + type + '}';
+        return "TypeResponse{" + "type=" + getType() + '}';
     }
 
 }
