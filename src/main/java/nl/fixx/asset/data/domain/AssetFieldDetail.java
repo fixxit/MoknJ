@@ -22,42 +22,42 @@ public class AssetFieldDetail {
      * @return the id
      */
     public String getId() {
-        return id;
+	return id;
     }
 
     /**
      * @return the type
      */
     public AssetFieldType getType() {
-        return type;
+	return type;
     }
 
     /**
-     * @param type the type to set
+     * @param type
+     *            the type to set
      */
     public void setType(AssetFieldType type) {
-        this.type = type;
+	this.type = type;
     }
 
     /**
      * @return the name
      */
     public String getName() {
-        return name;
+	return name;
     }
 
     /**
-     * @param name the name to set
+     * @param name
+     *            the name to set
      */
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
-
 
     @Override
     public String toString() {
-        return "AssetFieldDetail{" + "id=" + id + ", type=" + type + ", name=" + name + '}';
+	return "AssetFieldDetail{" + "id=" + id + ", type=" + type + ", name=" + name + '}';
     }
-
 
 }

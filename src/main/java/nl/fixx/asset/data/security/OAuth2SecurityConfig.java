@@ -5,7 +5,6 @@
  */
 package nl.fixx.asset.data.security;
 
-import nl.fixx.asset.data.util.PropertiesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +23,8 @@ import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHand
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+
+import nl.fixx.asset.data.util.PropertiesManager;
 
 /**
  *
@@ -44,55 +45,50 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Autowired
     public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser(PropertiesManager.getProperty("admin.user")).password(PropertiesManager.getProperty("admin.pass")).roles("ADMIN").and()
-                .withUser(PropertiesManager.getProperty("user.user")).password(PropertiesManager.getProperty("user.pass")).roles("USER");
+	auth.inMemoryAuthentication().withUser(PropertiesManager.getProperty("admin.user")).password(PropertiesManager.getProperty("admin.pass")).roles("ADMIN").and().withUser(PropertiesManager.getProperty("user.user")).password(PropertiesManager.getProperty("user.pass")).roles("USER");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .anonymous().disable()
-                .authorizeRequests()
-                .antMatchers("/oauth/token").permitAll();
+	http.csrf().disable().anonymous().disable().authorizeRequests().antMatchers("/oauth/token").permitAll();
     }
 
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+	return super.authenticationManagerBean();
     }
 
     @Bean
     public TokenStore tokenStore() {
-        return new InMemoryTokenStore();
+	return new InMemoryTokenStore();
     }
 
     @Bean
     public OAuth2AccessDeniedHandler accessDeniedHandler() {
-        return new OAuth2AccessDeniedHandler();
+	return new OAuth2AccessDeniedHandler();
     }
 
     @Bean
     @Autowired
     public TokenStoreUserApprovalHandler userApprovalHandler(TokenStore tokenStore) {
-        TokenStoreUserApprovalHandler handler = new TokenStoreUserApprovalHandler();
-        handler.setTokenStore(tokenStore);
-        handler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
-        handler.setClientDetailsService(clientDetailsService);
-        return handler;
+	TokenStoreUserApprovalHandler handler = new TokenStoreUserApprovalHandler();
+	handler.setTokenStore(tokenStore);
+	handler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
+	handler.setClientDetailsService(clientDetailsService);
+	return handler;
     }
 
     @Bean
     @Autowired
     public ApprovalStore approvalStore(TokenStore tokenStore) throws Exception {
-        TokenApprovalStore store = new TokenApprovalStore();
-        store.setTokenStore(tokenStore);
-        return store;
+	TokenApprovalStore store = new TokenApprovalStore();
+	store.setTokenStore(tokenStore);
+	return store;
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
+	web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
     }
 }

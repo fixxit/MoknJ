@@ -5,7 +5,6 @@
  */
 package nl.fixx.asset.data.security;
 
-import nl.fixx.asset.data.util.PropertiesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +16,8 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+
+import nl.fixx.asset.data.util.PropertiesManager;
 
 /**
  * @author adriaan
@@ -39,25 +40,23 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory()
-                .withClient(PropertiesManager.getProperty("security.client")) // basic auth user
-                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
-                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
-                .scopes("read", "write", "trust")
-                .secret(PropertiesManager.getProperty("security.secret")) // basic auth password
-                .accessTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.token_validity_seconds"))).
-                refreshTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.refresh_token_validity_seconds")));
+	clients.inMemory().withClient(PropertiesManager.getProperty("security.client")) // basic
+											// auth
+											// user
+		.authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit").authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT").scopes("read", "write", "trust").secret(PropertiesManager.getProperty("security.secret")) // basic
+																														 // auth
+																														 // password
+		.accessTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.token_validity_seconds"))).refreshTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.refresh_token_validity_seconds")));
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(tokenStore).userApprovalHandler(userApprovalHandler)
-                .authenticationManager(authenticationManager);
+	endpoints.tokenStore(tokenStore).userApprovalHandler(userApprovalHandler).authenticationManager(authenticationManager);
     }
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-        oauthServer.realm(REALM + "/client");
+	oauthServer.realm(REALM + "/client");
     }
-    
+
 }

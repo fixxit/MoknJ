@@ -22,46 +22,49 @@ public class AssetField {
      * @return the id
      */
     public long getId() {
-        return id;
+	return id;
     }
 
     /**
-     * @param id the id to set
+     * @param id
+     *            the id to set
      */
     public void setId(long id) {
-        this.id = id;
+	this.id = id;
     }
 
     /**
      * @return the value
      */
     public String getValue() {
-        return value;
+	return value;
     }
 
     /**
-     * @param value the value to set
+     * @param value
+     *            the value to set
      */
     public void setValue(String value) {
-        this.value = value;
+	this.value = value;
     }
 
     /**
      * @return the fieldDetailId
      */
     public long getFieldDetailId() {
-        return fieldDetailId;
+	return fieldDetailId;
     }
 
     /**
-     * @param fieldDetailId the fieldDetailId to set
+     * @param fieldDetailId
+     *            the fieldDetailId to set
      */
     public void setFieldDetailId(long fieldDetailId) {
-        this.fieldDetailId = fieldDetailId;
+	this.fieldDetailId = fieldDetailId;
     }
 
     @Override
     public String toString() {
-        return "AssetField{" + "id=" + id + ", fieldDetailId=" + fieldDetailId + ", value=" + value + '}';
+	return "AssetField{" + "id=" + id + ", fieldDetailId=" + fieldDetailId + ", value=" + value + '}';
     }
 }

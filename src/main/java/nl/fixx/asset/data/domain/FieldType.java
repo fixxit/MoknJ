@@ -15,36 +15,38 @@ public class FieldType {
     private String type;
 
     public FieldType(String name, String type) {
-        this.name = name;
-        this.type = type;
+	this.name = name;
+	this.type = type;
     }
 
     /**
      * @return the name
      */
     public String getName() {
-        return name;
+	return name;
     }
 
     /**
-     * @param name the name to set
+     * @param name
+     *            the name to set
      */
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
     /**
      * @return the type
      */
     public String getType() {
-        return type;
+	return type;
     }
 
     /**
-     * @param type the type to set
+     * @param type
+     *            the type to set
      */
     public void setType(String type) {
-        this.type = type;
+	this.type = type;
     }
 
 }

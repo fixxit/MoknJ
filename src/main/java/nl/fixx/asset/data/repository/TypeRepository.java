@@ -5,11 +5,11 @@
  */
 package nl.fixx.asset.data.repository;
 
-import nl.fixx.asset.data.domain.AssetType;
-import nl.fixx.asset.data.repository.custom.TypeRepositoryCustom;
-
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+
+import nl.fixx.asset.data.domain.AssetType;
+import nl.fixx.asset.data.repository.custom.TypeRepositoryCustom;
 
 /**
  *

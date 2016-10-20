@@ -41,20 +41,20 @@ public class TestResourceRepository {
 
 	assertNotNull(resourceRet.getId());
     }
-    
+
     @Test
-    public void updateTest(){
+    public void updateTest() {
 	Resource resource = this.repository.findByEmail("junit_test@fixx.it");
 	String id = resource.getId();
 	assertNotNull(resource);
 
-	//update
+	// update
 	resource.setSurname("Uber Dog");
 	resource = this.repository.save(resource);
 	assertSame(id, resource.getId());
 	assertSame("Uber Dog", resource.getSurname());
-	
-	//restore
+
+	// restore
 	resource.setSurname("Cowardly Dog");
 	resource = this.repository.save(resource);
 	assertSame(id, resource.getId());
@@ -90,7 +90,8 @@ public class TestResourceRepository {
 	while (true) {
 	    Resource resource = this.repository.findByEmail("junit_test@fixx.it");
 	    if (resource != null) {
-		//System.out.println("******************************************deleting: " + resource.toString());
+		// System.out.println("******************************************deleting:
+		// " + resource.toString());
 		this.repository.delete(resource);
 	    } else {
 		break;

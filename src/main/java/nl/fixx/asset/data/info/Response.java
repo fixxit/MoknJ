@@ -10,35 +10,35 @@ public abstract class Response {
     protected String message;
 
     public boolean isSuccess() {
-        return success;
+	return success;
     }
 
     public void setSuccess(boolean success) {
-        this.success = success;
+	this.success = success;
     }
 
     public String getAction() {
-        return action;
+	return action;
     }
 
     public void setAction(String action) {
-        this.action = action;
+	this.action = action;
     }
 
     public String getMethod() {
-        return method;
+	return method;
     }
 
     public void setMethod(String method) {
-        this.method = method;
+	this.method = method;
     }
 
     public String getMessage() {
-        return message;
+	return message;
     }
 
     public void setMessage(String message) {
-        this.message = message;
+	this.message = message;
     }
 
     @Override

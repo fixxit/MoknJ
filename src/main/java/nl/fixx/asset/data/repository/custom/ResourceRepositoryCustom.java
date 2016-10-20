@@ -9,5 +9,6 @@ import nl.fixx.asset.data.domain.Resource;
  */
 public interface ResourceRepositoryCustom {
     Resource findById(String id);
+
     Resource findByEmail(String email);
 }

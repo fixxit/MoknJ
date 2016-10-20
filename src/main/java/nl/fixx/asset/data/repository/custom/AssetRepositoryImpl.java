@@ -1,10 +1,11 @@
 package nl.fixx.asset.data.repository.custom;
 
 import java.util.List;
-import nl.fixx.asset.data.domain.Asset;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
+
+import nl.fixx.asset.data.domain.Asset;
 
 public class AssetRepositoryImpl implements AssetRepositoryCustom {
 

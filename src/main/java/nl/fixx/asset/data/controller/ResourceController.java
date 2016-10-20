@@ -33,14 +33,14 @@ public class ResourceController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.PUT)
-    public ResourceResponse addResource(@RequestBody  Resource resource){
+    public ResourceResponse addResource(@RequestBody Resource resource) {
 	Resource resourceRet = this.repository.save(resource);
 	this.resourceResponse.setResource(resourceRet);
 	return resourceResponse;
     }
-    
+
     @RequestMapping(value = "/findById", method = RequestMethod.GET)
-    public ResourceResponse findById(@RequestBody String id){
+    public ResourceResponse findById(@RequestBody String id) {
 	Resource resourceRet = this.repository.findById(id);
 	this.resourceResponse.setResource(resourceRet);
 	return resourceResponse;

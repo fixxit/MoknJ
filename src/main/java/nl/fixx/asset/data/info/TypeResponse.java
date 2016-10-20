@@ -6,6 +6,7 @@
 package nl.fixx.asset.data.info;
 
 import java.util.List;
+
 import nl.fixx.asset.data.domain.AssetType;
 import nl.fixx.asset.data.domain.FieldType;
 
@@ -22,33 +23,35 @@ public class TypeResponse extends Response {
      * @return the fieldTypes
      */
     public List<FieldType> getFieldTypes() {
-        return fieldTypes;
+	return fieldTypes;
     }
 
     /**
-     * @param fieldTypes the fieldTypes to set
+     * @param fieldTypes
+     *            the fieldTypes to set
      */
     public void setFieldTypes(List<FieldType> fieldTypes) {
-        this.fieldTypes = fieldTypes;
+	this.fieldTypes = fieldTypes;
     }
 
     /**
      * @return the type
      */
     public AssetType getType() {
-        return type;
+	return type;
     }
 
     /**
-     * @param type the type to set
+     * @param type
+     *            the type to set
      */
     public void setType(AssetType type) {
-        this.type = type;
+	this.type = type;
     }
 
     @Override
     public String toString() {
-        return "TypeResponse{" + "type=" + getType() + '}';
+	return "TypeResponse{" + "type=" + getType() + '}';
     }
 
 }
