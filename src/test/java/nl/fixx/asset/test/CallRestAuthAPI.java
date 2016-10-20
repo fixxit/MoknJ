@@ -7,9 +7,14 @@ import java.net.URL;
 import java.util.Base64;
 
 public class CallRestAuthAPI {
-    public static String doCall() {
+    public static String doCall(String username, String password) {
 	try {
-	    URL url = new URL("http://localhost:8080/oauth/token?grant_type=password&username=fixxit&password=test");
+	    StringBuilder sb = new StringBuilder("http://localhost:8080/oauth/token?grant_type=password&username=");
+	    sb.append(username);
+	    sb.append("&password=");
+	    sb.append(password);
+	    
+	    URL url = new URL(sb.toString());
 	    String userCredentials = "fixx-trusted-client:fixx_secret";
 	    String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 
