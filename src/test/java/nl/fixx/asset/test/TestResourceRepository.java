@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import nl.fixx.asset.data.builders.ResourceBuilder;
 import nl.fixx.asset.data.config.MongoConfiguration;
 import nl.fixx.asset.data.domain.Resource;
 import nl.fixx.asset.data.repository.ResourceRepository;
@@ -31,11 +32,12 @@ public class TestResourceRepository {
 
     @Test
     public void saveTest() {
-	Resource resource = new Resource();
-	resource.setContactNumber("0644010101");
-	resource.setEmail("junit_test@fixx.it");
-	resource.setFirstName("Courage");
-	resource.setSurname("Cowardly Dog");
+	Resource resource = new ResourceBuilder()
+		.contactNumber("0644010101")
+		.email("junit_test@fixx.it")
+		.firstName("Courage")
+		.surname("Cowardly Dog")
+		.build();
 
 	Resource resourceRet = this.repository.save(resource);
 
