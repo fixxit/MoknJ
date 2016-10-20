@@ -9,36 +9,36 @@ public class ResourceBuilder {
     private Resource resource = new Resource();
     
     public ResourceBuilder firstName(String firstName){
-	resource.setFirstName(firstName);
+	this.resource.setFirstName(firstName);
 	return this;
     }
     
     public ResourceBuilder surname(String surname){
-	resource.setSurname(surname);
+	this.resource.setSurname(surname);
 	return this;
     }
     
     public ResourceBuilder email(String email){
-	resource.setEmail(email);
+	this.resource.setEmail(email);
 	return this;
     }
     
     public ResourceBuilder contactNumber(String contactNumber){
-	resource.setContactNumber(contactNumber);
+	this.resource.setContactNumber(contactNumber);
 	return this;
     }
     
     public ResourceBuilder placedAtClient(String placedAtClient){
-	resource.setPlacedAtClient(placedAtClient);
+	this.resource.setPlacedAtClient(placedAtClient);
 	return this;
     }
     
     public ResourceBuilder assetList(List<Asset> assetList){
-	resource.setAssetList(assetList);
+	this.resource.setAssetList(assetList);
 	return this;
     }
     
     public Resource build(){
-	return resource;
+	return this.resource;
     }
 }
