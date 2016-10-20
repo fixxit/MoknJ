@@ -13,6 +13,9 @@ import nl.fixx.asset.data.domain.FieldType;
 import nl.fixx.asset.data.info.TypeResponse;
 import nl.fixx.asset.data.repository.TypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,10 +51,20 @@ public class TypeController {
         }
 
         try {
-            AssetType type = this.resp.save(payload);
-            response.setSuccess(type != null);
-            response.setMessage("Saved type[" + type.getId() + "]");
-            response.setType(type);
+            ExampleMatcher NAME_MATCHER = ExampleMatcher.matching()
+                    .withMatcher("name", GenericPropertyMatchers.ignoreCase());
+            Example<AssetType> example = Example.<AssetType>of(payload, NAME_MATCHER);
+            boolean exists = resp.exists(example);
+            if (!exists) {
+                AssetType type = this.resp.save(payload);
+                response.setSuccess(type != null);
+                response.setMessage("Saved type[" + type.getId() + "]");
+                response.setType(type);
+            } else {
+                response.setSuccess(false);
+                response.setMessage("Asset type by name " + payload.getName()
+                        + "exists");
+            }
         } catch (IllegalArgumentException ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
