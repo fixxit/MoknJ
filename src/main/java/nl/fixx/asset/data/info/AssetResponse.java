@@ -5,8 +5,7 @@
  */
 package nl.fixx.asset.data.info;
 
-import java.util.ArrayList;
-
+import java.util.List;
 import nl.fixx.asset.data.domain.Asset;
 
 /**
@@ -16,7 +15,7 @@ import nl.fixx.asset.data.domain.Asset;
 public class AssetResponse extends Response {
 
     private Asset asset;
-    private ArrayList<Asset> assets;
+    private List<Asset> assets;
 
     /**
      * @return the asset
@@ -36,7 +35,7 @@ public class AssetResponse extends Response {
     /**
      * @return the assets
      */
-    public ArrayList<Asset> getAssets() {
+    public List<Asset> getAssets() {
 	return assets;
     }
 
@@ -44,7 +43,7 @@ public class AssetResponse extends Response {
      * @param assets
      *            the assets to set
      */
-    public void setAssets(ArrayList<Asset> assets) {
+    public void setAssets(List<Asset> assets) {
 	this.assets = assets;
     }
 
