@@ -5,8 +5,7 @@
  */
 package nl.fixx.asset.data.domain;
 
-import java.util.ArrayList;
-
+import java.util.List;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -17,12 +16,12 @@ public class Asset {
 
     @Id
     private String id;
-    private long typeId;
-    private ArrayList<AssetField> values;
+    private String typeId;
+    private List<AssetField> details;
 
     @Override
     public String toString() {
-	return "Asset{" + "id=" + id + ", typeId=" + typeId + ", values=" + values + '}';
+	return "Asset{" + "id=" + id + ", typeId=" + typeId + ", values=" + details + '}';
     }
 
     /**
@@ -35,7 +34,7 @@ public class Asset {
     /**
      * @return the typeId
      */
-    public long getTypeId() {
+    public String getTypeId() {
 	return typeId;
     }
 
@@ -43,23 +42,23 @@ public class Asset {
      * @param typeId
      *            the typeId to set
      */
-    public void setTypeId(long typeId) {
+    public void setTypeId(String typeId) {
 	this.typeId = typeId;
     }
 
     /**
-     * @return the values
+     * @return the details
      */
-    public ArrayList<AssetField> getValues() {
-	return values;
+    public List<AssetField> getDetails() {
+	return details;
     }
 
     /**
-     * @param values
-     *            the values to set
+     * @param details
+     *            the details to set
      */
-    public void setValues(ArrayList<AssetField> values) {
-	this.values = values;
+    public void setDetails(List<AssetField> details) {
+	this.details = details;
     }
 
 }

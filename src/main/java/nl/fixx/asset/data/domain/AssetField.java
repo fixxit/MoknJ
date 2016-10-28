@@ -14,14 +14,13 @@ import org.springframework.data.annotation.Id;
 public class AssetField {
 
     @Id
-    private long id;
-    private long fieldDetailId;
+    private String id;
     private String value;
 
     /**
      * @return the id
      */
-    public long getId() {
+    public String getId() {
 	return id;
     }
 
@@ -29,7 +28,7 @@ public class AssetField {
      * @param id
      *            the id to set
      */
-    public void setId(long id) {
+    public void setId(String id) {
 	this.id = id;
     }
 
@@ -48,23 +47,8 @@ public class AssetField {
 	this.value = value;
     }
 
-    /**
-     * @return the fieldDetailId
-     */
-    public long getFieldDetailId() {
-	return fieldDetailId;
-    }
-
-    /**
-     * @param fieldDetailId
-     *            the fieldDetailId to set
-     */
-    public void setFieldDetailId(long fieldDetailId) {
-	this.fieldDetailId = fieldDetailId;
-    }
-
     @Override
     public String toString() {
-	return "AssetField{" + "id=" + id + ", fieldDetailId=" + fieldDetailId + ", value=" + value + '}';
+	return "AssetField{" + "id=" + id + ", value=" + value + '}';
     }
 }
