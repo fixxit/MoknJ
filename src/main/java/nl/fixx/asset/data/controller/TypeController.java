@@ -56,10 +56,15 @@ public class TypeController {
         }
 
         try {
+            // For updates if the type has a id then bypass the exists
+            boolean bypassExists = false;
+            if (payload.getId() != null) {
+                bypassExists = true;
+            }
             ExampleMatcher NAME_MATCHER = ExampleMatcher.matching().withMatcher("name", GenericPropertyMatchers.ignoreCase());
             Example<AssetType> example = Example.<AssetType>of(payload, NAME_MATCHER);
             boolean exists = typeResp.exists(example);
-            if (!exists) {
+            if (!exists || bypassExists) {
                 for (AssetFieldDetail detail : payload.getDetails()) {
                     detail = this.fieldDetailResp.save(detail);
                 }

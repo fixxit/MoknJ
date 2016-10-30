@@ -16,36 +16,34 @@ public class AssetField {
     @Id
     private String id;
     private String value;
-
     /**
      * @return the id
      */
     public String getId() {
-	return id;
+        return id;
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(String id) {
-	this.id = id;
+        this.id = id;
     }
 
     /**
      * @return the value
      */
     public String getValue() {
-	return value;
+        return value;
     }
 
     /**
-     * @param value
-     *            the value to set
+     * @param value the value to set
      */
     public void setValue(String value) {
-	this.value = value;
+        this.value = value;
     }
+
 
     @Override
     public String toString() {
