@@ -5,6 +5,7 @@
  */
 package nl.fixx.asset.data.domain;
 
+import java.util.Objects;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -16,6 +17,7 @@ public class AssetField {
     @Id
     private String id;
     private String value;
+
     /**
      * @return the id
      */
@@ -44,9 +46,38 @@ public class AssetField {
         this.value = value;
     }
 
-
     @Override
     public String toString() {
-	return "AssetField{" + "id=" + id + ", value=" + value + '}';
+        return "AssetField{" + "id=" + id + ", value=" + value + '}';
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + Objects.hashCode(this.id);
+        hash = 59 * hash + Objects.hashCode(this.value);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AssetField other = (AssetField) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.value, other.value)) {
+            return false;
+        }
+        return true;
+    }
+
 }

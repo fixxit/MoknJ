@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssetController {
 
     @Autowired
-    private AssetRepository aResp;
+    private AssetRepository assetResp;
     @Autowired
     private AssetFieldDetailRepository afdResp;
 
@@ -36,6 +36,19 @@ public class AssetController {
         try {
             if (id != null) {
                 saveAsset.setTypeId(id);
+
+                // checks if the original object differs from new saved object
+                // stop the unique filter form check for duplicates on asset
+                // which has not changed from the db version...
+                String flag = null;
+                if (saveAsset.getId() != null) {
+                    Asset dbAsset = assetResp.findOne(saveAsset.getId());
+                    if (saveAsset.equals(dbAsset)) {
+                        flag = "no_changes";
+                    } else {
+                        flag = "has_changes";
+                    }
+                }
 
                 Asset search = new Asset();
                 search.setTypeId(id);
@@ -60,8 +73,11 @@ public class AssetController {
                 }
 
                 // Create a list of all the values for the unique assets
-                for (Asset asset : aResp.findAll(allByTypeIDExample)) {
-                    if (!asset.getId().equalsIgnoreCase(saveAsset.getId())) {
+                for (Asset asset : assetResp.findAll(allByTypeIDExample)) {
+                    // if statement below checks that if update asset does not check
+                    // it self to flag for duplication
+                    if (!asset.getId().equals(saveAsset.getId())
+                            && !"no_changes".equals(flag)) {
                         List<AssetField> details = asset.getDetails();
                         for (AssetField field : details) {
                             if (uniqueFields.keySet().contains(field.getId())) {
@@ -108,8 +124,9 @@ public class AssetController {
                     return response;
                 }
 
-                Asset savedAsset = aResp.save(saveAsset);
+                Asset savedAsset = assetResp.save(saveAsset);
                 response.setSuccess(true);
+                response.setAsset(saveAsset);
                 response.setMessage("saved asset[" + savedAsset.getId() + "]");
             } else {
                 response.setSuccess(false);
@@ -134,7 +151,7 @@ public class AssetController {
                 ExampleMatcher.GenericPropertyMatchers.ignoreCase());
         Example<Asset> example = Example.<Asset>of(search, NAME_MATCHER);
 
-        assets.addAll(aResp.findAll(example));
+        assets.addAll(assetResp.findAll(example));
         response.setAssets(assets);
         return response;
     }
@@ -142,15 +159,39 @@ public class AssetController {
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public AssetResponse get(@PathVariable String id) {
         AssetResponse response = new AssetResponse();
-        response.setAsset(aResp.findOne(id));
+        response.setAsset(assetResp.findOne(id));
         return response;
+    }
+
+    @RequestMapping(value = "/delete/", method = RequestMethod.POST)
+    public AssetResponse delete(@RequestBody Asset search) {
+        // to insure that the below fields have no influence on find all.
+        search.setDetails(null);
+        search.setTypeId(null);
+
+        AssetResponse response = new AssetResponse();
+        ExampleMatcher NAME_MATCHER = ExampleMatcher.matching().withMatcher("id",
+                ExampleMatcher.GenericPropertyMatchers.ignoreCase());
+        Example<Asset> example = Example.<Asset>of(search, NAME_MATCHER);
+        // todo needs a check for linked resources ...
+        List<Asset> assets = assetResp.findAll(example);
+        if (assets.size() > 0) {
+            assetResp.delete(search.getId());
+            response.setSuccess(true);
+            response.setMessage("Removed asset [" + search.getId() + "] successfully.");
+            return response;
+        } else {
+            response.setSuccess(false);
+            response.setMessage("Could not find any asset matching id[" + search.getId() + "]");
+            return response;
+        }
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public AssetResponse all() {
         AssetResponse response = new AssetResponse();
         ArrayList assets = new ArrayList<>();
-        assets.addAll(aResp.findAll());
+        assets.addAll(assetResp.findAll());
         response.setAssets(assets);
         return response;
     }

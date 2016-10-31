@@ -6,6 +6,7 @@
 package nl.fixx.asset.data.domain;
 
 import java.util.List;
+import java.util.Objects;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -60,5 +61,40 @@ public class Asset {
     public void setDetails(List<AssetField> details) {
 	this.details = details;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.id);
+        hash = 67 * hash + Objects.hashCode(this.typeId);
+        hash = 67 * hash + Objects.hashCode(this.details);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Asset other = (Asset) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.typeId, other.typeId)) {
+            return false;
+        }
+        if (!Objects.equals(this.details, other.details)) {
+            return false;
+        }
+        return true;
+    }
+
+
 
 }
