@@ -7,7 +7,7 @@ import nl.fixx.asset.data.domain.Resource;
 
 public class ResourceResponse extends Response {
     private Resource resource;
-    private List<Resource> resourceList = new ArrayList<>();
+    private List<Resource> resources = new ArrayList<>();
 
     public Resource getResource() {
 	return resource;
@@ -17,16 +17,16 @@ public class ResourceResponse extends Response {
 	this.resource = resource;
     }
 
-    public List<Resource> getResourceList() {
-	return resourceList;
+    public List<Resource> getResources() {
+	return resources;
     }
 
-    public void setResourceList(List<Resource> resourceList) {
-	this.resourceList = resourceList;
+    public void setResources(List<Resource> resources) {
+	this.resources = resources;
     }
 
     @Override
     public String toString() {
-	return "ResourceResponse [resource=" + resource + ", resourceList=" + resourceList + "]";
+	return "ResourceResponse [resource=" + resource + ", resourceList=" + resources + "]";
     }
 }

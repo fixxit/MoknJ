@@ -41,7 +41,6 @@ public class TypeController {
     @Autowired
     private AssetFieldDetailRepository fieldDetailResp;
 
-
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody
     TypeResponse add(@RequestBody AssetType payload) {
@@ -85,7 +84,7 @@ public class TypeController {
         return response;
     }
 
-    @RequestMapping(value="/get/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public @ResponseBody
     TypeResponse get(@PathVariable String id) {
         TypeResponse response = new TypeResponse();
@@ -93,12 +92,23 @@ public class TypeController {
         return response;
     }
 
-
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public @ResponseBody
     TypeResponse all() {
         TypeResponse response = new TypeResponse();
         response.setTypes(typeResp.findAll());
+        return response;
+    }
+
+    /**
+     * To do add delete method for types.
+     * @return
+     */
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public @ResponseBody
+    TypeResponse delete() {
+        TypeResponse response = new TypeResponse();
+
         return response;
     }
 

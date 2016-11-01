@@ -17,6 +17,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import nl.fixx.asset.data.config.MongoConfiguration;
 import nl.fixx.asset.data.domain.Resource;
 import nl.fixx.asset.data.repository.ResourceRepository;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {MongoConfiguration.class})

@@ -1,8 +1,5 @@
 package nl.fixx.asset.data.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.data.annotation.Id;
 
 /**
@@ -18,7 +15,6 @@ public class Resource {
     private String contactNumber; // decided on string so we can save dashes,
 				  // +country code and leading zeros if required
     private String placedAtClient; // current client where resource is working
-    private List<Asset> assetList = new ArrayList<>();
 
     @Override
     public String toString() {
@@ -73,11 +69,4 @@ public class Resource {
 	this.placedAtClient = placedAtClient;
     }
 
-    public List<Asset> getAssetList() {
-	return assetList;
-    }
-
-    public void setAssetList(List<Asset> assetList) {
-	this.assetList = assetList;
-    }
 }

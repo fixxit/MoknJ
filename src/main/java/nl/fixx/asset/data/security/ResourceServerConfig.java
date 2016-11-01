@@ -6,7 +6,7 @@
 package nl.fixx.asset.data.security;
 
 import javax.servlet.http.HttpServletRequest;
-
+import nl.fixx.asset.data.util.PropertiesManager;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +19,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import nl.fixx.asset.data.util.PropertiesManager;
-
 /**
  *
  * @author Riaan Schoeman
@@ -32,56 +30,56 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     private static final String RESOURCE_ID = PropertiesManager.getProperty("security.resource_id");
 
     public static String getFullURL(HttpServletRequest request) {
-	StringBuffer requestURL = request.getRequestURL();
-	String queryString = request.getQueryString();
+        StringBuffer requestURL = request.getRequestURL();
+        String queryString = request.getQueryString();
 
-	if (queryString == null) {
-	    return requestURL.toString();
-	} else {
-	    return requestURL.append('?').append(queryString).toString();
-	}
+        if (queryString == null) {
+            return requestURL.toString();
+        } else {
+            return requestURL.append('?').append(queryString).toString();
+        }
     }
 
     @Bean
     public FilterRegistrationBean corsFilter() {
-	UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource() {
-	    @Override
-	    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-		System.out.println("Incomming request from : " + getFullURL(request));
-		return super.getCorsConfiguration(request);
-	    }
-	};
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource() {
+            @Override
+            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                System.out.println("Incomming request from : " + getFullURL(request));
+                return super.getCorsConfiguration(request);
+            }
+        };
 
-	CorsConfiguration config = new CorsConfiguration();
-	config.setAllowCredentials(true);
-	config.addAllowedOrigin("*");
-	config.addAllowedHeader("*");
-	config.addAllowedMethod("OPTIONS");
-	config.addAllowedMethod("HEAD");
-	config.addAllowedMethod("GET");
-	config.addAllowedMethod("PUT");
-	config.addAllowedMethod("POST");
-	config.addAllowedMethod("DELETE");
-	config.addAllowedMethod("PATCH");
-	source.registerCorsConfiguration("/**", config);
-	FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-	bean.setOrder(0);
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("OPTIONS");
+        config.addAllowedMethod("HEAD");
+        config.addAllowedMethod("GET");
+        config.addAllowedMethod("PUT");
+        config.addAllowedMethod("POST");
+        config.addAllowedMethod("DELETE");
+        config.addAllowedMethod("PATCH");
+        source.registerCorsConfiguration("/**", config);
+        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(0);
 
-	return bean;
+        return bean;
     }
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
-	resources.resourceId(RESOURCE_ID).stateless(false).authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+        resources.resourceId(RESOURCE_ID).stateless(false).authenticationEntryPoint(new CustomAuthenticationEntryPoint());
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-	http.anonymous().disable().requestMatchers().antMatchers("/asset/**")// change
-									     // this
-									     // part
-									     // for
-		.and().authorizeRequests().antMatchers("/asset/**").access("hasRole('ADMIN')").and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
+        http.anonymous().disable().requestMatchers().antMatchers("/asset/**")// change
+                // this
+                // part
+                // for
+                .and().authorizeRequests().antMatchers("/asset/**").access("hasRole('ADMIN')").and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
     }
 
 }

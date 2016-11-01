@@ -1,8 +1,6 @@
 package nl.fixx.asset.data.builders;
 
-import java.util.List;
 
-import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.domain.Resource;
 
 public class ResourceBuilder {
@@ -33,10 +31,6 @@ public class ResourceBuilder {
 	return this;
     }
 
-    public ResourceBuilder assetList(List<Asset> assetList) {
-	this.resource.setAssetList(assetList);
-	return this;
-    }
 
     public Resource build() {
 	return this.resource;
