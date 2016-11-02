@@ -9,6 +9,9 @@ import nl.fixx.asset.data.domain.AssetLink;
 import nl.fixx.asset.data.info.LinkResponse;
 import nl.fixx.asset.data.repository.AssetLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,20 +53,7 @@ public class LinkController {
      */
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public LinkResponse all() {
-
-        return response;
-    }
-
-    /**
-     * Get the latest single entry for a asset. This is used on home to get the
-     * asset checked in/out status.
-     *
-     * @param id
-     * @return
-     */
-    @RequestMapping(value = "/get/{id}/asset", method = RequestMethod.POST)
-    public LinkResponse getLatestEntryForAsset(@PathVariable String id) {
-
+        response.setLinks(auditRep.findAll(new Sort(Sort.Direction.ASC, "date")));
         return response;
     }
 
@@ -75,7 +65,12 @@ public class LinkController {
      */
     @RequestMapping(value = "/all/{id}/asset", method = RequestMethod.POST)
     public LinkResponse allByAssetId(@PathVariable String id) {
-
+        AssetLink search = new AssetLink();
+        search.setAssetId(id);
+        ExampleMatcher NAME_MATCHER = ExampleMatcher.matching().withMatcher("assetId",
+                ExampleMatcher.GenericPropertyMatchers.ignoreCase());
+        Example<AssetLink> example = Example.<AssetLink>of(search, NAME_MATCHER);
+        response.setLinks(auditRep.findAll(example, new Sort(Sort.Direction.ASC, "date")));
         return response;
     }
 
@@ -87,7 +82,12 @@ public class LinkController {
      */
     @RequestMapping(value = "/all/{id}/resource", method = RequestMethod.POST)
     public LinkResponse allByResourceId(@PathVariable String id) {
-
+        AssetLink search = new AssetLink();
+        search.setResourceId(id);
+        ExampleMatcher NAME_MATCHER = ExampleMatcher.matching().withMatcher("resourceId",
+                ExampleMatcher.GenericPropertyMatchers.ignoreCase());
+        Example<AssetLink> example = Example.<AssetLink>of(search, NAME_MATCHER);
+        response.setLinks(auditRep.findAll(example, new Sort(Sort.Direction.ASC, "date")));
         return response;
     }
 
