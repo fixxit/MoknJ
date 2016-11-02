@@ -5,7 +5,7 @@
  */
 package nl.fixx.asset.data.repository;
 
-import nl.fixx.asset.data.domain.AssetAudit;
+import nl.fixx.asset.data.domain.AssetLink;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +14,6 @@ import org.springframework.stereotype.Repository;
  * @author adriaan
  */
 @Repository
-public interface AssetAuditRepository extends MongoRepository<AssetAudit, String> {
+public interface AssetLinkRepository extends MongoRepository<AssetLink, String> {
 
 }

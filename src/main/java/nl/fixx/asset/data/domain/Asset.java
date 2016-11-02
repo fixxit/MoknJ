@@ -19,11 +19,13 @@ public class Asset {
     private String id;
     private String typeId;
     private List<AssetField> details;
+    private String resourceId;
 
     @Override
     public String toString() {
-	return "Asset{" + "id=" + id + ", typeId=" + typeId + ", values=" + details + '}';
+        return "Asset{" + "id=" + id + ", typeId=" + typeId + ", details=" + details + ", resourceId=" + resourceId + '}';
     }
+
 
     /**
      * @return the id
@@ -95,6 +97,18 @@ public class Asset {
         return true;
     }
 
+    /**
+     * @return the resourceId
+     */
+    public String getResourceId() {
+        return resourceId;
+    }
 
+    /**
+     * @param resourceId the resourceId to set
+     */
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
 
 }

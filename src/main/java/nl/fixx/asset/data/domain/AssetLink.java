@@ -11,10 +11,10 @@ import org.springframework.data.annotation.Id;
  *
  * @author adriaan
  */
-public class AssetAudit {
+public class AssetLink {
+
     @Id
     private String id;
-
     private boolean checked;
     private String date;
     private String resourceId;
@@ -82,4 +82,10 @@ public class AssetAudit {
     public void setAssetId(String assetId) {
         this.assetId = assetId;
     }
+
+    @Override
+    public String toString() {
+        return "AssetLink{" + "id=" + id + ", checked=" + checked + ", date=" + date + ", resourceId=" + resourceId + ", assetId=" + assetId + '}';
+    }
+
 }

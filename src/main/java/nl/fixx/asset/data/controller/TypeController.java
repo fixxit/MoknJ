@@ -44,7 +44,6 @@ public class TypeController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody
     TypeResponse add(@RequestBody AssetType payload) {
-        System.out.println(payload.toString());
         TypeResponse response = new TypeResponse();
         response.setAction("POST");
         response.setMethod("/add");

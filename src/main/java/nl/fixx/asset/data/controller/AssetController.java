@@ -26,9 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssetController {
 
     @Autowired
-    private AssetRepository assetResp;
+    private AssetRepository rep;// main asset Repository
     @Autowired
-    private AssetFieldDetailRepository afdResp;
+    private AssetFieldDetailRepository fieldRep; // Asset Field Detail Repository
 
     @RequestMapping(value = "/add/{id}", method = RequestMethod.POST)
     public AssetResponse add(@PathVariable String id, @RequestBody Asset saveAsset) {
@@ -42,7 +42,7 @@ public class AssetController {
                 // which has not changed from the db version...
                 String flag = null;
                 if (saveAsset.getId() != null) {
-                    Asset dbAsset = assetResp.findOne(saveAsset.getId());
+                    Asset dbAsset = rep.findOne(saveAsset.getId());
                     if (saveAsset.equals(dbAsset)) {
                         flag = "no_changes";
                     } else {
@@ -66,14 +66,14 @@ public class AssetController {
                 // Get all the unique field ids
                 List<AssetField> newAssetFields = saveAsset.getDetails();
                 for (AssetField field : newAssetFields) {
-                    AssetFieldDetail detail = afdResp.findOne(field.getId());
+                    AssetFieldDetail detail = fieldRep.findOne(field.getId());
                     if (detail.isUnique()) {
                         uniqueFields.put(field.getId(), detail.getName());
                     }
                 }
 
                 // Create a list of all the values for the unique assets
-                for (Asset asset : assetResp.findAll(allByTypeIDExample)) {
+                for (Asset asset : rep.findAll(allByTypeIDExample)) {
                     // if statement below checks that if update asset does not check
                     // it self to flag for duplication
                     if (!asset.getId().equals(saveAsset.getId())
@@ -124,7 +124,7 @@ public class AssetController {
                     return response;
                 }
 
-                Asset savedAsset = assetResp.save(saveAsset);
+                Asset savedAsset = rep.save(saveAsset);
                 response.setSuccess(true);
                 response.setAsset(saveAsset);
                 response.setMessage("saved asset[" + savedAsset.getId() + "]");
@@ -151,7 +151,7 @@ public class AssetController {
                 ExampleMatcher.GenericPropertyMatchers.ignoreCase());
         Example<Asset> example = Example.<Asset>of(search, NAME_MATCHER);
 
-        assets.addAll(assetResp.findAll(example));
+        assets.addAll(rep.findAll(example));
         response.setAssets(assets);
         return response;
     }
@@ -159,7 +159,7 @@ public class AssetController {
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public AssetResponse get(@PathVariable String id) {
         AssetResponse response = new AssetResponse();
-        response.setAsset(assetResp.findOne(id));
+        response.setAsset(rep.findOne(id));
         return response;
     }
 
@@ -174,9 +174,9 @@ public class AssetController {
                 ExampleMatcher.GenericPropertyMatchers.ignoreCase());
         Example<Asset> example = Example.<Asset>of(search, NAME_MATCHER);
         // todo needs a check for linked resources ...
-        List<Asset> assets = assetResp.findAll(example);
+        List<Asset> assets = rep.findAll(example);
         if (assets.size() > 0) {
-            assetResp.delete(search.getId());
+            rep.delete(search.getId());
             response.setSuccess(true);
             response.setMessage("Removed asset [" + search.getId() + "] successfully.");
             return response;
@@ -191,7 +191,7 @@ public class AssetController {
     public AssetResponse all() {
         AssetResponse response = new AssetResponse();
         ArrayList assets = new ArrayList<>();
-        assets.addAll(assetResp.findAll());
+        assets.addAll(rep.findAll());
         response.setAssets(assets);
         return response;
     }
