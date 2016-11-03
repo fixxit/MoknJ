@@ -67,7 +67,7 @@ public class AssetController {
                 List<AssetField> newAssetFields = saveAsset.getDetails();
                 for (AssetField field : newAssetFields) {
                     AssetFieldDetail detail = fieldRep.findOne(field.getId());
-                    if (detail.isUnique()) {
+                    if (detail != null && detail.isUnique()) {
                         uniqueFields.put(field.getId(), detail.getName());
                     }
                 }
