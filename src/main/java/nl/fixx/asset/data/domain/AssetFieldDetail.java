@@ -18,6 +18,8 @@ public class AssetFieldDetail {
     private AssetFieldType type;
     private String name;
     private boolean unique;
+    private boolean mandatory;
+    private boolean display;
 
     /**
      * @return the id
@@ -68,9 +70,37 @@ public class AssetFieldDetail {
         this.unique = unique;
     }
 
+    /**
+     * @return the mandatory
+     */
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    /**
+     * @param mandatory the mandatory to set
+     */
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+    }
+
+    /**
+     * @return the display
+     */
+    public boolean isDisplay() {
+        return display;
+    }
+
+    /**
+     * @param display the display to set
+     */
+    public void setDisplay(boolean display) {
+        this.display = display;
+    }
+
     @Override
     public String toString() {
-        return "AssetFieldDetail{" + "id=" + id + ", type=" + type + ", name=" + name + ", unique=" + unique + '}';
+        return "AssetFieldDetail{" + "id=" + id + ", type=" + type + ", name=" + name + ", unique=" + unique + ", mandatory=" + mandatory + ", display=" + display + '}';
     }
 
 }
