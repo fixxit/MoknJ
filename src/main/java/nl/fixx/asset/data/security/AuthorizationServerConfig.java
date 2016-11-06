@@ -42,15 +42,21 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         clients.inMemory().withClient(PropertiesManager.getProperty("security.client")) // basic
                 // auth
                 // user
-                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit").authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT").scopes("read", "write", "trust").secret(PropertiesManager.getProperty("security.secret")) // basic
+                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
+                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
+                .scopes("read", "write", "trust")
+                .secret(PropertiesManager.getProperty("security.secret")) // basic
                 // auth
                 // password
-                .accessTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.token_validity_seconds"))).refreshTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.refresh_token_validity_seconds")));
+                .accessTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.token_validity_seconds")))
+                .refreshTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.refresh_token_validity_seconds")));
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(tokenStore).userApprovalHandler(userApprovalHandler).authenticationManager(authenticationManager);
+        endpoints.tokenStore(tokenStore)
+                .userApprovalHandler(userApprovalHandler)
+                .authenticationManager(authenticationManager);
     }
 
     @Override

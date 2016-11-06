@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
  * Created by Colin on 10/12/2016 1:57 PM
  */
 public class Resource {
+
     @Id
     private String id;
 
@@ -13,60 +14,113 @@ public class Resource {
     private String surname;
     private String email;
     private String contactNumber; // decided on string so we can save dashes,
-				  // +country code and leading zeros if required
+    // +country code and leading zeros if required
     private String placedAtClient; // current client where resource is working
-
-    @Override
-    public String toString() {
-	return "Resource{" + "id='" + id + '\'' + ", firstName='" + firstName + '\'' + ", surname='" + surname + '\'' + ", email='" + email + '\'' + ", contactNumber='" + contactNumber + '\'' + ", placedAtClient='" + placedAtClient + '\'' + '}';
-    }
+    private boolean systemUser;
+    private String userName;
+    private String password;
 
     public String getId() {
-	return id;
+        return id;
     }
 
     public void setId(String id) {
-	this.id = id;
+        this.id = id;
     }
 
     public String getFirstName() {
-	return firstName;
+        return firstName;
     }
 
     public void setFirstName(String firstName) {
-	this.firstName = firstName;
+        this.firstName = firstName;
     }
 
     public String getSurname() {
-	return surname;
+        return surname;
     }
 
     public void setSurname(String surname) {
-	this.surname = surname;
+        this.surname = surname;
     }
 
     public String getEmail() {
-	return email;
+        return email;
     }
 
     public void setEmail(String email) {
-	this.email = email;
+        this.email = email;
     }
 
     public String getContactNumber() {
-	return contactNumber;
+        return contactNumber;
     }
 
     public void setContactNumber(String contactNumber) {
-	this.contactNumber = contactNumber;
+        this.contactNumber = contactNumber;
     }
 
     public String getPlacedAtClient() {
-	return placedAtClient;
+        return placedAtClient;
     }
 
     public void setPlacedAtClient(String placedAtClient) {
-	this.placedAtClient = placedAtClient;
+        this.placedAtClient = placedAtClient;
+    }
+
+    /**
+     * @return the systemUser
+     */
+    public boolean isSystemUser() {
+        return systemUser;
+    }
+
+    /**
+     * @param systemUser the systemUser to set
+     */
+    public void setSystemUser(boolean systemUser) {
+        this.systemUser = systemUser;
+    }
+
+    /**
+     * @return the userName
+     */
+    public String getUserName() {
+        return userName;
+    }
+
+    /**
+     * @param userName the userName to set
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "Resource{" + "id=" + id
+                + ", firstName=" + firstName
+                + ", surname=" + surname
+                + ", email=" + email
+                + ", contactNumber=" + contactNumber
+                + ", placedAtClient=" + placedAtClient
+                + ", systemUser=" + systemUser
+                + ", userName=" + userName
+                + ", password=" + password + '}';
     }
 
 }

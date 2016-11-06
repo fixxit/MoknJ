@@ -5,12 +5,17 @@
  */
 package nl.fixx.asset.data.security;
 
+import java.util.List;
+import nl.fixx.asset.data.domain.Resource;
+import nl.fixx.asset.data.repository.ResourceRepository;
+import nl.fixx.asset.data.util.PropertiesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,8 +29,6 @@ import org.springframework.security.oauth2.provider.request.DefaultOAuth2Request
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
-import nl.fixx.asset.data.util.PropertiesManager;
-
 /**
  *
  * @author Riaan Schoeman
@@ -36,6 +39,13 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private ClientDetailsService clientDetailsService;
+    @Autowired
+    private ResourceRepository repository;
+
+    // In memory auth service and token store made public so it is accessible
+    // from rest classes.
+    private static InMemoryTokenStore inMemoryTokenStore = new InMemoryTokenStore();
+    private static InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> authService;
 
     /**
      * Define user access to user roles here
@@ -45,50 +55,75 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Autowired
     public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
-	auth.inMemoryAuthentication().withUser(PropertiesManager.getProperty("admin.user")).password(PropertiesManager.getProperty("admin.pass")).roles("ADMIN").and().withUser(PropertiesManager.getProperty("user.user")).password(PropertiesManager.getProperty("user.pass")).roles("USER");
+        authService = auth.inMemoryAuthentication();
+        List<Resource> resources = repository.findAll();
+        loadUserAccess(resources);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-	http.csrf().disable().anonymous().disable().authorizeRequests().antMatchers("/oauth/token").permitAll();
+        http.csrf()
+                .disable()
+                .anonymous()
+                .disable()
+                .authorizeRequests()
+                .antMatchers("/oauth/token").permitAll();
     }
 
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
-	return super.authenticationManagerBean();
+        return super.authenticationManagerBean();
     }
 
     @Bean
     public TokenStore tokenStore() {
-	return new InMemoryTokenStore();
+        return inMemoryTokenStore;
     }
 
     @Bean
     public OAuth2AccessDeniedHandler accessDeniedHandler() {
-	return new OAuth2AccessDeniedHandler();
+        return new OAuth2AccessDeniedHandler();
     }
 
     @Bean
     @Autowired
     public TokenStoreUserApprovalHandler userApprovalHandler(TokenStore tokenStore) {
-	TokenStoreUserApprovalHandler handler = new TokenStoreUserApprovalHandler();
-	handler.setTokenStore(tokenStore);
-	handler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
-	handler.setClientDetailsService(clientDetailsService);
-	return handler;
+        TokenStoreUserApprovalHandler handler = new TokenStoreUserApprovalHandler();
+        handler.setTokenStore(tokenStore);
+        handler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
+        handler.setClientDetailsService(clientDetailsService);
+        return handler;
     }
 
     @Bean
     @Autowired
     public ApprovalStore approvalStore(TokenStore tokenStore) throws Exception {
-	TokenApprovalStore store = new TokenApprovalStore();
-	store.setTokenStore(tokenStore);
-	return store;
+        TokenApprovalStore store = new TokenApprovalStore();
+        store.setTokenStore(tokenStore);
+        return store;
+    }
+
+    public static void loadUserAccess(List<Resource> resources) throws Exception {
+        for (Resource resource : resources) {
+            if (resource.isSystemUser()) {
+                authService.withUser(resource.getUserName())
+                        .password(resource.getPassword())
+                        .roles("ADMIN");
+            }
+        }
+
+        authService.withUser(PropertiesManager.getProperty("admin.user"))
+                .password(PropertiesManager.getProperty("admin.pass"))
+                .roles("ADMIN");
+    }
+
+    public static String getUserForToken(String token) {
+        return inMemoryTokenStore.readAuthentication(token).getName();
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-	web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
+        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
     }
 }

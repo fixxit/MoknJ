@@ -1,6 +1,5 @@
 package nl.fixx.asset.data.controller;
 
-import java.util.ArrayList;
 import nl.fixx.asset.data.domain.Resource;
 import nl.fixx.asset.data.info.ResourceResponse;
 import nl.fixx.asset.data.repository.ResourceRepository;
@@ -24,21 +23,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResourceController {
 
     @Autowired
-    ResourceRepository repository;
-    ResourceResponse resourceResponse = new ResourceResponse();
+    private ResourceRepository repository;
+    private ResourceResponse resourceResponse = new ResourceResponse();
 
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public ResourceResponse getAllResources() {
-        ArrayList<Resource> resourceList = new ArrayList<>();
-        resourceList.addAll(repository.findAll());
-        this.resourceResponse.setResources(resourceList);
+        this.resourceResponse.setResources(repository.findAll());
         return this.resourceResponse;
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResourceResponse addResource(@RequestBody Resource payload) {
+    public ResourceResponse addResource(@RequestBody Resource payload) throws Exception {
 
-         try {
+        try {
             // For updates if the type has a id then bypass the exists
             boolean bypassExists = false;
             if (payload.getId() != null) {
@@ -49,22 +46,21 @@ public class ResourceController {
                     withMatcher("firstName", GenericPropertyMatchers.ignoreCase()).
                     withMatcher("surname", GenericPropertyMatchers.ignoreCase());
             Example<Resource> example = Example.<Resource>of(payload, NAME_MATCHER);
-            
+
             boolean exists = repository.exists(example);
             if (!exists || bypassExists) {
                 Resource resource = this.repository.save(payload);
                 this.resourceResponse.setSuccess(resource != null);
-                this.resourceResponse.setMessage("Saved type[" + resource.getId() + "]");
+                this.resourceResponse.setMessage("Saved Resource[" + resource.getId() + "]");
                 this.resourceResponse.setResource(resource);
             } else {
                 this.resourceResponse.setSuccess(false);
-                this.resourceResponse.setMessage("Asset type by name " + payload.getFirstName()+ "exists");
+                this.resourceResponse.setMessage("Resource by name " + payload.getFirstName() + "exists");
             }
         } catch (IllegalArgumentException ex) {
             this.resourceResponse.setSuccess(false);
             this.resourceResponse.setMessage(ex.getMessage());
         }
-
 
         return resourceResponse;
     }

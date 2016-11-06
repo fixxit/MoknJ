@@ -1,6 +1,8 @@
 package nl.fixx.asset.data.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import nl.fixx.asset.data.domain.AssetFieldDetail;
 import nl.fixx.asset.data.info.AssetResponse;
 import nl.fixx.asset.data.repository.AssetFieldDetailRepository;
 import nl.fixx.asset.data.repository.AssetRepository;
+import nl.fixx.asset.data.security.OAuth2SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin // added for cors, allow access from another web server
@@ -31,7 +35,9 @@ public class AssetController {
     private AssetFieldDetailRepository fieldRep; // Asset Field Detail Repository
 
     @RequestMapping(value = "/add/{id}", method = RequestMethod.POST)
-    public AssetResponse add(@PathVariable String id, @RequestBody Asset saveAsset) {
+    public AssetResponse add(@PathVariable String id,
+            @RequestBody Asset saveAsset,
+            @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
         try {
             if (id != null) {
@@ -124,6 +130,8 @@ public class AssetController {
                     return response;
                 }
 
+                saveAsset.setLastModifiedBy(OAuth2SecurityConfig.getUserForToken(access_token));
+                saveAsset.setLastModifiedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                 Asset savedAsset = rep.save(saveAsset);
                 response.setSuccess(true);
                 response.setAsset(saveAsset);
@@ -143,16 +151,7 @@ public class AssetController {
     @RequestMapping(value = "/get/all/{id}", method = RequestMethod.POST)
     public AssetResponse getAllAssets(@PathVariable String id) {
         AssetResponse response = new AssetResponse();
-        List<Asset> assets = new ArrayList<>();
-        Asset search = new Asset();
-        search.setTypeId(id);
-
-        ExampleMatcher NAME_MATCHER = ExampleMatcher.matching().withMatcher("typeId",
-                ExampleMatcher.GenericPropertyMatchers.ignoreCase());
-        Example<Asset> example = Example.<Asset>of(search, NAME_MATCHER);
-
-        assets.addAll(rep.findAll(example));
-        response.setAssets(assets);
+        response.setAssets(rep.getAllAssets(id));
         return response;
     }
 

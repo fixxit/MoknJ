@@ -17,9 +17,10 @@ public class AssetLink {
     private String id;
     private boolean checked;
     private String date;
-    private String createdDate;
     private String resourceId;
     private String assetId;
+    private String createdBy;
+    private String createdDate;
 
     /**
      * @return the id
@@ -98,9 +99,29 @@ public class AssetLink {
         this.createdDate = createdDate;
     }
 
+    /**
+     * @return the createdBy
+     */
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    /**
+     * @param createdBy the createdBy to set
+     */
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     @Override
     public String toString() {
-        return "AssetLink{" + "id=" + id + ", checked=" + checked + ", date=" + date + ", createdDate=" + createdDate + ", resourceId=" + resourceId + ", assetId=" + assetId + '}';
+        return "AssetLink{" + "id=" + id
+                + ", checked=" + checked
+                + ", date=" + date
+                + ", resourceId=" + resourceId
+                + ", assetId=" + assetId
+                + ", createdBy=" + createdBy
+                + ", createdDate=" + createdDate + '}';
     }
 
 }

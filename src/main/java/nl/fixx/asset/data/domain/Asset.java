@@ -20,48 +20,42 @@ public class Asset {
     private String typeId;
     private List<AssetField> details;
     private String resourceId;
-
-    @Override
-    public String toString() {
-        return "Asset{" + "id=" + id + ", typeId=" + typeId + ", details=" + details + ", resourceId=" + resourceId + '}';
-    }
-
+    private String lastModifiedDate;
+    private String lastModifiedBy;
 
     /**
      * @return the id
      */
     public String getId() {
-	return id;
+        return id;
     }
 
     /**
      * @return the typeId
      */
     public String getTypeId() {
-	return typeId;
+        return typeId;
     }
 
     /**
-     * @param typeId
-     *            the typeId to set
+     * @param typeId the typeId to set
      */
     public void setTypeId(String typeId) {
-	this.typeId = typeId;
+        this.typeId = typeId;
     }
 
     /**
      * @return the details
      */
     public List<AssetField> getDetails() {
-	return details;
+        return details;
     }
 
     /**
-     * @param details
-     *            the details to set
+     * @param details the details to set
      */
     public void setDetails(List<AssetField> details) {
-	this.details = details;
+        this.details = details;
     }
 
     @Override
@@ -111,4 +105,40 @@ public class Asset {
         this.resourceId = resourceId;
     }
 
+    /**
+     * @return the lastModifiedDate
+     */
+    public String getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    /**
+     * @param lastModifiedDate the lastModifiedDate to set
+     */
+    public void setLastModifiedDate(String lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Asset{" + "id=" + id
+                + ", typeId=" + typeId
+                + ", details=" + details
+                + ", resourceId=" + resourceId
+                + ", lastModifiedDate=" + lastModifiedDate + '}';
+    }
+
+    /**
+     * @return the lastModifiedBy
+     */
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    /**
+     * @param lastModifiedBy the lastModifiedBy to set
+     */
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
 }

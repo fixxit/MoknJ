@@ -5,9 +5,12 @@
  */
 package nl.fixx.asset.data.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import nl.fixx.asset.data.domain.AssetLink;
 import nl.fixx.asset.data.info.LinkResponse;
 import nl.fixx.asset.data.repository.AssetLinkRepository;
+import nl.fixx.asset.data.security.OAuth2SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -32,8 +36,10 @@ public class LinkController {
     LinkResponse response = new LinkResponse();
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public LinkResponse add(@RequestBody AssetLink payload) {
+    public LinkResponse add(@RequestBody AssetLink payload, @RequestParam String access_token) {
         try {
+            payload.setCreatedBy(OAuth2SecurityConfig.getUserForToken(access_token));
+            payload.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             response.setLink(this.auditRep.save(payload));
             response.setSuccess(response.getLink() != null);
             response.setMessage("Saved type[" + response.getLink().getId() + "]");
