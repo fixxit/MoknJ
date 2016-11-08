@@ -9,13 +9,13 @@ import java.util.Map;
 import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.domain.AssetField;
 import nl.fixx.asset.data.domain.AssetFieldDetail;
+import nl.fixx.asset.data.domain.AssetLink;
 import nl.fixx.asset.data.info.AssetResponse;
 import nl.fixx.asset.data.repository.AssetFieldDetailRepository;
+import nl.fixx.asset.data.repository.AssetLinkRepository;
 import nl.fixx.asset.data.repository.AssetRepository;
 import nl.fixx.asset.data.security.OAuth2SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +33,8 @@ public class AssetController {
     private AssetRepository rep;// main asset Repository
     @Autowired
     private AssetFieldDetailRepository fieldRep; // Asset Field Detail Repository
+    @Autowired
+    private AssetLinkRepository auditRep; // Asset Audit Repository
 
     @RequestMapping(value = "/add/{id}", method = RequestMethod.POST)
     public AssetResponse add(@PathVariable String id,
@@ -56,11 +58,6 @@ public class AssetController {
                     }
                 }
 
-                Asset search = new Asset();
-                search.setTypeId(id);
-                ExampleMatcher NAME_MATCHER = ExampleMatcher.matching().withMatcher("typeId",
-                        ExampleMatcher.GenericPropertyMatchers.ignoreCase());
-                Example<Asset> allByTypeIDExample = Example.<Asset>of(search, NAME_MATCHER);
                 /**
                  * Find unique fields for asset and check if the current list of
                  * assets is unique for the field...
@@ -79,7 +76,7 @@ public class AssetController {
                 });
 
                 // Create a list of all the values for the unique assets
-                for (Asset asset : rep.findAll(allByTypeIDExample)) {
+                for (Asset asset : rep.getAllByTypeId(id)) {
                     // if statement below checks that if update asset does not check
                     // it self to flag for duplication
                     if (!asset.getId().equals(saveAsset.getId())
@@ -142,7 +139,13 @@ public class AssetController {
     @RequestMapping(value = "/get/all/{id}", method = RequestMethod.POST)
     public AssetResponse getAllAssets(@PathVariable String id) {
         AssetResponse response = new AssetResponse();
-        response.setAssets(rep.getAllByTypeId(id));
+        List<Asset> assets = new ArrayList<>();
+        rep.getAllByTypeId(id).stream().filter((asset)
+                -> (!asset.isHidden())).forEach((asset)
+                -> {
+            assets.add(asset);
+        });
+        response.setAssets(assets);
         return response;
     }
 
@@ -154,28 +157,40 @@ public class AssetController {
     }
 
     @RequestMapping(value = "/delete/", method = RequestMethod.POST)
-    public AssetResponse delete(@RequestBody Asset search) {
+    public AssetResponse delete(@RequestBody Asset asset) {
         // to insure that the below fields have no influence on find all.
-        search.setDetails(null);
-        search.setTypeId(null);
-
         AssetResponse response = new AssetResponse();
-        ExampleMatcher NAME_MATCHER = ExampleMatcher.matching().withMatcher("id",
-                ExampleMatcher.GenericPropertyMatchers.ignoreCase());
-        Example<Asset> example = Example.<Asset>of(search, NAME_MATCHER);
-        // todo needs a check for linked resources ...
-        List<Asset> assets = rep.findAll(example);
-        if (assets.size() > 0) {
-
-            rep.delete(search.getId());
-            response.setSuccess(true);
-            response.setMessage("Removed asset [" + search.getId() + "] successfully.");
-            return response;
-        } else {
+        Asset result = rep.findOne(asset.getId());
+        List<AssetLink> assets = auditRep.getAllByAssetId(result.getId());
+        try {
+            // todo needs a check for linked resources ...
+            if (result != null) {
+                if (assets.size() > 0) {
+                    // hide asset by updating hidden field
+                    if (result != null) {
+                        result.setHidden(true);
+                        rep.save(result);
+                        response.setSuccess(true);
+                        response.setMessage("Hid asset "
+                                + "[" + asset.getId() + "] successfully.");
+                    }
+                } else {
+                    // delete asset from the asset list.
+                    rep.delete(result);
+                    response.setSuccess(true);
+                    response.setMessage("Removed asset "
+                            + "[" + asset.getId() + "] successfully.");
+                }
+            } else {
+                response.setSuccess(false);
+                response.setMessage("Could not remove asset "
+                        + "[" + asset.getId() + "] not found in db");
+            }
+        } catch (Exception ex) {
             response.setSuccess(false);
-            response.setMessage("Could not find any asset matching id[" + search.getId() + "]");
-            return response;
+            response.setMessage(ex.getMessage());
         }
+        return response;
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.POST)

@@ -33,8 +33,6 @@ public class LinkController {
     @Autowired
     private AssetLinkRepository auditRep; // Asset Audit Repository
 
-
-
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public LinkResponse add(@RequestBody AssetLink payload, @RequestParam String access_token) {
         final LinkResponse response = new LinkResponse();
@@ -44,7 +42,7 @@ public class LinkController {
             response.setLink(this.auditRep.save(payload));
             response.setSuccess(response.getLink() != null);
             response.setMessage("Saved type[" + response.getLink().getId() + "]");
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
