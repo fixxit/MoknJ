@@ -142,7 +142,7 @@ public class AssetController {
     @RequestMapping(value = "/get/all/{id}", method = RequestMethod.POST)
     public AssetResponse getAllAssets(@PathVariable String id) {
         AssetResponse response = new AssetResponse();
-        response.setAssets(rep.getAllAssets(id));
+        response.setAssets(rep.getAllByTypeId(id));
         return response;
     }
 
@@ -166,6 +166,7 @@ public class AssetController {
         // todo needs a check for linked resources ...
         List<Asset> assets = rep.findAll(example);
         if (assets.size() > 0) {
+
             rep.delete(search.getId());
             response.setSuccess(true);
             response.setMessage("Removed asset [" + search.getId() + "] successfully.");

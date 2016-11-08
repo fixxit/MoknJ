@@ -19,6 +19,7 @@ public class Resource {
     private boolean systemUser;
     private String userName;
     private String password;
+    private boolean hidden;
 
     public String getId() {
         return id;
@@ -110,6 +111,20 @@ public class Resource {
         this.password = password;
     }
 
+    /**
+     * @return the hidden
+     */
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    /**
+     * @param hidden the hidden to set
+     */
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
     @Override
     public String toString() {
         return "Resource{" + "id=" + id
@@ -120,7 +135,8 @@ public class Resource {
                 + ", placedAtClient=" + placedAtClient
                 + ", systemUser=" + systemUser
                 + ", userName=" + userName
-                + ", password=" + password + '}';
+                + ", password=" + password
+                + ", hidden=" + hidden + '}';
     }
 
 }

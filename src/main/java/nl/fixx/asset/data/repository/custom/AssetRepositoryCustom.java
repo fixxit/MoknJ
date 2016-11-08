@@ -7,6 +7,8 @@ public interface AssetRepositoryCustom {
 
     public List<Asset> findAll();
 
-    public List<Asset> getAllAssets(String id);
+    public List<Asset> getAllByTypeId(String id);
+    
+    public List<Asset> getAllByResourceId(String id);
 
 }

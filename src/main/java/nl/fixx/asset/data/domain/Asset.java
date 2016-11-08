@@ -22,6 +22,7 @@ public class Asset {
     private String resourceId;
     private String lastModifiedDate;
     private String lastModifiedBy;
+    private boolean hidden;
 
     /**
      * @return the id
@@ -119,15 +120,6 @@ public class Asset {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    @Override
-    public String toString() {
-        return "Asset{" + "id=" + id
-                + ", typeId=" + typeId
-                + ", details=" + details
-                + ", resourceId=" + resourceId
-                + ", lastModifiedDate=" + lastModifiedDate + '}';
-    }
-
     /**
      * @return the lastModifiedBy
      */
@@ -141,4 +133,30 @@ public class Asset {
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
+
+    /**
+     * @return the hidden
+     */
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    /**
+     * @param hidden the hidden to set
+     */
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    @Override
+    public String toString() {
+        return "Asset{" + "id=" + id
+                + ", typeId=" + typeId
+                + ", details=" + details
+                + ", resourceId=" + resourceId
+                + ", lastModifiedDate=" + lastModifiedDate
+                + ", lastModifiedBy=" + lastModifiedBy
+                + ", hidden=" + hidden + '}';
+    }
+
 }

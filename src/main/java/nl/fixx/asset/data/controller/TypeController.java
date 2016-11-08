@@ -43,10 +43,10 @@ public class TypeController {
     private AssetFieldDetailRepository fieldDetailRep;
 
     @Autowired
-    private AssetRepository assetRep;// main asset Repository
+    private AssetRepository assetRep;
 
     @Autowired
-    private AssetLinkRepository auditRep; // Asset Audit Repository
+    private AssetLinkRepository auditRep;
 
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
@@ -138,7 +138,7 @@ public class TypeController {
             }
         } else {
             try {
-                List<Asset> assets = assetRep.getAllAssets(id);
+                List<Asset> assets = assetRep.getAllByTypeId(id);
                 assets.stream().forEach((asset) -> {
                     List<AssetLink> links = auditRep.getAllByAssetId(asset.getId());
                     links.stream().forEach((link) -> {
