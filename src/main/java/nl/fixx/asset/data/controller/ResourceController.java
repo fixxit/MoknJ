@@ -33,7 +33,7 @@ public class ResourceController {
     private AssetLinkRepository auditRep;
 
     @RequestMapping(value = "/all", method = RequestMethod.POST)
-    public ResourceResponse getAllResources() {
+    public ResourceResponse all() {
         final ResourceResponse resourceResponse = new ResourceResponse();
         List<Resource> resources = new ArrayList<>();
         resourceRep.findAll().stream()
@@ -46,7 +46,7 @@ public class ResourceController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public ResourceResponse addResource(@RequestBody Resource payload) throws Exception {
+    public ResourceResponse add(@RequestBody Resource payload) throws Exception {
         final ResourceResponse resourceResponse = new ResourceResponse();
         try {
             // For updates if the type has a id then bypass the exists
