@@ -33,10 +33,11 @@ public class LinkController {
     @Autowired
     private AssetLinkRepository auditRep; // Asset Audit Repository
 
-    LinkResponse response = new LinkResponse();
+
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public LinkResponse add(@RequestBody AssetLink payload, @RequestParam String access_token) {
+        final LinkResponse response = new LinkResponse();
         try {
             payload.setCreatedBy(OAuth2SecurityConfig.getUserForToken(access_token));
             payload.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -57,6 +58,7 @@ public class LinkController {
      */
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public LinkResponse all() {
+        final LinkResponse response = new LinkResponse();
         response.setLinks(auditRep.findAll(new Sort(Sort.Direction.DESC, "date")));
         return response;
     }
@@ -69,6 +71,7 @@ public class LinkController {
      */
     @RequestMapping(value = "/all/{id}/asset", method = RequestMethod.POST)
     public LinkResponse allByAssetId(@PathVariable String id) {
+        final LinkResponse response = new LinkResponse();
         response.setLinks(auditRep.getAllByAssetId(id));
         return response;
     }
@@ -81,6 +84,7 @@ public class LinkController {
      */
     @RequestMapping(value = "/all/{id}/resource", method = RequestMethod.POST)
     public LinkResponse allByResourceId(@PathVariable String id) {
+        final LinkResponse response = new LinkResponse();
         response.setLinks(auditRep.getAllByResourceId(id));
         return response;
     }

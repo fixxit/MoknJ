@@ -11,4 +11,5 @@ package nl.fixx.asset.data.repository.custom;
  */
 public interface TypeRepositoryCustom {
 
+    public boolean existsByName(String name);
 }

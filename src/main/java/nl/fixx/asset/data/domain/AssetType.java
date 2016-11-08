@@ -6,7 +6,6 @@
 package nl.fixx.asset.data.domain;
 
 import java.util.List;
-
 import org.springframework.data.annotation.Id;
 
 /**
@@ -20,47 +19,60 @@ public class AssetType {
     private String name;
     // Fields names (etc <Sizeinteger>) and field type
     private List<AssetFieldDetail> details;
+    private boolean hidden;
 
     /**
      * @return the id
      */
     public String getId() {
-	return id;
+        return id;
     }
 
     /**
      * @return the name
      */
     public String getName() {
-	return name;
+        return name;
     }
 
     /**
-     * @param name
-     *            the type to set
+     * @param name the type to set
      */
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     /**
      * @return the details
      */
     public List<AssetFieldDetail> getDetails() {
-	return details;
+        return details;
     }
 
     /**
-     * @param details
-     *            the details to set
+     * @param details the details to set
      */
     public void setDetails(List<AssetFieldDetail> details) {
-	this.details = details;
+        this.details = details;
+    }
+
+    /**
+     * @return the hidden
+     */
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    /**
+     * @param hidden the hidden to set
+     */
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
 
     @Override
     public String toString() {
-	return "AssetType{" + "id=" + id + ", name=" + name + ", details=" + details + '}';
+        return "AssetType{" + "id=" + id + ", name=" + name + ", details=" + details + ", hidden=" + hidden + '}';
     }
 
 }

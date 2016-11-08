@@ -65,18 +65,18 @@ public class AssetController {
                  * Find unique fields for asset and check if the current list of
                  * assets is unique for the field...
                  */
-                Map<String, String> uniqueFields = new HashMap<String, String>();
-                Map<String, Boolean> unifieldIndicator = new HashMap<String, Boolean>();
-                Map<String, List<String>> uniqueValues = new HashMap<String, List<String>>();
+                Map<String, String> uniqueFields = new HashMap<>();
+                Map<String, Boolean> unifieldIndicator = new HashMap<>();
+                Map<String, List<String>> uniqueValues = new HashMap<>();
 
                 // Get all the unique field ids
                 List<AssetField> newAssetFields = saveAsset.getDetails();
-                for (AssetField field : newAssetFields) {
+                newAssetFields.stream().forEach((field) -> {
                     AssetFieldDetail detail = fieldRep.findOne(field.getId());
                     if (detail != null && detail.isUnique()) {
                         uniqueFields.put(field.getId(), detail.getName());
                     }
-                }
+                });
 
                 // Create a list of all the values for the unique assets
                 for (Asset asset : rep.findAll(allByTypeIDExample)) {
@@ -85,28 +85,22 @@ public class AssetController {
                     if (!asset.getId().equals(saveAsset.getId())
                             && !"no_changes".equals(flag)) {
                         List<AssetField> details = asset.getDetails();
-                        for (AssetField field : details) {
-                            if (uniqueFields.keySet().contains(field.getId())) {
-                                if (uniqueValues.get(field.getId()) == null) {
-                                    uniqueValues.put(field.getId(), new ArrayList<String>());
-                                }
-                                if (!uniqueValues.get(field.getId()).contains(field.getValue())) {
-                                    uniqueValues.get(field.getId()).add(field.getValue());
-                                }
+                        details.stream().filter((field) -> (uniqueFields.keySet().contains(field.getId()))).map((field) -> {
+                            if (uniqueValues.get(field.getId()) == null) {
+                                uniqueValues.put(field.getId(), new ArrayList<>());
                             }
-                        }
+                            return field;
+                        }).filter((field) -> (!uniqueValues.get(field.getId()).contains(field.getValue()))).forEach((field) -> {
+                            uniqueValues.get(field.getId()).add(field.getValue());
+                        });
                     }
                 }
 
                 // check if fields to be saved for asset has duplicates
                 if (!uniqueValues.isEmpty()) {
-                    for (AssetField field : newAssetFields) {
-                        if (uniqueValues.containsKey(field.getId())) {
-                            if (uniqueValues.get(field.getId()).contains(field.getValue())) {
-                                unifieldIndicator.put(field.getId(), true);
-                            }
-                        }
-                    }
+                    newAssetFields.stream().filter((field) -> (uniqueValues.containsKey(field.getId()))).filter((field) -> (uniqueValues.get(field.getId()).contains(field.getValue()))).forEach((field) -> {
+                        unifieldIndicator.put(field.getId(), true);
+                    });
                 }
 
                 // generate duplication message
@@ -114,10 +108,7 @@ public class AssetController {
                     String message = unifieldIndicator.size() > 1
                             ? "Non unique values for fields ["
                             : "Non unique value for field ";
-                    for (String typeId : unifieldIndicator.keySet()) {
-                        String fieldName = uniqueFields.get(typeId);
-                        message += fieldName + ",";
-                    }
+                    message = unifieldIndicator.keySet().stream().map((typeId) -> uniqueFields.get(typeId)).map((fieldName) -> fieldName + ",").reduce(message, String::concat);
                     if (message.endsWith(",")) {
                         message = message.substring(0, message.length() - 1);
                     }

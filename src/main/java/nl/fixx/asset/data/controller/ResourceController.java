@@ -24,17 +24,18 @@ public class ResourceController {
 
     @Autowired
     private ResourceRepository repository;
-    private ResourceResponse resourceResponse = new ResourceResponse();
+
 
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public ResourceResponse getAllResources() {
-        this.resourceResponse.setResources(repository.findAll());
-        return this.resourceResponse;
+        final ResourceResponse resourceResponse = new ResourceResponse();
+        resourceResponse.setResources(repository.findAll());
+        return resourceResponse;
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public ResourceResponse addResource(@RequestBody Resource payload) throws Exception {
-
+        final ResourceResponse resourceResponse = new ResourceResponse();
         try {
             // For updates if the type has a id then bypass the exists
             boolean bypassExists = false;
@@ -49,17 +50,17 @@ public class ResourceController {
 
             boolean exists = repository.exists(example);
             if (!exists || bypassExists) {
-                Resource resource = this.repository.save(payload);
-                this.resourceResponse.setSuccess(resource != null);
-                this.resourceResponse.setMessage("Saved Resource[" + resource.getId() + "]");
-                this.resourceResponse.setResource(resource);
+                Resource resource = repository.save(payload);
+                resourceResponse.setSuccess(resource != null);
+                resourceResponse.setMessage("Saved Resource[" + resource.getId() + "]");
+                resourceResponse.setResource(resource);
             } else {
-                this.resourceResponse.setSuccess(false);
-                this.resourceResponse.setMessage("Resource by name " + payload.getFirstName() + "exists");
+                resourceResponse.setSuccess(false);
+                resourceResponse.setMessage("Resource by name " + payload.getFirstName() + "exists");
             }
         } catch (IllegalArgumentException ex) {
-            this.resourceResponse.setSuccess(false);
-            this.resourceResponse.setMessage(ex.getMessage());
+            resourceResponse.setSuccess(false);
+            resourceResponse.setMessage(ex.getMessage());
         }
 
         return resourceResponse;
@@ -67,8 +68,9 @@ public class ResourceController {
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public ResourceResponse get(@PathVariable String id) {
-        Resource resourceRet = this.repository.findById(id);
-        this.resourceResponse.setResource(resourceRet);
+        final ResourceResponse resourceResponse = new ResourceResponse();
+        Resource resourceRet = repository.findById(id);
+        resourceResponse.setResource(resourceRet);
         return resourceResponse;
     }
 }
