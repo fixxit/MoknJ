@@ -1,8 +1,0 @@
-nl\fixx\asset\data\config\MongoConfiguration.class
-nl\fixx\asset\data\repository\RepositoryPackage.class
-nl\fixx\asset\data\template\TemplatePackage.class
-nl\fixx\asset\data\Greeting.class
-nl\fixx\asset\data\Application.class
-nl\fixx\asset\data\repository\AssetRepository.class
-nl\fixx\asset\data\domain\Asset.class
-nl\fixx\asset\data\GreetingController.class
