@@ -14,10 +14,11 @@ public class Application extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-	return application.sources(Application.class);
+        return application.sources(Application.class);
     }
 
     public static void main(String[] args) {
-	SpringApplication.run(Application.class, args);
+        System.getProperties().put("server.port", 8085);
+        SpringApplication.run(Application.class, args);
     }
 }
