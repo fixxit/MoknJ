@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.provider.error.AbstractOAuth2Security
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.util.StringUtils;
 
-import nl.fixx.asset.data.util.PropertiesManager;
+import nl.fixx.asset.data.util.SecurityPropertiesManager;
 
 /**
  *
@@ -30,7 +30,7 @@ public class CustomAuthenticationEntryPoint extends AbstractOAuth2SecurityExcept
 
     private String typeName = OAuth2AccessToken.BEARER_TYPE;
 
-    private String realmName = PropertiesManager.getProperty("security.realm");
+    private String realmName = SecurityPropertiesManager.getProperty("security.realm");
 
     public void setRealmName(String realmName) {
 	this.realmName = realmName;

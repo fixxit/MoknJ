@@ -6,7 +6,7 @@
 package nl.fixx.asset.data.security;
 
 import javax.servlet.http.HttpServletRequest;
-import nl.fixx.asset.data.util.PropertiesManager;
+import nl.fixx.asset.data.util.SecurityPropertiesManager;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
-    private static final String RESOURCE_ID = PropertiesManager.getProperty("security.resource_id");
+    private static final String RESOURCE_ID = SecurityPropertiesManager.getProperty("security.resource_id");
 
     public static String getFullURL(HttpServletRequest request) {
         StringBuffer requestURL = request.getRequestURL();

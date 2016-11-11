@@ -52,6 +52,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -95,14 +96,10 @@
                         -Xdebug
                         -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
                     </jvmArguments>
-                    <archive>
-                        <manifest>
-                            <mainClass>nl.fixx.asset.data.Application</mainClass>
-                        </manifest>
-                    </archive>
+                    
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 </project>

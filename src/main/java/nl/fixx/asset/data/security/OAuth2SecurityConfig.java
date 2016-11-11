@@ -8,7 +8,7 @@ package nl.fixx.asset.data.security;
 import java.util.List;
 import nl.fixx.asset.data.domain.Resource;
 import nl.fixx.asset.data.repository.ResourceRepository;
-import nl.fixx.asset.data.util.PropertiesManager;
+import nl.fixx.asset.data.util.SecurityPropertiesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,7 +57,13 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
     public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
         authService = auth.inMemoryAuthentication();
         List<Resource> resources = repository.findAll();
-        loadUserAccess(resources);
+        if (!resources.isEmpty()) {
+            loadUserAccess(resources);
+        } else {
+            authService.withUser(SecurityPropertiesManager.getProperty("admin.user"))
+                    .password(SecurityPropertiesManager.getProperty("admin.pass"))
+                    .roles("ADMIN");
+        }
     }
 
     @Override
@@ -112,10 +118,6 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
                         .roles("ADMIN");
             }
         }
-
-        authService.withUser(PropertiesManager.getProperty("admin.user"))
-                .password(PropertiesManager.getProperty("admin.pass"))
-                .roles("ADMIN");
     }
 
     public static String getUserForToken(String token) {

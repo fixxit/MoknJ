@@ -5,7 +5,7 @@
  */
 package nl.fixx.asset.data.security;
 
-import nl.fixx.asset.data.util.PropertiesManager;
+import nl.fixx.asset.data.util.SecurityPropertiesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-    private static String REALM = PropertiesManager.getProperty("security.realm");
+    private static String REALM = SecurityPropertiesManager.getProperty("security.realm");
 
     @Autowired
     private TokenStore tokenStore;
@@ -39,17 +39,17 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory().withClient(PropertiesManager.getProperty("security.client")) // basic
+        clients.inMemory().withClient(SecurityPropertiesManager.getProperty("security.client")) // basic
                 // auth
                 // user
                 .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
                 .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
                 .scopes("read", "write", "trust")
-                .secret(PropertiesManager.getProperty("security.secret")) // basic
+                .secret(SecurityPropertiesManager.getProperty("security.secret")) // basic
                 // auth
                 // password
-                .accessTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.token_validity_seconds")))
-                .refreshTokenValiditySeconds(new Integer(PropertiesManager.getProperty("security.refresh_token_validity_seconds")));
+                .accessTokenValiditySeconds(new Integer(SecurityPropertiesManager.getProperty("security.token_validity_seconds")))
+                .refreshTokenValiditySeconds(new Integer(SecurityPropertiesManager.getProperty("security.refresh_token_validity_seconds")));
     }
 
     @Override
