@@ -5,10 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 @SpringBootApplication
-@EnableGlobalMethodSecurity
 @ComponentScan(basePackages = "nl.fixx.asset.data")
 public class Application extends SpringBootServletInitializer {
 
@@ -18,7 +16,6 @@ public class Application extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) {
-        System.getProperties().put("server.port", 8085);
         SpringApplication.run(Application.class, args);
     }
 }

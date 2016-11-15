@@ -48,7 +48,6 @@ public class TypeController {
     @Autowired
     private AssetLinkRepository auditRep;
 
-
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody
     TypeResponse add(@RequestBody AssetType payload) {
@@ -109,6 +108,44 @@ public class TypeController {
         });
 
         response.setTypes(types);
+        return response;
+    }
+
+    @RequestMapping(value = "/hidden", method = RequestMethod.POST)
+    public @ResponseBody
+    TypeResponse hidden() {
+        TypeResponse response = new TypeResponse();
+        List<AssetType> templates = typeRep.findAll();
+        List<AssetType> types = new ArrayList<>();
+        templates.stream().filter((type) -> (type.isHidden())).forEach((type) -> {
+            types.add(type);
+        });
+
+        response.setTypes(types);
+        return response;
+    }
+
+    /**
+     * change template state to visible...
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/unhide/{id}", method = RequestMethod.POST)
+    public TypeResponse unhide(@PathVariable String id) {
+        TypeResponse response = new TypeResponse();
+        try {
+            AssetType template = typeRep.findOne(id);
+            template.setHidden(false);
+            template = this.typeRep.save(template);
+            response.setSuccess(template != null);
+            response.setMessage("Template [" + template.getName() + "] "
+                    + " set to visible!");
+            response.setType(template);
+        } catch (IllegalArgumentException ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+        }
         return response;
     }
 

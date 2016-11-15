@@ -79,7 +79,13 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 // this
                 // part
                 // for
-                .and().authorizeRequests().antMatchers("/asset/**").access("hasRole('ADMIN')").and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
+                .and()
+                .authorizeRequests()
+                .antMatchers("/asset/**").
+                access("hasRole('ADMIN')")
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler(new OAuth2AccessDeniedHandler());
     }
 
 }
