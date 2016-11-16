@@ -37,4 +37,13 @@ public class ResourceRepositoryImpl implements ResourceRepositoryCustom {
         query.with(new Sort(Sort.Direction.DESC, "id"));
         return operations.find(query, Resource.class);
     }
+
+    @Override
+    public Resource findByUserName(String username) {
+        System.out.println("finding username : " + username);
+        Query query = new Query(new Criteria().where("userName").is(username));
+        Resource resource = operations.findOne(query, Resource.class);
+        System.out.println("finding username : " + resource.toString());
+        return resource;
+    }
 }

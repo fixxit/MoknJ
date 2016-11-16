@@ -166,14 +166,12 @@ public class AssetController {
             // todo needs a check for linked resources ...
             if (result != null) {
                 if (assets.size() > 0) {
-                    // hide asset by updating hidden field
-                    if (result != null) {
-                        result.setHidden(true);
-                        rep.save(result);
-                        response.setSuccess(true);
-                        response.setMessage("Hid asset "
-                                + "[" + asset.getId() + "] successfully.");
-                    }
+                    // hide asset by updating hidden field=
+                    result.setHidden(true);
+                    rep.save(result);
+                    response.setSuccess(true);
+                    response.setMessage("Hid asset "
+                            + "[" + asset.getId() + "] successfully.");
                 } else {
                     // delete asset from the asset list.
                     rep.delete(result);

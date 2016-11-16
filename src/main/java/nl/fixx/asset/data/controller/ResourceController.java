@@ -9,7 +9,9 @@ import nl.fixx.asset.data.info.ResourceResponse;
 import nl.fixx.asset.data.repository.AssetLinkRepository;
 import nl.fixx.asset.data.repository.AssetRepository;
 import nl.fixx.asset.data.repository.ResourceRepository;
+import static nl.fixx.asset.data.security.OAuth2SecurityConfig.PSW_ENCODER;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,12 @@ public class ResourceController {
     @Autowired
     private AssetLinkRepository auditRep;
 
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public ResourceController() {
+        this.passwordEncoder = PSW_ENCODER;
+    }
+
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public ResourceResponse all() {
         final ResourceResponse resourceResponse = new ResourceResponse();
@@ -50,9 +58,10 @@ public class ResourceController {
         final ResourceResponse resourceResponse = new ResourceResponse();
         try {
             // For updates if the type has a id then bypass the exists
-            boolean bypassExists = false;
+
+            Resource dbResource = null;
             if (payload.getId() != null) {
-                bypassExists = true;
+                dbResource = resourceRep.findById(payload.getId());
             }
 
             List<Resource> results = resourceRep.findByFullname(
@@ -60,9 +69,25 @@ public class ResourceController {
 
             boolean exists = results.size() > 0;
 
-            System.out.println("Results : " + results);
+            if (!exists || dbResource != null) {
+                // SET PASSWORD TO A SALT...
+                if (dbResource != null
+                        && payload.isSystemUser()
+                        && payload.getPassword() != null) {
+                    // if psw is not equal set new password else nothing
+                    // hass password but assigned new password.
+                    if (dbResource.getPassword() != null
+                            && !dbResource.getPassword().equals(payload.getPassword())) {
+                        payload.setPassword(passwordEncoder.encode(payload.getPassword()));
+                    // emmpty password but did recieve value for password field...
+                    } else if (dbResource.getPassword() == null && payload.getPassword() != null) {
+                        payload.setPassword(passwordEncoder.encode(payload.getPassword()));
+                    }
+                } else if (payload.isSystemUser() && payload.getPassword() != null) {
+                    // new with new password
+                    payload.setPassword(passwordEncoder.encode(payload.getPassword()));
+                }
 
-            if (!exists || bypassExists) {
                 Resource resource = resourceRep.save(payload);
                 resourceResponse.setSuccess(resource != null);
                 resourceResponse.setMessage("Saved employee[" + resource.getId() + "]");
@@ -85,7 +110,9 @@ public class ResourceController {
     public ResourceResponse get(@PathVariable String id) {
         final ResourceResponse resourceResponse = new ResourceResponse();
         Resource resourceRet = resourceRep.findById(id);
-        resourceResponse.setResource(resourceRet);
+        if (resourceRet != null) {
+            resourceResponse.setResource(resourceRet);
+        }
         return resourceResponse;
     }
 

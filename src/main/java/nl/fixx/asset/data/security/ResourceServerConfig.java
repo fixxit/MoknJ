@@ -45,7 +45,6 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                System.out.println("Incomming request from : " + getFullURL(request));
                 return super.getCorsConfiguration(request);
             }
         };
@@ -81,8 +80,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 // for
                 .and()
                 .authorizeRequests()
-                .antMatchers("/asset/**").
-                access("hasRole('ADMIN')")
+                .antMatchers("/asset/**")
+                .hasAuthority("ADMIN")
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(new OAuth2AccessDeniedHandler());

@@ -5,21 +5,19 @@
  */
 package nl.fixx.asset.data.security;
 
-import java.util.List;
-import nl.fixx.asset.data.domain.Resource;
 import nl.fixx.asset.data.repository.ResourceRepository;
-import nl.fixx.asset.data.util.SecurityPropertiesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
@@ -42,28 +40,27 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private ResourceRepository repository;
 
-    // In memory auth service and token store made public so it is accessible
-    // from rest classes.
-    private static InMemoryTokenStore inMemoryTokenStore = new InMemoryTokenStore();
-    private static InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> authService;
+    public static BCryptPasswordEncoder PSW_ENCODER = new BCryptPasswordEncoder();
 
     /**
-     * Define user access to user roles here
-     *
-     * @param auth
-     * @throws Exception
+     * In memory auth service and token store made public so it is accessible
+     * from rest classes.
      */
+    private static final InMemoryTokenStore IN_MEM_TOKEN_STORE = new InMemoryTokenStore();
+
     @Autowired
     public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
-        authService = auth.inMemoryAuthentication();
-        List<Resource> resources = repository.findAll();
-        if (!resources.isEmpty()) {
-            loadUserAccess(resources);
-        } else {
-            authService.withUser(SecurityPropertiesManager.getProperty("admin.user"))
-                    .password(SecurityPropertiesManager.getProperty("admin.pass"))
-                    .roles("ADMIN");
-        }
+        auth.userDetailsService(new CustomUserService(repository)).passwordEncoder(PSW_ENCODER);
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(new CustomUserService(repository)).passwordEncoder(PSW_ENCODER);
+    }
+
+    @Override
+    public UserDetailsService userDetailsServiceBean() throws Exception {
+        return new CustomUserService(repository);
     }
 
     @Override
@@ -84,7 +81,7 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public TokenStore tokenStore() {
-        return inMemoryTokenStore;
+        return IN_MEM_TOKEN_STORE;
     }
 
     @Bean
@@ -110,18 +107,8 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
         return store;
     }
 
-    public static void loadUserAccess(List<Resource> resources) throws Exception {
-        for (Resource resource : resources) {
-            if (resource.isSystemUser()) {
-                authService.withUser(resource.getUserName())
-                        .password(resource.getPassword())
-                        .roles("ADMIN");
-            }
-        }
-    }
-
     public static String getUserForToken(String token) {
-        return inMemoryTokenStore.readAuthentication(token).getName();
+        return IN_MEM_TOKEN_STORE.readAuthentication(token).getName();
     }
 
     @Override

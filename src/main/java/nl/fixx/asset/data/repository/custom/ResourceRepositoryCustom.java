@@ -13,5 +13,7 @@ public interface ResourceRepositoryCustom {
 
     Resource findByEmail(String email);
 
+    Resource findByUserName(String username);
+
     List<Resource> findByFullname(String name, String surname);
 }

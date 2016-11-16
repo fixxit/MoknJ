@@ -43,7 +43,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 // auth
                 // user
                 .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
-                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
+                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")// needs to be changed???? TODO!
                 .scopes("read", "write", "trust")
                 .secret(SecurityPropertiesManager.getProperty("security.secret")) // basic
                 // auth

@@ -79,7 +79,7 @@ public class TypeController {
                 response.setType(type);
             } else {
                 response.setSuccess(false);
-                response.setMessage("Asset type by name " + payload.getName() + "exists");
+                response.setMessage("Asset type by name " + payload.getName() + " exists");
             }
         } catch (IllegalArgumentException ex) {
             response.setSuccess(false);

@@ -1,5 +1,6 @@
 package nl.fixx.asset.data.domain;
 
+import java.util.List;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -20,6 +21,7 @@ public class Resource {
     private String userName;
     private String password;
     private boolean hidden;
+    private List<String> roles;
 
     public String getId() {
         return id;
@@ -125,6 +127,20 @@ public class Resource {
         this.hidden = hidden;
     }
 
+    /**
+     * @return the roles
+     */
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    /**
+     * @param roles the roles to set
+     */
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
     @Override
     public String toString() {
         return "Resource{" + "id=" + id
@@ -136,7 +152,8 @@ public class Resource {
                 + ", systemUser=" + systemUser
                 + ", userName=" + userName
                 + ", password=" + password
-                + ", hidden=" + hidden + '}';
+                + ", hidden=" + hidden
+                + ", roles=" + roles + '}';
     }
 
 }
