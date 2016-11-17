@@ -19,13 +19,13 @@ public class ResourceRepositoryImpl implements ResourceRepositoryCustom {
 
     @Override
     public Resource findById(String id) {
-        Query query = new Query(new Criteria().where("id").is(id));
+        Query query = new Query(Criteria.where("id").is(id));
         return operations.findOne(query, Resource.class);
     }
 
     @Override
     public Resource findByEmail(String email) {
-        Query query = new Query(new Criteria().where("email").is(email));
+        Query query = new Query(Criteria.where("email").is(email));
         return operations.findOne(query, Resource.class);
     }
 
@@ -40,10 +40,8 @@ public class ResourceRepositoryImpl implements ResourceRepositoryCustom {
 
     @Override
     public Resource findByUserName(String username) {
-        System.out.println("finding username : " + username);
-        Query query = new Query(new Criteria().where("userName").is(username));
+        Query query = new Query(Criteria.where("userName").is(username));
         Resource resource = operations.findOne(query, Resource.class);
-        System.out.println("finding username : " + resource.toString());
         return resource;
     }
 }
