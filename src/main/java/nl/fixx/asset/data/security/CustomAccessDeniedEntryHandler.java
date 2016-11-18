@@ -9,48 +9,30 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import static nl.fixx.asset.data.security.CustomAuthenticationEntryPoint.getFullURL;
 import nl.fixx.asset.data.util.SecurityPropertiesManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.provider.error.AbstractOAuth2SecurityExceptionHandler;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.util.StringUtils;
 
 /**
  *
  * @author adriaan
  */
-public class CustomAuthenticationEntryPoint extends AbstractOAuth2SecurityExceptionHandler implements AuthenticationEntryPoint {
+public class CustomAccessDeniedEntryHandler extends AbstractOAuth2SecurityExceptionHandler implements AccessDeniedHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CustomAuthenticationEntryPoint.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CustomAccessDeniedEntryHandler.class);
 
     private final String typeName = OAuth2AccessToken.BEARER_TYPE;
 
     private final String realmName = SecurityPropertiesManager.getProperty("security.realm");
-
-    public static String getFullURL(HttpServletRequest request) {
-        StringBuffer requestURL = request.getRequestURL();
-        String queryString = request.getQueryString();
-
-        if (queryString == null) {
-            return requestURL.toString();
-        } else {
-            return requestURL.append('?').append(queryString).toString();
-        }
-    }
-
-    @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        String uri = getFullURL(request);
-        LOG.info("access authenticated redirect:" + uri);
-        response.addHeader("Access-Control-Allow-Origin", "*");
-        doHandle(request, response, authException);
-    }
 
     @Override
     protected ResponseEntity<OAuth2Exception> enhanceResponse(ResponseEntity<OAuth2Exception> response, Exception exception) {
@@ -79,6 +61,14 @@ public class CustomAuthenticationEntryPoint extends AbstractOAuth2SecurityExcept
             existing = StringUtils.arrayToDelimitedString(tokens, " ").substring(existing.indexOf(" ") + 1);
         }
         return existing;
+    }
+
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        String uri = getFullURL(request);
+        System.out.println("access denied redirect:" + uri);
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        doHandle(request, response, accessDeniedException);
     }
 
 }

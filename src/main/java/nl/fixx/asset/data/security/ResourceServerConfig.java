@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -69,22 +68,34 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.resourceId(RESOURCE_ID).stateless(false).authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+        resources.resourceId(RESOURCE_ID)
+                .stateless(false)
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint());
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.anonymous().disable().requestMatchers().antMatchers("/asset/**")// change
-                // this
-                // part
-                // for
+        http.anonymous().disable().requestMatchers()
+                .antMatchers("/asset/**", "/type/**", "/link/**", "/resource/**")
                 .and()
                 .authorizeRequests()
                 .antMatchers("/asset/**")
-                .hasAuthority("ADMIN")
+                .hasAuthority("ASSET")
+                .and()
+                .authorizeRequests()
+                .antMatchers("/type/**")
+                .hasAuthority("TYPE")
+                .and()
+                .authorizeRequests()
+                .antMatchers("/link/**")
+                .hasAuthority("LINK")
+                .and()
+                .authorizeRequests()
+                .antMatchers("/resource/**")
+                .hasAuthority("RESOURCE")
                 .and()
                 .exceptionHandling()
-                .accessDeniedHandler(new OAuth2AccessDeniedHandler());
+                .accessDeniedHandler(new CustomAccessDeniedEntryHandler());
     }
 
 }

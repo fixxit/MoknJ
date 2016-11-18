@@ -5,6 +5,7 @@ import java.util.List;
 import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.domain.AssetLink;
 import nl.fixx.asset.data.domain.Resource;
+import nl.fixx.asset.data.domain.ResourceAuthority;
 import nl.fixx.asset.data.info.ResourceResponse;
 import nl.fixx.asset.data.repository.AssetLinkRepository;
 import nl.fixx.asset.data.repository.AssetRepository;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @CrossOrigin // added for cors, allow access from another web server
 @RestController
-@RequestMapping(value = "/asset/resource")
+@RequestMapping(value = "/resource")
 public class ResourceController {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceController.class);
@@ -45,7 +46,7 @@ public class ResourceController {
         this.passwordEncoder = PSW_ENCODER;
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.POST)
+    @RequestMapping(value = "/get/all", method = RequestMethod.POST)
     public ResourceResponse all() {
         final ResourceResponse resourceResponse = new ResourceResponse();
         List<Resource> resources = new ArrayList<>();
@@ -142,7 +143,20 @@ public class ResourceController {
         return resourceResponse;
     }
 
-    // DELETE SHOULD DELET THE RESOUCRE IF NO ASSET OR AUDIT IS linked else hide
+    @RequestMapping(value = "/authorities", method = RequestMethod.POST)
+    public ResourceResponse authorities() {
+        final ResourceResponse resourceResponse = new ResourceResponse();
+        resourceResponse.setAuthorities(new ArrayList<>());
+
+        ResourceAuthority[] auths = ResourceAuthority.values();
+        for (ResourceAuthority auth : auths) {
+            resourceResponse.getAuthorities().add(auth.toString());
+        }
+
+        return resourceResponse;
+    }
+
+    // DELETE SHOULD DELETE THE RESOUCRE IF NO ASSET OR AUDIT IS linked else hide
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     public ResourceResponse delete(@PathVariable String id) {
         final ResourceResponse resourceResponse = new ResourceResponse();

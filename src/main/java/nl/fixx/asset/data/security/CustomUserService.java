@@ -8,6 +8,7 @@ package nl.fixx.asset.data.security;
 import java.util.HashSet;
 import java.util.Set;
 import nl.fixx.asset.data.domain.Resource;
+import nl.fixx.asset.data.domain.ResourceAuthority;
 import nl.fixx.asset.data.repository.ResourceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +34,14 @@ public class CustomUserService implements UserDetailsService {
 
     private Set<GrantedAuthority> getAuthorities(Resource user) {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        if (user.getRoles() != null && user.getRoles().isEmpty()) {
-            user.getRoles().stream().forEach((role) -> {
-                authorities.add(new SimpleGrantedAuthority(role));
+        if (user.getAuthorities() != null && !user.getAuthorities().isEmpty()) {
+            user.getAuthorities().stream().forEach((auth) -> {
+                ResourceAuthority resAuth = ResourceAuthority.authority(auth);
+                if (!ResourceAuthority.ALL_ACCESS.equals(resAuth)) {
+                    if (resAuth != null) {
+                        authorities.add(new SimpleGrantedAuthority(resAuth.name()));
+                    }
+                }
             });
         } else {
             LOG.info("BAD BAD!");
@@ -43,8 +49,11 @@ public class CustomUserService implements UserDetailsService {
             LOG.info("###This is bad setting default access rights!###");
             LOG.info("###default access rights are admin NOT COOL!!###");
             LOG.info("################################################");
-            GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ADMIN");
-            authorities.add(grantedAuthority);
+            for (ResourceAuthority auth : ResourceAuthority.values()) {
+                if (!auth.equals(ResourceAuthority.ALL_ACCESS)) {
+                    authorities.add((GrantedAuthority) new SimpleGrantedAuthority(auth.name()));
+                }
+            }
         }
         LOG.info("user authorities are " + authorities.toString());
         return authorities;

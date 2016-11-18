@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @CrossOrigin // added for cors, allow access from another web server
 @RestController
-@RequestMapping(value = "/asset/type")
+@RequestMapping(value = "/type")
 public class TypeController {
 
     @Autowired

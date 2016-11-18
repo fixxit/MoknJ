@@ -21,7 +21,7 @@ public class Resource {
     private String userName;
     private String password;
     private boolean hidden;
-    private List<String> roles;
+    private List<String> authorities;
 
     public String getId() {
         return id;
@@ -128,17 +128,17 @@ public class Resource {
     }
 
     /**
-     * @return the roles
+     * @return the authorities
      */
-    public List<String> getRoles() {
-        return roles;
+    public List<String> getAuthorities() {
+        return authorities;
     }
 
     /**
-     * @param roles the roles to set
+     * @param authorities the authorities to set
      */
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
+    public void setAuthorities(List<String> authorities) {
+        this.authorities = authorities;
     }
 
     @Override
@@ -153,7 +153,7 @@ public class Resource {
                 + ", userName=" + userName
                 + ", password=" + password
                 + ", hidden=" + hidden
-                + ", roles=" + roles + '}';
+                + ", authorities=" + authorities + '}';
     }
 
 }

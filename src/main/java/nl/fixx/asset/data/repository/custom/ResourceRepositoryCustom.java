@@ -1,4 +1,3 @@
-
 package nl.fixx.asset.data.repository.custom;
 
 import java.util.List;
@@ -9,11 +8,12 @@ import nl.fixx.asset.data.domain.Resource;
  * @author colin
  */
 public interface ResourceRepositoryCustom {
-    Resource findById(String id);
 
-    Resource findByEmail(String email);
+    public Resource findById(String id);
 
-    Resource findByUserName(String username);
+    public Resource findByEmail(String email);
 
-    List<Resource> findByFullname(String name, String surname);
+    public Resource findByUserName(String username);
+
+    public List<Resource> findByFullname(String name, String surname);
 }
