@@ -20,6 +20,7 @@ public class AssetType {
     // Fields names (etc <Sizeinteger>) and field type
     private List<AssetFieldDetail> details;
     private boolean hidden;
+    private String index;
 
     /**
      * @return the id
@@ -70,9 +71,23 @@ public class AssetType {
         this.hidden = hidden;
     }
 
+    /**
+     * @return the index
+     */
+    public String getIndex() {
+        return index;
+    }
+
+    /**
+     * @param index the index to set
+     */
+    public void setIndex(String index) {
+        this.index = index;
+    }
+
     @Override
     public String toString() {
-        return "AssetType{" + "id=" + id + ", name=" + name + ", details=" + details + ", hidden=" + hidden + '}';
+        return "AssetType{" + "id=" + id + ", name=" + name + ", details=" + details + ", hidden=" + hidden + ", index=" + index + '}';
     }
 
 }

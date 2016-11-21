@@ -40,6 +40,8 @@ public class ResourceController {
     @Autowired
     private AssetLinkRepository auditRep;
 
+    public static String ADMIN_NAME = "fixxit";
+
     private final BCryptPasswordEncoder passwordEncoder;
 
     public ResourceController() {
@@ -51,7 +53,8 @@ public class ResourceController {
         final ResourceResponse resourceResponse = new ResourceResponse();
         List<Resource> resources = new ArrayList<>();
         resourceRep.findAll().stream()
-                .filter((resource) -> (!resource.isHidden()))
+                .filter((resource) -> (!resource.isHidden()
+                        && !ADMIN_NAME.equals(resource.getUserName())))
                 .forEach((resource) -> {
                     resources.add(resource);
                 });

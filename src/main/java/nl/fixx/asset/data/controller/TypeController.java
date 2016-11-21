@@ -6,6 +6,7 @@
 package nl.fixx.asset.data.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.domain.AssetFieldType;
@@ -18,6 +19,7 @@ import nl.fixx.asset.data.repository.AssetLinkRepository;
 import nl.fixx.asset.data.repository.AssetRepository;
 import nl.fixx.asset.data.repository.TypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.comparator.NullSafeComparator;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -103,8 +105,14 @@ public class TypeController {
         TypeResponse response = new TypeResponse();
         List<AssetType> templates = typeRep.findAll();
         List<AssetType> types = new ArrayList<>();
+
         templates.stream().filter((type) -> (!type.isHidden())).forEach((type) -> {
             types.add(type);
+        });
+
+        Collections.sort(types, (AssetType a1, AssetType a2) -> {
+            return new NullSafeComparator<>(String::compareTo,
+                    true).compare(a1.getIndex(), a2.getIndex());
         });
 
         response.setTypes(types);

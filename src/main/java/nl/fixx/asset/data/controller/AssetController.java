@@ -10,10 +10,12 @@ import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.domain.AssetField;
 import nl.fixx.asset.data.domain.AssetFieldDetail;
 import nl.fixx.asset.data.domain.AssetLink;
+import nl.fixx.asset.data.domain.Resource;
 import nl.fixx.asset.data.info.AssetResponse;
 import nl.fixx.asset.data.repository.AssetFieldDetailRepository;
 import nl.fixx.asset.data.repository.AssetLinkRepository;
 import nl.fixx.asset.data.repository.AssetRepository;
+import nl.fixx.asset.data.repository.ResourceRepository;
 import nl.fixx.asset.data.security.OAuth2SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,6 +37,8 @@ public class AssetController {
     private AssetFieldDetailRepository fieldRep; // Asset Field Detail Repository
     @Autowired
     private AssetLinkRepository auditRep; // Asset Audit Repository
+    @Autowired
+    private ResourceRepository resourceRep;
 
     @RequestMapping(value = "/add/{id}", method = RequestMethod.POST)
     public AssetResponse add(@PathVariable String id,
@@ -118,22 +122,37 @@ public class AssetController {
                     return response;
                 }
 
-                saveAsset.setLastModifiedBy(OAuth2SecurityConfig.getUserForToken(access_token));
-                saveAsset.setLastModifiedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                Resource user = resourceRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
+                if (user != null && user.isSystemUser()) {
+                    String fullname = user.getFirstName() + " " + user.getSurname();
+                    if (!fullname.trim().isEmpty()) {
+                        saveAsset.setLastModifiedBy(fullname);
+                    } else {
+                        saveAsset.setLastModifiedBy(user.getUserName());
+                    }
+                } else {
+                    response.setSuccess(false);
+                    response.setMessage("Asset save error, could not find system"
+                            + " user for this token");
+                    return response;
+                }
+
+                saveAsset.setLastModifiedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
                 Asset savedAsset = rep.save(saveAsset);
                 response.setSuccess(true);
                 response.setAsset(saveAsset);
                 response.setMessage("saved asset[" + savedAsset.getId() + "]");
+                return response;
             } else {
                 response.setSuccess(false);
                 response.setMessage("No asset type id provided.");
+                return response;
             }
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
+            return response;
         }
-
-        return response;
     }
 
     @RequestMapping(value = "/get/all/{id}", method = RequestMethod.POST)

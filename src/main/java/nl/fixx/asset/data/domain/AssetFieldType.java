@@ -10,8 +10,8 @@ package nl.fixx.asset.data.domain;
  * @author adriaan
  */
 public enum AssetFieldType {
-    ASSET_INPUT_INT_TYPE("Integer"),
-    ASSET_INPUT_STR_TYPE("String"),
+    ASSET_INPUT_INT_TYPE("Number"),
+    ASSET_INPUT_STR_TYPE("Text"),
     ASSET_INPUT_DAT_TYPE("Date"),
     ASSET_INPUT_MON_TYPE("Monetary");
 

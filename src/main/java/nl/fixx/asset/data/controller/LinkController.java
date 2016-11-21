@@ -7,9 +7,13 @@ package nl.fixx.asset.data.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import nl.fixx.asset.data.domain.Asset;
 import nl.fixx.asset.data.domain.AssetLink;
+import nl.fixx.asset.data.domain.Resource;
 import nl.fixx.asset.data.info.LinkResponse;
 import nl.fixx.asset.data.repository.AssetLinkRepository;
+import nl.fixx.asset.data.repository.AssetRepository;
+import nl.fixx.asset.data.repository.ResourceRepository;
 import nl.fixx.asset.data.security.OAuth2SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -32,14 +36,42 @@ public class LinkController {
 
     @Autowired
     private AssetLinkRepository auditRep; // Asset Audit Repository
+    @Autowired
+    private AssetRepository assetRep;// main asset Repository
+    @Autowired
+    private ResourceRepository resourceRep;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public LinkResponse add(@RequestBody AssetLink payload, @RequestParam String access_token) {
         final LinkResponse response = new LinkResponse();
         try {
-            payload.setCreatedBy(OAuth2SecurityConfig.getUserForToken(access_token));
-            payload.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            String user = getUserName(access_token);
+            if (user != null && !user.trim().isEmpty()) {
+                payload.setCreatedBy(user);
+            } else {
+                response.setSuccess(false);
+                response.setMessage("Could not find system user for this token");
+                return response;
+            }
+
+            payload.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
             response.setLink(this.auditRep.save(payload));
+
+            // add resource id to asset depending on isChecked
+            if (payload.getAssetId() != null) {
+                Asset dbAsset = assetRep.findOne(payload.getAssetId());
+                if (payload.isChecked()) {
+                    dbAsset.setResourceId(payload.getResourceId());
+                } else {
+                    dbAsset.setResourceId(null);
+                }
+
+                dbAsset.setLastModifiedBy(user);
+                dbAsset.setLastModifiedDate(
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
+                assetRep.save(dbAsset);
+            }
+
             response.setSuccess(response.getLink() != null);
             response.setMessage("Saved type[" + response.getLink().getId() + "]");
         } catch (Exception ex) {
@@ -47,6 +79,20 @@ public class LinkController {
             response.setMessage(ex.getMessage());
         }
         return response;
+    }
+
+    private String getUserName(String access_token) throws Exception {
+        String username = null;
+        Resource user = resourceRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
+        if (user != null && user.isSystemUser()) {
+            String fullname = user.getFirstName() + " " + user.getSurname();
+            if (!fullname.trim().isEmpty()) {
+                username = fullname;
+            } else {
+                username = user.getUserName();
+            }
+        }
+        return username;
     }
 
     /**
