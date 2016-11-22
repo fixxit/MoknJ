@@ -68,9 +68,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.resourceId(RESOURCE_ID)
-                .stateless(false)
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+        resources.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .resourceId(RESOURCE_ID)
+                .stateless(false);
     }
 
     @Override

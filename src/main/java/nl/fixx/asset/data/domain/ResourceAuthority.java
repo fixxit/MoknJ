@@ -38,9 +38,7 @@ public enum ResourceAuthority {
     public static ResourceAuthority authority(String value) {
         for (ResourceAuthority auth : ResourceAuthority.values()) {
             if (auth.displayName.equals(value)) {
-                if (!auth.equals(ResourceAuthority.ALL_ACCESS)) {
-                    return auth;
-                }
+                return auth;
             }
         }
         return null;

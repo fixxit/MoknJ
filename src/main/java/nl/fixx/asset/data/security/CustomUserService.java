@@ -41,21 +41,17 @@ public class CustomUserService implements UserDetailsService {
                     if (resAuth != null) {
                         authorities.add(new SimpleGrantedAuthority(resAuth.name()));
                     }
+                } else {
+                    LOG.info("adding full admin rights!");
+                    for (ResourceAuthority auths : ResourceAuthority.values()) {
+                        if (!authorities.contains(auths)) {
+                            authorities.add(new SimpleGrantedAuthority(auths.name()));
+                        }
+                    }
                 }
             });
-        } else {
-            LOG.info("BAD BAD!");
-            LOG.info("################################################");
-            LOG.info("###This is bad setting default access rights!###");
-            LOG.info("###default access rights are admin NOT COOL!!###");
-            LOG.info("################################################");
-            for (ResourceAuthority auth : ResourceAuthority.values()) {
-                if (!auth.equals(ResourceAuthority.ALL_ACCESS)) {
-                    authorities.add((GrantedAuthority) new SimpleGrantedAuthority(auth.name()));
-                }
-            }
         }
-        LOG.info("user authorities are " + authorities.toString());
+        LOG.info("authorities " + authorities);
         return authorities;
     }
 
@@ -64,7 +60,6 @@ public class CustomUserService implements UserDetailsService {
         try {
             Resource user = repository.findByUserName(username);
             if (user == null || !user.isSystemUser()) {
-                LOG.info("user not found with the provided username");
                 throw new UsernameNotFoundException("User not found");
             }
             return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), getAuthorities(user));

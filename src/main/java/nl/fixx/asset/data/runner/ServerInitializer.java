@@ -5,6 +5,8 @@
  */
 package nl.fixx.asset.data.runner;
 
+import java.util.ArrayList;
+import java.util.List;
 import nl.fixx.asset.data.controller.ResourceController;
 import nl.fixx.asset.data.domain.Resource;
 import nl.fixx.asset.data.repository.ResourceRepository;
@@ -47,15 +49,18 @@ public class ServerInitializer implements ApplicationRunner {
             resource.setSystemUser(true);
             resource.setUserName(ResourceController.ADMIN_NAME);
             resource.setPassword(passwordEncoder.encode("fix!2"));
+            List<String> auths = new ArrayList<>();
+            auths.add("Administrator rights");
+            resource.setAuthorities(auths);
 
             Resource indb = resp.findByUserName(ResourceController.ADMIN_NAME);
             if (indb != null && indb.getId() != null) {
-                LOG.info("Sysadmin exists skipping creation of user!");
-            } else {
-                Resource saved = resp.save(resource);
-                LOG.info("inserted sysadmin [" + saved.getId() + "] user "
-                        + "fixxit no sysadmin is present...");
+                resource.setId(indb.getId());
             }
+
+            Resource saved = resp.save(resource);
+            LOG.info("Setting sysadmin [" + saved.getId() + "] user "
+                    + "fixxit no sysadmin is present...");
         } catch (Exception ex) {
             LOG.info("Error running system init", ex);
         }

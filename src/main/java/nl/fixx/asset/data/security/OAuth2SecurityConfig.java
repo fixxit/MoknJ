@@ -37,6 +37,7 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private ClientDetailsService clientDetailsService;
+
     @Autowired
     private ResourceRepository repository;
 
