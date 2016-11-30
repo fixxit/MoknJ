@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.fixxit</groupId>
-    <artifactId>FixxITAssetTrackerAPI</artifactId>
+    <artifactId>FixxITMoknj</artifactId>
     <version>0.1.0</version>
 
     <parent>
@@ -126,4 +126,5 @@
         </plugins>
     </build>
     <packaging>war</packaging>
+    <name>FixxITMoknj</name>
 </project>

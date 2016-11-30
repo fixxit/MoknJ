@@ -1,12 +1,14 @@
 package nl.fixx.asset.data;
 
+import nl.it.fixx.moknj.builders.UserBuilder;
+import nl.it.fixx.moknj.config.MongoConfiguration;
+import nl.it.fixx.moknj.domain.core.user.User;
+import nl.it.fixx.moknj.repository.UserRepository;
+import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-
-import nl.fixx.asset.data.builders.ResourceBuilder;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,48 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import nl.fixx.asset.data.config.MongoConfiguration;
-import nl.fixx.asset.data.domain.Resource;
-import nl.fixx.asset.data.repository.ResourceRepository;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {MongoConfiguration.class})
 public class TestResourceRepository {
 
     @Autowired
-    ResourceRepository repository;
+    UserRepository repository;
 
     @Before
     public void init() {
@@ -64,21 +30,21 @@ public class TestResourceRepository {
 
     @Test
     public void saveTest() {
-        Resource resource = new ResourceBuilder()
+        User resource = new UserBuilder()
                 .contactNumber("0644010101")
                 .email("junit_test@fixx.it")
                 .firstName("Courage")
                 .surname("Cowardly Dog")
                 .build();
 
-        Resource resourceRet = this.repository.save(resource);
+        User resourceRet = this.repository.save(resource);
 
         assertNotNull(resourceRet.getId());
     }
 
     @Test
     public void updateTest() {
-        Resource resource = this.repository.findByEmail("junit_test@fixx.it");
+        User resource = this.repository.findByEmail("junit_test@fixx.it");
         String id = resource.getId();
         assertNotNull(resource);
 
@@ -98,7 +64,7 @@ public class TestResourceRepository {
     @Test
     public void findByIdEmailTest() {
         // first find without id
-        Resource resource = this.repository.findByEmail("junit_test@fixx.it");
+        User resource = this.repository.findByEmail("junit_test@fixx.it");
         assertNotNull(resource);
 
         resource = this.repository.findById(resource.getId());
@@ -110,7 +76,7 @@ public class TestResourceRepository {
 
     @Test
     public void deleteTest() {
-        Resource resource = this.repository.findByEmail("junit_test@fixx.it");
+        User resource = this.repository.findByEmail("junit_test@fixx.it");
         assertNotNull(resource);
 
         this.repository.findById(resource.getId());
@@ -122,7 +88,7 @@ public class TestResourceRepository {
     @After
     public void cleanup() {
         while (true) {
-            Resource resource = this.repository.findByEmail("junit_test@fixx.it");
+            User resource = this.repository.findByEmail("junit_test@fixx.it");
             if (resource != null) {
                 // System.out.println("******************************************deleting:
                 // " + resource.toString());
@@ -135,7 +101,7 @@ public class TestResourceRepository {
 
     /*
      * { "_id" : ObjectId("58073ae0194e922778916055"), "_class" :
-     * "nl.fixx.asset.data.domain.Resource", "firstName" : "Courage", "surname"
+     * "nl.fixx.asset.data.domain.User", "firstName" : "Courage", "surname"
      * : "Cowardly Dog", "email" : "junit_test@fixx.it", "contactNumber" :
      * "0644010101", "assetList" : [] }
      */
