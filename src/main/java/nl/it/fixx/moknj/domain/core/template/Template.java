@@ -5,9 +5,9 @@
  */
 package nl.it.fixx.moknj.domain.core.template;
 
-import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
-import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import java.util.List;
+import nl.it.fixx.moknj.domain.core.field.FieldDetail;
+import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -23,7 +23,6 @@ public class Template {
     // Fields names (etc <Sizeinteger>) and field type
     protected List<FieldDetail> details;
     protected boolean hidden;
-    protected String index;
 
     /**
      * @return the id
@@ -75,20 +74,6 @@ public class Template {
     }
 
     /**
-     * @return the index
-     */
-    public String getIndex() {
-        return index;
-    }
-
-    /**
-     * @param index the index to set
-     */
-    public void setIndex(String index) {
-        this.index = index;
-    }
-
-    /**
      * @return the templateType
      */
     public GlobalTemplateType getTemplateType() {
@@ -104,7 +89,7 @@ public class Template {
 
     @Override
     public String toString() {
-        return "Template{" + "id=" + id + ", name=" + name + ", templateType=" + templateType + ", details=" + details + ", hidden=" + hidden + ", index=" + index + '}';
+        return "Template{" + "id=" + id + ", name=" + name + ", templateType=" + templateType + ", details=" + details + ", hidden=" + hidden + '}';
     }
 
 }

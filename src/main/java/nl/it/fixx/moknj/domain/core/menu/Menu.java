@@ -1,6 +1,7 @@
 package nl.it.fixx.moknj.domain.core.menu;
 
 import java.util.List;
+import nl.it.fixx.moknj.domain.core.template.Template;
 
 /**
  *
@@ -12,8 +13,7 @@ public class Menu {
     private String name;
     private String pageName;
     private String index;
-
-    private List<String> templates;
+    private List<Template> templates;
 
     /**
      * @return the id
@@ -39,14 +39,14 @@ public class Menu {
     /**
      * @return the templates
      */
-    public List<String> getTemplates() {
+    public List<Template> getTemplates() {
         return templates;
     }
 
     /**
      * @param templates the templates to set
      */
-    public void setTemplates(List<String> templates) {
+    public void setTemplates(List<Template> templates) {
         this.templates = templates;
     }
 
@@ -80,8 +80,7 @@ public class Menu {
 
     @Override
     public String toString() {
-        return "Menu{" + "id=" + id + ", name=" + name + ", cardName=" + pageName
-                + ", index=" + index + ", templates=" + templates + '}';
+        return "Menu{" + "id=" + id + ", name=" + name + ", pageName=" + pageName + ", index=" + index + ", templates=" + templates + '}';
     }
 
 }

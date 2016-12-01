@@ -6,7 +6,6 @@
 package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import nl.it.fixx.moknj.domain.core.field.FieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
@@ -21,7 +20,6 @@ import nl.it.fixx.moknj.repository.FieldDetailRepository;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import nl.it.fixx.moknj.response.TemplateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.comparator.NullSafeComparator;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -110,11 +108,6 @@ public class TemplateController {
 
         templates.stream().filter((type) -> (!type.isHidden())).forEach((type) -> {
             types.add(type);
-        });
-
-        Collections.sort(types, (Template a1, Template a2) -> {
-            return new NullSafeComparator<>(String::compareTo,
-                    true).compare(a1.getIndex(), a2.getIndex());
         });
 
         response.setTypes(types);
