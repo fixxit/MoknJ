@@ -3,7 +3,9 @@ package nl.it.fixx.moknj.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import nl.it.fixx.moknj.domain.core.global.GlobalMenuType;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
+import nl.it.fixx.moknj.domain.core.menu.MenuType;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.repository.MenuRepository;
 import nl.it.fixx.moknj.repository.TemplateRepository;
@@ -32,6 +34,11 @@ public class MenuContoller {
     @Autowired
     private TemplateRepository typeRep;
 
+    /**
+     *
+     * @param payload
+     * @return
+     */
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody
     MenuResponse add(@RequestBody Menu payload) {
@@ -70,6 +77,12 @@ public class MenuContoller {
         return response;
     }
 
+    /**
+     * Gets menu by id.
+     *
+     * @param id
+     * @return
+     */
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public @ResponseBody
     MenuResponse get(@PathVariable String id) {
@@ -79,12 +92,17 @@ public class MenuContoller {
             List<Template> templates = menu.getTemplates();
             for (int tempIndex = 0; tempIndex < templates.size(); tempIndex++) {
                 Template temp = templates.get(tempIndex);
-                Template template = typeRep.findOne(temp.getId());
-                if (template != null) {
-                    if (template.isHidden()) {
+
+                Template globalTemplate = typeRep.findOne(temp.getId());
+                if (globalTemplate != null) {
+                    // sets teh template menu rules down to template passed back
+                    globalTemplate.setAllowScopeChallenge(temp.isAllowScopeChallenge());
+
+                    // check if template is hidden
+                    if (globalTemplate.isHidden()) {
                         templates.remove(tempIndex);
                     } else {
-                        templates.set(tempIndex, template);
+                        templates.set(tempIndex, globalTemplate);
                     }
                 } else {
                     templates.remove(tempIndex);
@@ -98,6 +116,11 @@ public class MenuContoller {
         return response;
     }
 
+    /**
+     * Used to get all mapped menu's from db.
+     *
+     * @return
+     */
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public @ResponseBody
     MenuResponse all() {
@@ -109,16 +132,20 @@ public class MenuContoller {
             List<Template> templates = menu.getTemplates();
             for (int tempIndex = 0; tempIndex < templates.size(); tempIndex++) {
                 Template temp = templates.get(tempIndex);
-                Template template = typeRep.findOne(temp.getId());
+
+                Template globalTemplate = typeRep.findOne(temp.getId());
                 // check if template is in db
-                if (template != null) {
+                if (globalTemplate != null) {
+                    // sets teh template menu rules down to template passed back
+                    globalTemplate.setAllowScopeChallenge(temp.isAllowScopeChallenge());
+
                     // check if template is hidden
-                    if (template.isHidden()) {
+                    if (globalTemplate.isHidden()) {
                         // remove from list if so
                         templates.remove(tempIndex);
                     } else {
                         // update template with db version
-                        templates.set(tempIndex, template);
+                        templates.set(tempIndex, globalTemplate);
                     }
                 } else {
                     // if db does not contain the template remove it from list.
@@ -157,6 +184,24 @@ public class MenuContoller {
             response.setMessage(ex.getMessage());
         }
 
+        return response;
+    }
+
+    /**
+     * Gets all the modules allowed for menu item
+     *
+     * @return
+     */
+    @RequestMapping(value = "/module/types", method = RequestMethod.POST)
+    public @ResponseBody
+    MenuResponse getMenuTypes() {
+        MenuResponse response = new MenuResponse();
+        GlobalMenuType[] moduleTypes = GlobalMenuType.values();
+        List<MenuType> menuTypes = new ArrayList<>();
+        for (GlobalMenuType type : moduleTypes) {
+            menuTypes.add(new MenuType(type.name(), type.getName(), type.getTemplate()));
+        }
+        response.setMenuTypes(menuTypes);
         return response;
     }
 

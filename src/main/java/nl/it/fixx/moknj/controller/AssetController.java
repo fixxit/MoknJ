@@ -6,15 +6,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
+import nl.it.fixx.moknj.domain.core.menu.Menu;
+import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
-import nl.it.fixx.moknj.response.AssetResponse;
+import nl.it.fixx.moknj.domain.modules.asset.Asset;
+import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
+import nl.it.fixx.moknj.repository.MenuRepository;
+import nl.it.fixx.moknj.repository.UserRepository;
+import nl.it.fixx.moknj.response.AssetResponse;
 import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import nl.it.fixx.moknj.repository.UserRepository;
 
 @CrossOrigin // added for cors, allow access from another web server
 @RestController
@@ -32,13 +35,15 @@ import nl.it.fixx.moknj.repository.UserRepository;
 public class AssetController {
 
     @Autowired
-    private AssetRepository rep;// main asset Repository
+    private AssetRepository assetRep;// main asset Repository
     @Autowired
     private FieldDetailRepository fieldRep; // Asset FieldValue Detail Repository
     @Autowired
     private AssetLinkRepository auditRep; // Asset Audit Repository
     @Autowired
     private UserRepository resourceRep;
+    @Autowired
+    private MenuRepository menuRep;
 
     @RequestMapping(value = "/add/{id}", method = RequestMethod.POST)
     public AssetResponse add(@PathVariable String id,
@@ -54,7 +59,7 @@ public class AssetController {
                 // which has not changed from the db version...
                 String flag = null;
                 if (saveAsset.getId() != null) {
-                    Asset dbAsset = rep.findOne(saveAsset.getId());
+                    Asset dbAsset = assetRep.findOne(saveAsset.getId());
                     if (saveAsset.equals(dbAsset)) {
                         flag = "no_changes";
                     } else {
@@ -80,7 +85,7 @@ public class AssetController {
                 });
 
                 // Create a list of all the values for the unique assets
-                for (Asset asset : rep.getAllByTypeId(id)) {
+                for (Asset asset : assetRep.getAllByTypeId(id)) {
                     // if statement below checks that if update asset does not check
                     // it self to flag for duplication
                     if (!asset.getId().equals(saveAsset.getId())
@@ -122,6 +127,7 @@ public class AssetController {
                     return response;
                 }
 
+                // Get user details who logged this asset using the token.
                 User user = resourceRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
                 if (user != null && user.isSystemUser()) {
                     String fullname = user.getFirstName() + " " + user.getSurname();
@@ -136,9 +142,9 @@ public class AssetController {
                             + " user for this token");
                     return response;
                 }
-
+                // Save asset
                 saveAsset.setLastModifiedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
-                Asset savedAsset = rep.save(saveAsset);
+                Asset savedAsset = assetRep.save(saveAsset);
                 response.setSuccess(true);
                 response.setAsset(saveAsset);
                 response.setMessage("saved asset[" + savedAsset.getId() + "]");
@@ -155,31 +161,68 @@ public class AssetController {
         }
     }
 
-    @RequestMapping(value = "/get/all/{id}", method = RequestMethod.POST)
-    public AssetResponse getAllAssets(@PathVariable String id) {
+    /**
+     * Gets a asset by template id and menu id
+     * @param templateId
+     * @param menuId
+     * @return
+     */
+    @RequestMapping(value = "/get/all/{templateId}/{menuId}", method = RequestMethod.POST)
+    public AssetResponse getAllAssets(@PathVariable String templateId, @PathVariable String menuId) {
         AssetResponse response = new AssetResponse();
         List<Asset> assets = new ArrayList<>();
-        rep.getAllByTypeId(id).stream().filter((asset)
-                -> (!asset.isHidden())).forEach((asset)
+        List<Asset> records = assetRep.getAllByTypeId(templateId);
+        // Gets custom template settings saved to menu.
+        Menu menu = menuRep.findOne(menuId);
+        menu.getTemplates().stream().filter((template)
+                -> (template.getId().equals(templateId))).forEach((Template template)
                 -> {
-            assets.add(asset);
+            records.stream().forEach((Asset record) -> {
+                // checks if scope check is required for this asset.
+                boolean inScope = false;
+                if (template.isAllowScopeChallenge()) {
+                    inScope = record.getMenuScopeIds().contains(menuId);
+                } else {
+                    inScope = true;
+                }
+                // if asset is inscope allow adding of asset.
+                if (inScope) {
+                    // checks if the asset is hidden.
+                    if (!record.isHidden()) {
+                        assets.add(record);
+                    }
+                }
+            });
         });
+
         response.setAssets(assets);
         return response;
     }
 
+    /**
+     * Gets the asset by id
+     *
+     * @param id
+     * @return Asset
+     */
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public AssetResponse get(@PathVariable String id) {
         AssetResponse response = new AssetResponse();
-        response.setAsset(rep.findOne(id));
+        response.setAsset(assetRep.findOne(id));
         return response;
     }
 
+    /**
+     * Deletes or hides asset depending on if it is linked to audit trail
+     *
+     * @param asset
+     * @return
+     */
     @RequestMapping(value = "/delete/", method = RequestMethod.POST)
     public AssetResponse delete(@RequestBody Asset asset) {
         // to insure that the below fields have no influence on find all.
         AssetResponse response = new AssetResponse();
-        Asset result = rep.findOne(asset.getId());
+        Asset result = assetRep.findOne(asset.getId());
         List<AssetLink> assets = auditRep.getAllByAssetId(result.getId());
         try {
             // todo needs a check for linked resources ...
@@ -187,13 +230,13 @@ public class AssetController {
                 if (assets.size() > 0) {
                     // hide asset by updating hidden field=
                     result.setHidden(true);
-                    rep.save(result);
+                    assetRep.save(result);
                     response.setSuccess(true);
                     response.setMessage("Hid asset "
                             + "[" + asset.getId() + "] successfully.");
                 } else {
                     // delete asset from the asset list.
-                    rep.delete(result);
+                    assetRep.delete(result);
                     response.setSuccess(true);
                     response.setMessage("Removed asset "
                             + "[" + asset.getId() + "] successfully.");
@@ -210,11 +253,16 @@ public class AssetController {
         return response;
     }
 
+    /**
+     * Gets all assets
+     *
+     * @return
+     */
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public AssetResponse all() {
         AssetResponse response = new AssetResponse();
         ArrayList assets = new ArrayList<>();
-        assets.addAll(rep.findAll());
+        assets.addAll(assetRep.findAll());
         response.setAssets(assets);
         return response;
     }

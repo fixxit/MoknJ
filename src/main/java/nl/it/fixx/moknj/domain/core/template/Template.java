@@ -23,6 +23,8 @@ public class Template {
     // Fields names (etc <Sizeinteger>) and field type
     protected List<FieldDetail> details;
     protected boolean hidden;
+    // This would allow you to bypass scope, scopes are set to the template entries.
+    private boolean allowScopeChallenge;
 
     /**
      * @return the id
@@ -87,9 +89,23 @@ public class Template {
         this.templateType = templateType;
     }
 
+    /**
+     * @return the allowScopeChallenge
+     */
+    public boolean isAllowScopeChallenge() {
+        return allowScopeChallenge;
+    }
+
+    /**
+     * @param allowScopeChallenge the allowScopeChallenge to set
+     */
+    public void setAllowScopeChallenge(boolean allowScopeChallenge) {
+        this.allowScopeChallenge = allowScopeChallenge;
+    }
+
     @Override
     public String toString() {
-        return "Template{" + "id=" + id + ", name=" + name + ", templateType=" + templateType + ", details=" + details + ", hidden=" + hidden + '}';
+        return "Template{" + "id=" + id + ", name=" + name + ", templateType=" + templateType + ", details=" + details + ", hidden=" + hidden + ", allowScopeChallenge=" + allowScopeChallenge + '}';
     }
 
 }

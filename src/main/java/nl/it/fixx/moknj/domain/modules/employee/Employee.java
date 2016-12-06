@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package nl.it.fixx.moknj.domain.modules.asset;
+package nl.it.fixx.moknj.domain.modules.employee;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,7 +9,7 @@ import org.springframework.data.annotation.Id;
  *
  * @author adriaan
  */
-public class Asset {
+public class Employee {
 
     @Id
     private String id;
@@ -24,16 +19,19 @@ public class Asset {
     private String lastModifiedDate;
     private String lastModifiedBy;
     private boolean hidden;
-    /**
-     * Scope id's define the menu's (cards) which this asset is visible on.
-     */
-    private List<String> menuScopeIds;
 
     /**
      * @return the id
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -62,41 +60,6 @@ public class Asset {
      */
     public void setDetails(List<FieldValue> details) {
         this.details = details;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + Objects.hashCode(this.id);
-        hash = 67 * hash + Objects.hashCode(this.typeId);
-        hash = 67 * hash + Objects.hashCode(this.details);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null) {
-            return false;
-        }
-
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-
-        final Asset other = (Asset) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-
-        if (!Objects.equals(this.typeId, other.typeId)) {
-            return false;
-        }
-
-        return Objects.equals(this.details, other.details);
     }
 
     /**
@@ -155,27 +118,45 @@ public class Asset {
         this.hidden = hidden;
     }
 
-    /**
-     * @return the menuScopeIds
-     */
-    public List<String> getMenuScopeIds() {
-        return menuScopeIds;
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.id);
+        hash = 67 * hash + Objects.hashCode(this.typeId);
+        hash = 67 * hash + Objects.hashCode(this.details);
+        return hash;
     }
 
-    /**
-     * @param menuScopeIds the menuScopeIds to set
-     */
-    public void setMenuScopeIds(List<String> menuScopeIds) {
-        this.menuScopeIds = menuScopeIds;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Employee other = (Employee) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.typeId, other.typeId)) {
+            return false;
+        }
+        if (!Objects.equals(this.details, other.details)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public String toString() {
-        return "Asset{" + "id=" + id + ", typeId=" + typeId
-                + ", details=" + details + ", resourceId=" + resourceId
-                + ", lastModifiedDate=" + lastModifiedDate
-                + ", lastModifiedBy=" + lastModifiedBy + ", hidden=" + hidden
-                + ", scopeIds=" + menuScopeIds + '}';
+        return "Employee{" + "id=" + id + ", typeId=" + typeId + ", details="
+                + details + ", resourceId=" + resourceId + ", lastModifiedDate="
+                + lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy
+                + ", hidden=" + hidden + '}';
     }
 
 }

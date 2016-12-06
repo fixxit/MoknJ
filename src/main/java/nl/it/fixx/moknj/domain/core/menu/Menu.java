@@ -1,6 +1,7 @@
 package nl.it.fixx.moknj.domain.core.menu;
 
 import java.util.List;
+import nl.it.fixx.moknj.domain.core.global.GlobalMenuType;
 import nl.it.fixx.moknj.domain.core.template.Template;
 
 /**
@@ -14,6 +15,7 @@ public class Menu {
     private String pageName;
     private String index;
     private List<Template> templates;
+    private GlobalMenuType menuType;
 
     /**
      * @return the id
@@ -78,9 +80,23 @@ public class Menu {
         this.pageName = pageName;
     }
 
+    /**
+     * @return the menuType
+     */
+    public GlobalMenuType getMenuType() {
+        return menuType;
+    }
+
+    /**
+     * @param menuType the menuType to set
+     */
+    public void setMenuType(GlobalMenuType menuType) {
+        this.menuType = menuType;
+    }
+
     @Override
     public String toString() {
-        return "Menu{" + "id=" + id + ", name=" + name + ", pageName=" + pageName + ", index=" + index + ", templates=" + templates + '}';
+        return "Menu{" + "id=" + id + ", name=" + name + ", pageName=" + pageName + ", index=" + index + ", templates=" + templates + ", menuType=" + menuType + '}';
     }
 
 }

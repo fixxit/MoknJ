@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.response;
 
 import java.util.List;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
+import nl.it.fixx.moknj.domain.core.menu.MenuType;
 
 /**
  *
@@ -15,6 +11,7 @@ import nl.it.fixx.moknj.domain.core.menu.Menu;
 public class MenuResponse extends Response {
 
     private List<Menu> menus;
+    private List<MenuType> menuTypes;
     private Menu menu;
 
     /**
@@ -45,9 +42,23 @@ public class MenuResponse extends Response {
         this.menu = menu;
     }
 
+    /**
+     * @return the menuTypes
+     */
+    public List<MenuType> getMenuTypes() {
+        return menuTypes;
+    }
+
+    /**
+     * @param menuTypes the menuTypes to set
+     */
+    public void setMenuTypes(List<MenuType> menuTypes) {
+        this.menuTypes = menuTypes;
+    }
+
     @Override
     public String toString() {
-        return "MenuResponse{" + "menus=" + menus + ", menu=" + menu + '}';
+        return "MenuResponse{" + "menus=" + menus + ", menuTypes=" + menuTypes + ", menu=" + menu + '}';
     }
 
 }
