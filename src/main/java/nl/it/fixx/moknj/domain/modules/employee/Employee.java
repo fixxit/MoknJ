@@ -19,6 +19,10 @@ public class Employee {
     private String lastModifiedDate;
     private String lastModifiedBy;
     private boolean hidden;
+    /**
+     * Scope id's define the menu's (cards) which this asset is visible on.
+     */
+    private List<String> menuScopeIds;
 
     /**
      * @return the id
@@ -151,12 +155,27 @@ public class Employee {
         return true;
     }
 
+    /**
+     * @return the menuScopeIds
+     */
+    public List<String> getMenuScopeIds() {
+        return menuScopeIds;
+    }
+
+    /**
+     * @param menuScopeIds the menuScopeIds to set
+     */
+    public void setMenuScopeIds(List<String> menuScopeIds) {
+        this.menuScopeIds = menuScopeIds;
+    }
+
     @Override
     public String toString() {
-        return "Employee{" + "id=" + id + ", typeId=" + typeId + ", details="
-                + details + ", resourceId=" + resourceId + ", lastModifiedDate="
-                + lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy
-                + ", hidden=" + hidden + '}';
+        return "Employee{" + "id=" + id + ", typeId=" + typeId
+                + ", details=" + details + ", resourceId=" + resourceId
+                + ", lastModifiedDate=" + lastModifiedDate
+                + ", lastModifiedBy=" + lastModifiedBy
+                + ", hidden=" + hidden + ", menuScopeIds=" + menuScopeIds + '}';
     }
 
 }
