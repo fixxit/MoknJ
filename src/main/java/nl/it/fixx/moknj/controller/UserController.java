@@ -6,10 +6,10 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.core.user.UserAuthority;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.response.UserResponse;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.UserRepository;
+import nl.it.fixx.moknj.response.UserResponse;
 import static nl.it.fixx.moknj.security.OAuth2SecurityConfig.PSW_ENCODER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class UserController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
     @Autowired
-    private UserRepository resourceRep;
+    private UserRepository userRep;
     @Autowired
     private AssetRepository assetRep;
     @Autowired
@@ -47,7 +47,7 @@ public class UserController {
     public UserResponse all() {
         final UserResponse userResponse = new UserResponse();
         List<User> resources = new ArrayList<>();
-        resourceRep.findAll().stream()
+        userRep.findAll().stream()
                 .filter((resource) -> (!resource.isHidden()
                         && !ADMIN_NAME.equals(resource.getUserName())))
                 .forEach((resource) -> {
@@ -64,10 +64,10 @@ public class UserController {
             // For updates if the type has a id then bypass the exists
             User dbResource = null;
             if (payload.getId() != null) {
-                dbResource = resourceRep.findById(payload.getId());
+                dbResource = userRep.findById(payload.getId());
             }
 
-            List<User> results = resourceRep.findByFullname(
+            List<User> results = userRep.findByFullname(
                     payload.getFirstName(), payload.getSurname());
 
             boolean exists = results.size() > 0;
@@ -102,7 +102,7 @@ public class UserController {
                     // this should execute for new users too
                     // as the dbUsername should then be empty string
                     if (!newUsername.equals(dbUsername)) {
-                        User indb = resourceRep.findByUserName(newUsername);
+                        User indb = userRep.findByUserName(newUsername);
                         if (indb != null && indb.getId() != null) {
                             userResponse.setSuccess(false);
                             userResponse.setMessage("Employee with a user name "
@@ -112,7 +112,7 @@ public class UserController {
                     }
                 }
 
-                User resource = resourceRep.save(payload);
+                User resource = userRep.save(payload);
                 userResponse.setSuccess(resource != null);
                 userResponse.setMessage("Saved employee[" + resource.getId() + "]");
                 userResponse.setResource(resource);
@@ -134,7 +134,7 @@ public class UserController {
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public UserResponse get(@PathVariable String id) {
         final UserResponse userResponse = new UserResponse();
-        User resourceRet = resourceRep.findById(id);
+        User resourceRet = userRep.findById(id);
         if (resourceRet != null) {
             userResponse.setResource(resourceRet);
         }
@@ -159,14 +159,14 @@ public class UserController {
     public UserResponse delete(@PathVariable String id) {
         final UserResponse userResponse = new UserResponse();
         try {
-            User resource = resourceRep.findById(id);
+            User resource = userRep.findById(id);
             List<Asset> assets = assetRep.getAllByResourceId(id);
             List<AssetLink> links = auditRep.getAllByResourceId(id);
             if (!assets.isEmpty() || !links.isEmpty()) {
                 resource.setHidden(true);
-                resourceRep.save(resource);
+                userRep.save(resource);
             } else {
-                resourceRep.delete(resource);
+                userRep.delete(resource);
             }
         } catch (Exception ex) {
             userResponse.setSuccess(false);
