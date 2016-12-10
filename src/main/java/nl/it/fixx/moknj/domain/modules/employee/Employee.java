@@ -3,13 +3,14 @@ package nl.it.fixx.moknj.domain.modules.employee;
 import java.util.List;
 import java.util.Objects;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
+import nl.it.fixx.moknj.domain.core.record.Record;
 import org.springframework.data.annotation.Id;
 
 /**
  *
  * @author adriaan
  */
-public class Employee {
+public class Employee implements Record {
 
     @Id
     private String id;
@@ -27,20 +28,15 @@ public class Employee {
     /**
      * @return the id
      */
+    @Override
     public String getId() {
         return id;
     }
 
     /**
-     * @param id the id to set
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
      * @return the typeId
      */
+    @Override
     public String getTypeId() {
         return typeId;
     }
@@ -48,6 +44,7 @@ public class Employee {
     /**
      * @param typeId the typeId to set
      */
+    @Override
     public void setTypeId(String typeId) {
         this.typeId = typeId;
     }
@@ -55,6 +52,7 @@ public class Employee {
     /**
      * @return the details
      */
+    @Override
     public List<FieldValue> getDetails() {
         return details;
     }
@@ -62,6 +60,7 @@ public class Employee {
     /**
      * @param details the details to set
      */
+    @Override
     public void setDetails(List<FieldValue> details) {
         this.details = details;
     }
@@ -83,6 +82,7 @@ public class Employee {
     /**
      * @return the lastModifiedDate
      */
+    @Override
     public String getLastModifiedDate() {
         return lastModifiedDate;
     }
@@ -90,6 +90,7 @@ public class Employee {
     /**
      * @param lastModifiedDate the lastModifiedDate to set
      */
+    @Override
     public void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
@@ -97,6 +98,7 @@ public class Employee {
     /**
      * @return the lastModifiedBy
      */
+    @Override
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -104,6 +106,7 @@ public class Employee {
     /**
      * @param lastModifiedBy the lastModifiedBy to set
      */
+    @Override
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
@@ -111,6 +114,7 @@ public class Employee {
     /**
      * @return the hidden
      */
+    @Override
     public boolean isHidden() {
         return hidden;
     }
@@ -118,6 +122,7 @@ public class Employee {
     /**
      * @param hidden the hidden to set
      */
+    @Override
     public void setHidden(boolean hidden) {
         this.hidden = hidden;
     }
@@ -149,15 +154,13 @@ public class Employee {
         if (!Objects.equals(this.typeId, other.typeId)) {
             return false;
         }
-        if (!Objects.equals(this.details, other.details)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.details, other.details);
     }
 
     /**
      * @return the menuScopeIds
      */
+    @Override
     public List<String> getMenuScopeIds() {
         return menuScopeIds;
     }
@@ -165,6 +168,7 @@ public class Employee {
     /**
      * @param menuScopeIds the menuScopeIds to set
      */
+    @Override
     public void setMenuScopeIds(List<String> menuScopeIds) {
         this.menuScopeIds = menuScopeIds;
     }

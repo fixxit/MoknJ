@@ -16,7 +16,7 @@ package nl.it.fixx.moknj.domain.core.global;
 public enum GlobalFieldType {
     GBL_INPUT_INT_TYPE("Number"),
     GBL_INPUT_TXT_TYPE("Text"),
-    GBL_INPUT_LTX_TYPE("Large Text"),
+    //GBL_INPUT_LTX_TYPE("Large Text"),
     GBL_INPUT_DAT_TYPE("Date"),
     GBL_INPUT_MON_TYPE("Monetary"),
     GBL_INPUT_DRP_TYPE("Dropdown");

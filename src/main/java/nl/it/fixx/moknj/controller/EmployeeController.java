@@ -195,9 +195,9 @@ public class EmployeeController {
                 if (inScope) {
                     // Find user whic is hidden and remove the employe record link
                     // to that record.
-                    User resource = userRep.findById(record.getResourceId());
+                    //User resource = userRep.findById(record.getResourceId());
                     // checks if the employee is hidden.
-                    if (!record.isHidden() && !resource.isHidden()) {
+                    if (!record.isHidden()) {
                         employees.add(record);
                     }
                 }
