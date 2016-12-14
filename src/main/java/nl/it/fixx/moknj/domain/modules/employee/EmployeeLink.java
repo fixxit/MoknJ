@@ -11,8 +11,10 @@ public class EmployeeLink {
     @Id
     private String id;
     private EmployeeAction action;
-    private String date;
-    private String resourceId;
+    private String actionValue;
+    private String changes;
+    private String template;
+    private String user;
     private String employeeId;
     private String createdBy;
     private String createdDate;
@@ -22,34 +24,6 @@ public class EmployeeLink {
      */
     public String getId() {
         return id;
-    }
-
-    /**
-     * @return the date
-     */
-    public String getDate() {
-        return date;
-    }
-
-    /**
-     * @param date the date to set
-     */
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    /**
-     * @return the resourceId
-     */
-    public String getResourceId() {
-        return resourceId;
-    }
-
-    /**
-     * @param resourceId the resourceId to set
-     */
-    public void setResourceId(String resourceId) {
-        this.resourceId = resourceId;
     }
 
     /**
@@ -107,4 +81,75 @@ public class EmployeeLink {
     public void setAction(EmployeeAction action) {
         this.action = action;
     }
+
+    /**
+     * @return the changes
+     */
+    public String getChanges() {
+        return changes;
+    }
+
+    /**
+     * @param changes the changes to set
+     */
+    public void setChanges(String changes) {
+        this.changes = changes;
+    }
+
+    /**
+     * @return the template
+     */
+    public String getTemplate() {
+        return template;
+    }
+
+    /**
+     * @param template the template to set
+     */
+    public void setTemplate(String template) {
+        this.template = template;
+    }
+
+    /**
+     * @return the user
+     */
+    public String getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the actionValue
+     */
+    public String getActionValue() {
+        return actionValue;
+    }
+
+    /**
+     * @param actionValue the actionValue to set
+     */
+    public void setActionValue(String actionValue) {
+        this.actionValue = actionValue;
+    }
+
+    @Override
+    public String toString() {
+        return "EmployeeLink{" + "id=" + id
+                + ", action=" + action
+                + ", actionValue=" + actionValue
+                + ", changes=" + changes
+                + ", template=" + template
+                + ", user=" + user
+                + ", employeeId=" + employeeId
+                + ", createdBy=" + createdBy
+                + ", createdDate=" + createdDate
+                + '}';
+    }
+
 }

@@ -8,10 +8,19 @@ package nl.it.fixx.moknj.domain.modules.employee;
  * @author adriaan
  */
 public enum EmployeeAction {
-    EMP_ACTION_SAVE,
-    EMP_ACTION_EDIT,
-    EMP_ACTION_NEW,
-    EMP_ACTION_OPEN,
-    EMP_ACTION_DELETE,
-    EMP_ACTION_HIDE;
+    EMP_ACTION_EDIT("Updated Employee"),
+    EMP_ACTION_NEW("Created Employee"),
+    EMP_ACTION_OPEN("Viewed Employee"),
+    EMP_ACTION_DELETE("Deleted Employee"),
+    EMP_ACTION_HIDE("Employee Hidden");
+
+    final String displayValue;
+
+    EmployeeAction(String displayValue) {
+        this.displayValue = displayValue;
+    }
+
+    public String getDisplayValue() {
+        return displayValue;
+    }
 }

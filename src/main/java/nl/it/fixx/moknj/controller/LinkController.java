@@ -7,12 +7,16 @@ package nl.it.fixx.moknj.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.domain.core.user.User;
-import nl.it.fixx.moknj.response.LinkResponse;
+import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
+import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
+import nl.it.fixx.moknj.repository.EmployeeRepository;
+import nl.it.fixx.moknj.repository.UserRepository;
+import nl.it.fixx.moknj.response.LinkResponse;
 import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -23,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import nl.it.fixx.moknj.repository.UserRepository;
 
 /**
  *
@@ -35,14 +38,21 @@ import nl.it.fixx.moknj.repository.UserRepository;
 public class LinkController {
 
     @Autowired
-    private AssetLinkRepository auditRep; // Asset Audit Repository
+    private AssetLinkRepository assetLinkRep;
     @Autowired
-    private AssetRepository assetRep;// main asset Repository
+    private AssetRepository assetRep;
+    @Autowired
+    private UserRepository userRep;
+    @Autowired
+    private EmployeeLinkRepository employeeLinkRep;
+    @Autowired
+    private EmployeeRepository employeeRep;
+
     @Autowired
     private UserRepository resourceRep;
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public LinkResponse add(@RequestBody AssetLink payload, @RequestParam String access_token) {
+    @RequestMapping(value = "/asset/add", method = RequestMethod.POST)
+    public LinkResponse addAssetLink(@RequestBody AssetLink payload, @RequestParam String access_token) {
         final LinkResponse response = new LinkResponse();
         try {
             String user = getUserName(access_token);
@@ -55,9 +65,9 @@ public class LinkController {
             }
 
             payload.setCreatedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
-            response.setLink(this.auditRep.save(payload));
+            response.setLink(this.assetLinkRep.save(payload));
 
-            // add resource id to asset depending on isChecked
+            // addAssetLink resource id to asset depending on isChecked
             if (payload.getAssetId() != null) {
                 Asset dbAsset = assetRep.findOne(payload.getAssetId());
                 if (payload.isChecked()) {
@@ -81,6 +91,93 @@ public class LinkController {
         return response;
     }
 
+    /**
+     * Get getAllAssetLinks links
+     *
+     * @return
+     */
+    @RequestMapping(value = "/asset/all", method = RequestMethod.POST)
+    public LinkResponse getAllAssetLinks() {
+        final LinkResponse response = new LinkResponse();
+        response.setLinks(assetLinkRep.findAll(new Sort(Sort.Direction.DESC, "createdDate")));
+        return response;
+    }
+
+    /**
+     * Get getAllAssetLinks links
+     *
+     * @return
+     */
+    @RequestMapping(value = "/employee/all", method = RequestMethod.POST)
+    public LinkResponse getAllEmployeeLinks() {
+        final LinkResponse response = new LinkResponse();
+        response.setEmployeeLinks(employeeLinkRep.findAll(new Sort(Sort.Direction.DESC, "createdDate")));
+        response.getEmployeeLinks().stream().map((link) -> {
+            // gets the user edited the record.
+            Employee dbEmployee = employeeRep.findOne(link.getEmployeeId());
+            if (dbEmployee.getResourceId() != null) {
+                User linkedUser = userRep.findById(dbEmployee.getResourceId());
+                String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
+                link.setUser(fullname);
+            }
+            return link;
+        }).forEach((link) -> {
+            link.setActionValue(link.getAction().getDisplayValue());
+        });
+        return response;
+    }
+
+    /**
+     * Get list of link entries for the asset id
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/employee/all/{id}/employee", method = RequestMethod.POST)
+    public LinkResponse getAllEmployeeLinksByEmployeeId(@PathVariable String id) {
+        final LinkResponse response = new LinkResponse();
+        response.setEmployeeLinks(employeeLinkRep.getAllByEmployeeId(id));
+        response.getEmployeeLinks().stream().map((link) -> {
+            // gets the user edited the record.
+            Employee dbEmployee = employeeRep.findOne(link.getEmployeeId());
+            if (dbEmployee.getResourceId() != null) {
+                User linkedUser = userRep.findById(dbEmployee.getResourceId());
+                String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
+                link.setUser(fullname);
+            }
+            return link;
+        }).forEach((link) -> {
+            link.setActionValue(link.getAction().getDisplayValue());
+        });
+        return response;
+    }
+
+    /**
+     * Get list of link entries for the asset id
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/asset/all/{id}/asset", method = RequestMethod.POST)
+    public LinkResponse getAllAssetLinksByAssetId(@PathVariable String id) {
+        final LinkResponse response = new LinkResponse();
+        response.setLinks(assetLinkRep.getAllByAssetId(id));
+        return response;
+    }
+
+    /**
+     * Get list of link entries for the resource.
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/asset/all/{id}/resource", method = RequestMethod.POST)
+    public LinkResponse getAllAssetLinksByRecourceId(@PathVariable String id) {
+        final LinkResponse response = new LinkResponse();
+        response.setLinks(assetLinkRep.getAllByResourceId(id));
+        return response;
+    }
+
     private String getUserName(String access_token) throws Exception {
         String username = null;
         User user = resourceRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
@@ -93,44 +190,6 @@ public class LinkController {
             }
         }
         return username;
-    }
-
-    /**
-     * Get all links
-     *
-     * @return
-     */
-    @RequestMapping(value = "/all", method = RequestMethod.POST)
-    public LinkResponse all() {
-        final LinkResponse response = new LinkResponse();
-        response.setLinks(auditRep.findAll(new Sort(Sort.Direction.DESC, "date")));
-        return response;
-    }
-
-    /**
-     * Get list of link entries for the asset id
-     *
-     * @param id
-     * @return
-     */
-    @RequestMapping(value = "/all/{id}/asset", method = RequestMethod.POST)
-    public LinkResponse allByAssetId(@PathVariable String id) {
-        final LinkResponse response = new LinkResponse();
-        response.setLinks(auditRep.getAllByAssetId(id));
-        return response;
-    }
-
-    /**
-     * Get list of link entries for the resource.
-     *
-     * @param id
-     * @return
-     */
-    @RequestMapping(value = "/all/{id}/resource", method = RequestMethod.POST)
-    public LinkResponse allByResourceId(@PathVariable String id) {
-        final LinkResponse response = new LinkResponse();
-        response.setLinks(auditRep.getAllByResourceId(id));
-        return response;
     }
 
 }

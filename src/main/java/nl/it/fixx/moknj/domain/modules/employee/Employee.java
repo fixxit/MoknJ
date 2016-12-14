@@ -157,6 +157,8 @@ public class Employee implements Record {
         return Objects.equals(this.details, other.details);
     }
 
+
+
     /**
      * @return the menuScopeIds
      */
