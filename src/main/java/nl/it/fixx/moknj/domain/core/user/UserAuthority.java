@@ -13,7 +13,8 @@ public enum UserAuthority {
     MENU("Access to edit/create/delete of Menu's"),
     TYPE("Access to edit/create/delete of templates"),
     RESOURCE("Access to edit/create/delete of system users"),
-    LINK("Access to edit/create of Audit trails");
+    LINK("Access to edit/create of Audit trails"),
+    DASH("Access to edit/create of Home Dashboard");
 
     final String displayName;
 

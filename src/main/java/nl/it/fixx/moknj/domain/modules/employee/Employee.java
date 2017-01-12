@@ -19,6 +19,8 @@ public class Employee implements Record {
     private String resourceId;
     private String lastModifiedDate;
     private String lastModifiedBy;
+    private String createdDate;
+    private String createdBy;
     private boolean hidden;
     /**
      * Scope id's define the menu's (cards) which this asset is visible on.
@@ -182,6 +184,34 @@ public class Employee implements Record {
                 + ", lastModifiedDate=" + lastModifiedDate
                 + ", lastModifiedBy=" + lastModifiedBy
                 + ", hidden=" + hidden + ", menuScopeIds=" + menuScopeIds + '}';
+    }
+
+    /**
+     * @return the createdDate
+     */
+    public String getCreatedDate() {
+        return createdDate;
+    }
+
+    /**
+     * @param createdDate the createdDate to set
+     */
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    /**
+     * @return the createdBy
+     */
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    /**
+     * @param createdBy the createdBy to set
+     */
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
 }

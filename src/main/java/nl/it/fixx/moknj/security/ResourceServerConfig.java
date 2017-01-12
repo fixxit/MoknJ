@@ -76,7 +76,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.anonymous().disable().requestMatchers()
-                .antMatchers("/asset/**", "/type/**", "/link/**", "/resource/**", "/menu/**")
+                .antMatchers("/asset/**", "/type/**", "/link/**", "/resource/**", "/menu/**", "/graph/**")
                 .and()
                 .authorizeRequests()
                 .antMatchers("/asset/**")
@@ -97,6 +97,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/menu/**")
                 .hasAuthority("MENU")
+                .and()
+                .authorizeRequests()
+                .antMatchers("/graph/**")
+                .hasAuthority("DASH")
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(new CustomAccessDeniedEntryHandler());

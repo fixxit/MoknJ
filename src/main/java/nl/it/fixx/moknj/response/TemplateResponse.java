@@ -1,6 +1,7 @@
 package nl.it.fixx.moknj.response;
 
 import java.util.List;
+import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldType;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.template.TemplateType;
@@ -15,6 +16,7 @@ public class TemplateResponse extends Response {
     private List<FieldType> fieldTypes;
     private List<Template> types;
     private List<TemplateType> templateTypes;
+    private List<FieldDetail> fields;
 
     /**
      * @return the fieldTypes
@@ -72,9 +74,23 @@ public class TemplateResponse extends Response {
         this.templateTypes = templateTypes;
     }
 
+    /**
+     * @return the fields
+     */
+    public List<FieldDetail> getFields() {
+        return fields;
+    }
+
+    /**
+     * @param fields the fields to set
+     */
+    public void setFields(List<FieldDetail> fields) {
+        this.fields = fields;
+    }
+
     @Override
     public String toString() {
-        return "TemplateResponse{" + "type=" + type + ", fieldTypes=" + fieldTypes + ", types=" + types + ", templateTypes=" + templateTypes + '}';
+        return "TemplateResponse{" + "type=" + type + ", fieldTypes=" + fieldTypes + ", types=" + types + ", templateTypes=" + templateTypes + ", fields=" + fields + '}';
     }
 
 }

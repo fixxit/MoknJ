@@ -32,7 +32,7 @@ public class MenuContoller {
     @Autowired
     private MenuRepository menuRep;
     @Autowired
-    private TemplateRepository typeRep;
+    private TemplateRepository templateRep;
 
     /**
      *
@@ -93,7 +93,7 @@ public class MenuContoller {
             for (int tempIndex = 0; tempIndex < templates.size(); tempIndex++) {
                 Template temp = templates.get(tempIndex);
 
-                Template globalTemplate = typeRep.findOne(temp.getId());
+                Template globalTemplate = templateRep.findOne(temp.getId());
                 if (globalTemplate != null) {
                     // sets teh template menu rules down to template passed back
                     globalTemplate.setAllowScopeChallenge(temp.isAllowScopeChallenge());
@@ -133,7 +133,7 @@ public class MenuContoller {
             for (int tempIndex = 0; tempIndex < templates.size(); tempIndex++) {
                 Template temp = templates.get(tempIndex);
 
-                Template globalTemplate = typeRep.findOne(temp.getId());
+                Template globalTemplate = templateRep.findOne(temp.getId());
                 // check if template is in db
                 if (globalTemplate != null) {
                     // sets teh template menu rules down to template passed back

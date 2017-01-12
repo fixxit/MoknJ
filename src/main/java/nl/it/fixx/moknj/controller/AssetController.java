@@ -6,10 +6,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import nl.it.fixx.moknj.bal.AssetBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
-import nl.it.fixx.moknj.domain.core.menu.Menu;
-import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
@@ -130,12 +129,7 @@ public class AssetController {
                 // Get user details who logged this asset using the token.
                 User user = resourceRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
                 if (user != null && user.isSystemUser()) {
-                    String fullname = user.getFirstName() + " " + user.getSurname();
-                    if (!fullname.trim().isEmpty()) {
-                        saveAsset.setLastModifiedBy(fullname);
-                    } else {
-                        saveAsset.setLastModifiedBy(user.getUserName());
-                    }
+                    saveAsset.setLastModifiedBy(user.getUserName());
                 } else {
                     response.setSuccess(false);
                     response.setMessage("Asset save error, could not find system"
@@ -143,7 +137,17 @@ public class AssetController {
                     return response;
                 }
                 // Save asset
-                saveAsset.setLastModifiedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date()));
+                String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
+                saveAsset.setLastModifiedDate(date);
+                if (saveAsset.getId() == null) {
+                    saveAsset.setCreatedBy(user.getUserName());
+                    saveAsset.setCreatedDate(date);
+                } else {
+                    Asset dbAsset = assetRep.findOne(saveAsset.getId());
+                    saveAsset.setCreatedBy(dbAsset.getCreatedBy());
+                    saveAsset.setCreatedDate(dbAsset.getCreatedDate());
+                }
+
                 Asset savedAsset = assetRep.save(saveAsset);
                 response.setSuccess(true);
                 response.setAsset(saveAsset);
@@ -163,6 +167,7 @@ public class AssetController {
 
     /**
      * Gets a asset by template id and menu id
+     *
      * @param templateId
      * @param menuId
      * @return
@@ -170,32 +175,7 @@ public class AssetController {
     @RequestMapping(value = "/get/all/{templateId}/{menuId}", method = RequestMethod.POST)
     public AssetResponse getAllAssets(@PathVariable String templateId, @PathVariable String menuId) {
         AssetResponse response = new AssetResponse();
-        List<Asset> assets = new ArrayList<>();
-        List<Asset> records = assetRep.getAllByTypeId(templateId);
-        // Gets custom template settings saved to menu.
-        Menu menu = menuRep.findOne(menuId);
-        menu.getTemplates().stream().filter((template)
-                -> (template.getId().equals(templateId))).forEach((Template template)
-                -> {
-            records.stream().forEach((Asset record) -> {
-                // checks if scope check is required for this asset.
-                boolean inScope = false;
-                if (template.isAllowScopeChallenge()) {
-                    inScope = record.getMenuScopeIds().contains(menuId);
-                } else {
-                    inScope = true;
-                }
-                // if asset is inscope allow adding of asset.
-                if (inScope) {
-                    // checks if the asset is hidden.
-                    if (!record.isHidden()) {
-                        assets.add(record);
-                    }
-                }
-            });
-        });
-
-        response.setAssets(assets);
+        response.setAssets(new AssetBal(assetRep, menuRep).getAll(templateId, menuId));
         return response;
     }
 

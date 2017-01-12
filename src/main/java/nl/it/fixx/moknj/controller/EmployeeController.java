@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import nl.it.fixx.moknj.bal.EmployeeBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
-import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
@@ -145,12 +145,7 @@ public class EmployeeController {
                 // Get user details who logged this employee using the token.
                 User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
                 if (user != null && user.isSystemUser()) {
-                    String fullname = user.getFirstName() + " " + user.getSurname();
-                    if (!fullname.trim().isEmpty()) {
-                        passedEmployee.setLastModifiedBy(fullname);
-                    } else {
-                        passedEmployee.setLastModifiedBy(user.getUserName());
-                    }
+                    passedEmployee.setLastModifiedBy(user.getUserName());
                 } else {
                     response.setSuccess(false);
                     response.setMessage("Employee save error, could not find system"
@@ -161,7 +156,17 @@ public class EmployeeController {
                 String createdDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
 
                 // Save employee
-                passedEmployee.setLastModifiedDate(createdDate);
+                String date = createdDate;
+                passedEmployee.setLastModifiedDate(date);
+                if (passedEmployee.getId() == null) {
+                    passedEmployee.setCreatedBy(user.getUserName());
+                    passedEmployee.setCreatedDate(date);
+                } else {
+                    Employee dbEmployee = employeeRep.findOne(passedEmployee.getId());
+                    passedEmployee.setCreatedBy(dbEmployee.getCreatedBy());
+                    passedEmployee.setCreatedDate(dbEmployee.getCreatedDate());
+                }
+
                 // Set audit logs
                 audit.setCreatedDate(createdDate);
                 audit.setCreatedBy(passedEmployee.getLastModifiedBy());
@@ -261,35 +266,7 @@ public class EmployeeController {
     @RequestMapping(value = "/get/all/{templateId}/{menuId}", method = RequestMethod.POST)
     public EmployeeResponse getAllEmployes(@PathVariable String templateId, @PathVariable String menuId) {
         EmployeeResponse response = new EmployeeResponse();
-        List<Employee> employees = new ArrayList<>();
-        List<Employee> records = employeeRep.getAllByTypeId(templateId);
-        // Gets custom template settings saved to menu.
-        Menu menu = menuRep.findOne(menuId);
-        menu.getTemplates().stream().filter((template)
-                -> (template.getId().equals(templateId))).forEach((Template template)
-                -> {
-            records.stream().forEach((Employee record) -> {
-                boolean inScope = false;
-                // checks if scope check is required for this template.
-                if (template.isAllowScopeChallenge()) {
-                    inScope = record.getMenuScopeIds().contains(menuId);
-                } else {
-                    inScope = true;
-                }
-                // if employee is inscope allow adding of employee.
-                if (inScope) {
-                    // Find user whic is hidden and remove the employe record link
-                    // to that record.
-                    //User resource = userRep.findById(record.getResourceId());
-                    // checks if the employee is hidden.
-                    if (!record.isHidden()) {
-                        employees.add(record);
-                    }
-                }
-            });
-        });
-
-        response.setEmployees(employees);
+        response.setEmployees(new EmployeeBal(employeeRep, menuRep).getAll(templateId, menuId));
         return response;
     }
 
@@ -336,83 +313,3 @@ public class EmployeeController {
         return response;
     }
 }
-
-//    /**
-//     * Gets a employee by template id and menu id
-//     *
-//     * @param templateId
-//     * @param menuId
-//     * @return
-//     */
-//    @RequestMapping(value = "/get/all/obj/{templateId}/{menuId}", method = RequestMethod.POST)
-//    public EmployeeResponse getAllInEmployeeStr(@PathVariable String templateId, @PathVariable String menuId) {
-//        EmployeeResponse response = new EmployeeResponse();
-//        List<Employee> employees = new ArrayList<>();
-//        List<Employee> records = employeeRep.getAllByTypeId(templateId);
-//        // Gets custom template settings saved to menu.
-//        Menu menu = menuRep.findOne(menuId);
-//        menu.getTemplates().stream().filter((template)
-//                -> (template.getId().equals(templateId))).forEach((Template template)
-//                -> {
-//            records.stream().forEach((Employee record) -> {
-//                boolean inScope = false;
-//                // checks if scope check is required for this template.
-//                if (template.isAllowScopeChallenge()) {
-//                    inScope = record.getMenuScopeIds().contains(menuId);
-//                } else {
-//                    inScope = true;
-//                }
-//                // if employee is inscope allow adding of employee.
-//                if (inScope) {
-//                    // Find user whic is hidden and remove the employe record link
-//                    // to that record.
-//                    //User resource = userRep.findById(record.getResourceId());
-//                    // checks if the employee is hidden.
-//                    if (!record.isHidden()) {
-//                        employees.add(record);
-//                    }
-//                }
-//            });
-//        });
-//
-//        StringBuilder empObj = new StringBuilder();
-//        empObj.append("[");
-//        for (Employee emp : employees) {
-//            List<FieldValue> empValues = emp.getDetails();
-//            empObj.append("{");
-//            for (FieldValue field : empValues) {
-//                FieldDetail detail = fieldRep.findOne(field.getId());
-//                if (detail != null) {
-//                    empObj.append("\"");
-//                    empObj.append(detail.getName().replaceAll(" ", "_"));
-//                    empObj.append("\":{");
-//
-//                    empObj.append("\"type\":");
-//                    empObj.append("\"");
-//                    empObj.append(detail.getType());
-//                    empObj.append("\",");
-//
-//                    empObj.append("\"value\":");
-//                    empObj.append("\"");
-//                    empObj.append(field.getValue());
-//                    empObj.append("\"},");
-//                }
-//            }
-//            if (empObj.toString().endsWith(",")) {
-//                empObj = new StringBuilder(empObj.toString().substring(0,
-//                        empObj.toString().length() - 1));
-//            }
-//
-//            empObj.append("},");
-//        }
-//        if (empObj.toString().endsWith(",")) {
-//            empObj = new StringBuilder(empObj.toString().substring(0,
-//                    empObj.toString().length() - 1));
-//        }
-//        empObj.append("]");
-//
-//        response.setEmployees(employees);
-//        response.setMessage(empObj.toString());
-//
-//        return response;
-//    }

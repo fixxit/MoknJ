@@ -7,6 +7,7 @@ package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
@@ -222,6 +223,24 @@ public class TemplateController {
             types.add(new TemplateType(type.name(), type.getName()));
         }
         response.setTemplateTypes(types);
+        return response;
+    }
+
+    @RequestMapping(value = "/template/{id}/fields", method = RequestMethod.POST)
+    public @ResponseBody
+    TemplateResponse getTemplateFields(@PathVariable String id) {
+        TemplateResponse response = new TemplateResponse();
+        Template template = typeRep.findOne(id);
+        List<FieldDetail> fields = new ArrayList<>();
+
+        template.getDetails().stream().filter((field)
+                -> (GlobalFieldType.GBL_INPUT_DRP_TYPE.equals(field.getType())))
+                .forEach((field) -> {
+                    fields.add(field);
+                });
+
+        response.setFields(fields);
+
         return response;
     }
 

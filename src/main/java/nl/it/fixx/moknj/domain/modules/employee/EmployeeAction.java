@@ -8,11 +8,11 @@ package nl.it.fixx.moknj.domain.modules.employee;
  * @author adriaan
  */
 public enum EmployeeAction {
-    EMP_ACTION_EDIT("Updated Employee"),
-    EMP_ACTION_NEW("Created Employee"),
-    EMP_ACTION_OPEN("Viewed Employee"),
-    EMP_ACTION_DELETE("Deleted Employee"),
-    EMP_ACTION_HIDE("Employee Hidden");
+    EMP_ACTION_EDIT("Update"),
+    EMP_ACTION_NEW("Create"),
+    EMP_ACTION_OPEN("View"),
+    EMP_ACTION_DELETE("Delete"),
+    EMP_ACTION_HIDE("Hide");
 
     final String displayValue;
 
