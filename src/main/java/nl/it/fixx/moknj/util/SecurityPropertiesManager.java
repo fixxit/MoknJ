@@ -2,6 +2,7 @@ package nl.it.fixx.moknj.util;
 
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -10,8 +11,8 @@ import java.util.logging.Logger;
 public class SecurityPropertiesManager {
 
     private static final String PROPERTIES_FILE = "security.properties";
-    private static Properties properties = new Properties();
-    private static Logger log = Logger.getLogger(SecurityPropertiesManager.class.getName());
+    private static final Properties properties = new Properties();
+    private static final Logger log = Logger.getLogger(SecurityPropertiesManager.class.getName());
 
     public static String getProperty(String property) {
 	try {
@@ -25,7 +26,7 @@ public class SecurityPropertiesManager {
 	if (properties != null) {
 	    return properties.get(property).toString();
 	} else {
-	    log.warning("Could not find property: " + property);
+	    log.log(Level.WARNING, "Could not find property: {0}", property);
 	    return null;
 	}
     }

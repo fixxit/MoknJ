@@ -159,8 +159,6 @@ public class Employee implements Record {
         return Objects.equals(this.details, other.details);
     }
 
-
-
     /**
      * @return the menuScopeIds
      */
@@ -177,18 +175,10 @@ public class Employee implements Record {
         this.menuScopeIds = menuScopeIds;
     }
 
-    @Override
-    public String toString() {
-        return "Employee{" + "id=" + id + ", typeId=" + typeId
-                + ", details=" + details + ", resourceId=" + resourceId
-                + ", lastModifiedDate=" + lastModifiedDate
-                + ", lastModifiedBy=" + lastModifiedBy
-                + ", hidden=" + hidden + ", menuScopeIds=" + menuScopeIds + '}';
-    }
-
     /**
      * @return the createdDate
      */
+    @Override
     public String getCreatedDate() {
         return createdDate;
     }
@@ -196,6 +186,7 @@ public class Employee implements Record {
     /**
      * @param createdDate the createdDate to set
      */
+    @Override
     public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
@@ -203,6 +194,7 @@ public class Employee implements Record {
     /**
      * @return the createdBy
      */
+    @Override
     public String getCreatedBy() {
         return createdBy;
     }
@@ -210,8 +202,14 @@ public class Employee implements Record {
     /**
      * @param createdBy the createdBy to set
      */
+    @Override
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" + "id=" + id + ", typeId=" + typeId + ", details=" + details + ", resourceId=" + resourceId + ", lastModifiedDate=" + lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy + ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", hidden=" + hidden + ", menuScopeIds=" + menuScopeIds + '}';
     }
 
 }

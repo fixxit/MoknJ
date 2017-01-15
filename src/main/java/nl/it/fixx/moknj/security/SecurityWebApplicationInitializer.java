@@ -4,13 +4,9 @@
  * and open the template in the editor.
  */
 package nl.it.fixx.moknj.security;
-
-import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
-
-/**
- *
- * @author adriaan
- */
-public class SecurityWebApplicationInitializer extends AbstractSecurityWebApplicationInitializer {
-
-}
+// *
+// * @author adriaan
+// */
+//public class SecurityWebApplicationInitializer extends AbstractSecurityWebApplicationInitializer {
+//
+//}

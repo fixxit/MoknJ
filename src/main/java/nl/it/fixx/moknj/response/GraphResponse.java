@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
+import nl.it.fixx.moknj.domain.core.graph.GraphDate;
 import nl.it.fixx.moknj.domain.core.graph.GraphFocus;
 import nl.it.fixx.moknj.domain.core.graph.GraphType;
 import nl.it.fixx.moknj.domain.core.graph.GraphView;
@@ -19,6 +20,7 @@ public class GraphResponse extends Response {
     private List<GraphType> graphTypes;
     private List<GraphView> graphViews;
     private List<GraphFocus> graphFocuses;
+    private List<GraphDate> graphDates;
     private List<Graph> savedGraphs;
     private Map<String, List<GraphData>> allGraphsData;
 
@@ -120,8 +122,23 @@ public class GraphResponse extends Response {
         this.allGraphsData = allGraphsData;
     }
 
+    /**
+     * @return the graphDates
+     */
+    public List<GraphDate> getGraphDates() {
+        return graphDates;
+    }
+
+    /**
+     * @param graphDates the graphDates to set
+     */
+    public void setGraphDates(List<GraphDate> graphDates) {
+        this.graphDates = graphDates;
+    }
+
     @Override
     public String toString() {
-        return "GraphResponse{" + "graphTemplate=" + graphTemplate + ", graphData=" + graphData + ", graphTypes=" + graphTypes + ", graphViews=" + graphViews + ", graphFocuses=" + graphFocuses + ", savedGraphs=" + savedGraphs + ", allGraphsData=" + allGraphsData + '}';
+        return "GraphResponse{" + "graphTemplate=" + graphTemplate + ", graphData=" + graphData + ", graphTypes=" + graphTypes + ", graphViews=" + graphViews + ", graphFocuses=" + graphFocuses + ", graphDates=" + graphDates + ", savedGraphs=" + savedGraphs + ", allGraphsData=" + allGraphsData + '}';
     }
+
 }

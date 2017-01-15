@@ -9,6 +9,8 @@ public enum GlobalGraphType {
     GBL_LINE("chart-line", "Line Chart"),
     GBL_BAR("chart-bar", "Bar Chart"),
     GBL_HORIZONTAL_BAR("chart-horizontal-bar", "Horizontal Bar"),
+    GBL_POLAR_AREA("chart-polar-area", "Polar Area"),
+    GBL_RADAR("chart-radar", "Radar"),
     GBL_PIE("chart-pie", "Pie Chart");
 
     private final String property;

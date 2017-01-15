@@ -78,4 +78,24 @@ public interface Record {
      * @param menuScopeIds the menuScopeIds to set
      */
     public void setMenuScopeIds(List<String> menuScopeIds);
+
+    /**
+     * @return the createdDate
+     */
+    public String getCreatedDate();
+
+    /**
+     * @param createdDate the createdDate to set
+     */
+    public void setCreatedDate(String createdDate);
+
+    /**
+     * @return the createdBy
+     */
+    public String getCreatedBy();
+
+    /**
+     * @param createdBy the createdBy to set
+     */
+    public void setCreatedBy(String createdBy);
 }

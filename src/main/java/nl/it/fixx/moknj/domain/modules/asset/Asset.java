@@ -185,18 +185,10 @@ public class Asset implements Record {
         this.menuScopeIds = menuScopeIds;
     }
 
-    @Override
-    public String toString() {
-        return "Asset{" + "id=" + id + ", typeId=" + typeId
-                + ", details=" + details + ", resourceId=" + resourceId
-                + ", lastModifiedDate=" + lastModifiedDate
-                + ", lastModifiedBy=" + lastModifiedBy + ", hidden=" + hidden
-                + ", scopeIds=" + menuScopeIds + '}';
-    }
-
     /**
      * @return the createdDate
      */
+    @Override
     public String getCreatedDate() {
         return createdDate;
     }
@@ -204,6 +196,7 @@ public class Asset implements Record {
     /**
      * @param createdDate the createdDate to set
      */
+    @Override
     public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
@@ -211,6 +204,7 @@ public class Asset implements Record {
     /**
      * @return the createdBy
      */
+    @Override
     public String getCreatedBy() {
         return createdBy;
     }
@@ -218,8 +212,14 @@ public class Asset implements Record {
     /**
      * @param createdBy the createdBy to set
      */
+    @Override
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    @Override
+    public String toString() {
+        return "Asset{" + "id=" + id + ", typeId=" + typeId + ", details=" + details + ", resourceId=" + resourceId + ", lastModifiedDate=" + lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy + ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", hidden=" + hidden + ", menuScopeIds=" + menuScopeIds + '}';
     }
 
 }

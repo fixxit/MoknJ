@@ -6,13 +6,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphFocus;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphView;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
-import nl.it.fixx.moknj.domain.core.graph.GraphBuilder;
+import nl.it.fixx.moknj.builders.GraphBuilder;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
+import nl.it.fixx.moknj.domain.core.graph.GraphDate;
 import nl.it.fixx.moknj.domain.core.graph.GraphFocus;
 import nl.it.fixx.moknj.domain.core.graph.GraphType;
 import nl.it.fixx.moknj.domain.core.graph.GraphView;
@@ -135,6 +137,24 @@ public class GraphController {
     }
 
     /**
+     * Gets all the modules allowed for menu item
+     *
+     * @return
+     */
+    @RequestMapping(value = "/datetypes", method = RequestMethod.POST)
+    public @ResponseBody
+    GraphResponse getDateTypes() {
+        GraphResponse response = new GraphResponse();
+        GlobalGraphDate[] types = GlobalGraphDate.values();
+        List<GraphDate> graphDateTypes = new ArrayList<>();
+        for (GlobalGraphDate type : types) {
+            graphDateTypes.add(new GraphDate(type.displayName(), type.name()));
+        }
+        response.setGraphDates(graphDateTypes);
+        return response;
+    }
+
+    /**
      * Gets all the focuses this is filter by template id.
      *
      * @param id
@@ -207,7 +227,7 @@ public class GraphController {
 
         List<Graph> graphSetup = graphRep.findAll();
         for (Graph graph : graphSetup) {
-            GraphData data = builder.generateGraph(graph);
+            GraphData data = builder.buildGraphData(graph);
             GlobalGraphType type = graph.getGraphType();
 
             List<GraphData> dataSet = allDataSets.get(type.getProperty());
@@ -236,7 +256,7 @@ public class GraphController {
         GraphResponse response = new GraphResponse();
         Graph graphInfo = graphRep.findOne(id);
         GraphBuilder builder = new GraphBuilder(assetRep, menuRep, templateRep, employeeRep, userRep);
-        response.setGraphData(builder.generateGraph(graphInfo));
+        response.setGraphData(builder.buildGraphData(graphInfo));
         return response;
     }
 

@@ -1,5 +1,6 @@
 package nl.it.fixx.moknj.domain.core.graph;
 
+import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphFocus;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphView;
@@ -25,8 +26,10 @@ public class Graph {
     private GlobalGraphType graphType;
     private GlobalGraphView graphView;
     private GlobalGraphFocus graphFocus;
+    private GlobalGraphDate graphDateType;
     private String graphDate;
     private String freefieldId;
+    private String freeDateFieldId;
 
     /**
      * Display field value on home setup filter view.
@@ -213,6 +216,34 @@ public class Graph {
      */
     public void setFreefieldId(String freefieldId) {
         this.freefieldId = freefieldId;
+    }
+
+    /**
+     * @return the freeDateFieldId
+     */
+    public String getFreeDateFieldId() {
+        return freeDateFieldId;
+    }
+
+    /**
+     * @param freeDateFieldId the freeDateFieldId to set
+     */
+    public void setFreeDateFieldId(String freeDateFieldId) {
+        this.freeDateFieldId = freeDateFieldId;
+    }
+
+    /**
+     * @return the graphDateType
+     */
+    public GlobalGraphDate getGraphDateType() {
+        return graphDateType;
+    }
+
+    /**
+     * @param graphDateType the graphDateType to set
+     */
+    public void setGraphDateType(GlobalGraphDate graphDateType) {
+        this.graphDateType = graphDateType;
     }
 
 }

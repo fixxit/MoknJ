@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nl.it.fixx.moknj.domain.core.graph;
+package nl.it.fixx.moknj.builders;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,12 +16,14 @@ import nl.it.fixx.moknj.bal.EntityBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.global.GlobalMenuType;
+import nl.it.fixx.moknj.domain.core.graph.Graph;
+import nl.it.fixx.moknj.domain.core.graph.GraphData;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
+import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.core.util.DateUtil;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
 import nl.it.fixx.moknj.repository.MenuRepository;
@@ -33,6 +35,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 /**
+ * This class is used to group the graph data for display in the UI
  *
  * @author adriaan
  */
@@ -43,6 +46,10 @@ public class GraphBuilder {
     private final TemplateRepository templateRep;
     private final EmployeeRepository employeeRep;
     private final UserRepository userRep;
+    private static final String MDL_ASSET_DEFAULT = "Asset";
+    private static final String MDL_EMPLOYEE_DEFAULT = "Employee";
+    private static final String MDL_ASSET_STATUS_IN = "IN";
+    private static final String MDL_ASSET_STATUS_OUT = "OUT";
 
     public GraphBuilder(AssetRepository assetRep, MenuRepository menuRep, TemplateRepository templateRep, EmployeeRepository employeeRep, UserRepository userRep) {
         this.assetRep = assetRep;
@@ -54,8 +61,17 @@ public class GraphBuilder {
 
     private final String FMT_CREATED_DATE = "yyyy-MM-dd HH:mm";
     private final String FMT_FILTER_DATE = "yyyy-MM-dd";
+    private final String FMT_MONTH_NAME = "MMM";
+    private final String FMT_DAY_NAME = "EEE";
 
-    public GraphData generateGraph(Graph graphInfo) throws Exception {
+    /**
+     * Generates the graph data!
+     *
+     * @param graphInfo
+     * @return
+     * @throws Exception
+     */
+    public GraphData buildGraphData(Graph graphInfo) throws Exception {
 
         GraphData data = new GraphData();
         // get all records for template.
@@ -97,10 +113,13 @@ public class GraphBuilder {
                         case GBL_DOWFM:
                             xAxisLabels = DateUtil.getDaysOfWeek(datetime);
                             break;
+                        case GBL_OFTD:
+                            DateTime today = new DateTime();
+                            xAxisLabels.add(today.toLocalDate().toString(FMT_FILTER_DATE));
+                            break;
                         case GBL_SMTEOM:
                         case GBL_SYTEOY:
                         case GBL_SYTD:
-                        case GBL_OFTD:
                             // SWOPS THE data set for x axis labels
                             getXAxisLabels(xAxisLabels, graphInfo, template);
                             xAxisSwapped = true;
@@ -141,14 +160,14 @@ public class GraphBuilder {
                             }
                             break;
                         case GBL_FOCUS_IN_AND_OUT:
-                            yAxisLabels.add("IN");
-                            yAxisLabels.add("Out");
+                            yAxisLabels.add(MDL_ASSET_STATUS_IN);
+                            yAxisLabels.add(MDL_ASSET_STATUS_OUT);
                             break;
                         case GBL_FOCUS_DEFAULT:
                             if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
-                                yAxisLabels.add("Assets");
+                                yAxisLabels.add(MDL_ASSET_DEFAULT);
                             } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
-                                yAxisLabels.add("Employee");
+                                yAxisLabels.add(MDL_EMPLOYEE_DEFAULT);
                             }
                             break;
                         default:
@@ -159,9 +178,9 @@ public class GraphBuilder {
                 if (xAxisSwapped) {
                     yAxisLabels = new HashSet<>();
                     if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
-                        yAxisLabels.add("Assets");
+                        yAxisLabels.add(MDL_ASSET_DEFAULT);
                     } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
-                        yAxisLabels.add("Employee");
+                        yAxisLabels.add(MDL_EMPLOYEE_DEFAULT);
                     }
                 }
 
@@ -170,78 +189,131 @@ public class GraphBuilder {
                 String[] xAxis = xAxisLabels.toArray(new String[xAxisLabels.size()]);
 
                 for (Object record : records) {
-                    if (record instanceof Employee) {
+                    Record value = (Record) record;
 
-                        Employee employee = (Employee) record;
-                        String yAxisValue = null;
-                        if (null != graphInfo.getGraphFocus()) {
-                            switch (graphInfo.getGraphFocus()) {
-                                case GBL_FOCUS_CREATED_BY:
-                                    String createdBy = employee.getCreatedBy();
-                                    yAxisValue = createdBy;
-                                    break;
-                                case GBL_FOCUS_FREE_FIELD:
-                                    for (FieldValue field : employee.getDetails()) {
-                                        if (field.getId().equals(graphInfo.getFreefieldId())) {
-                                            yAxisValue = field.getValue();
-                                            break;
-                                        }
+                    // y- axis value should come here
+                    String yAxisValue = null;
+                    if (null != graphInfo.getGraphFocus()) {
+                        switch (graphInfo.getGraphFocus()) {
+                            case GBL_FOCUS_CREATED_BY:
+                                String createdBy = value.getCreatedBy();
+                                yAxisValue = createdBy;
+                                break;
+                            case GBL_FOCUS_FREE_FIELD:
+                                for (FieldValue field : value.getDetails()) {
+                                    if (field.getId().equals(graphInfo.getFreefieldId())) {
+                                        yAxisValue = field.getValue();
+                                        break;
                                     }
-                                    break;
-                                case GBL_FOCUS_DEFAULT:
-                                default:
-                                    yAxisValue = "Employee";
-                                    break;
-                            }
-                        }
-
-                        if (yAxisValue == null) {
-                            // if for some reason the y axis is null set default.
-                            yAxisValue = "Employee";
-                        }
-
-                        DateTime createdDate = DateUtil.parseDate(employee.getCreatedDate(), FMT_CREATED_DATE);
-                        String strDate = new SimpleDateFormat(FMT_FILTER_DATE).format(createdDate.toDate());
-                        DateTime filterDate = DateUtil.parseDate(strDate, FMT_FILTER_DATE);
-                        LocalDate local = filterDate.toLocalDate();
-
-                        String xAxisValue = "";
-                        if (null != graphInfo.getGraphView()) {
-                            switch (graphInfo.getGraphView()) {
-                                case GBL_MTMTFY:
-                                case GBL_MTMFD:
-                                    xAxisValue = local.toString("MMM");
-                                    break;
-                                case GBL_DOWFY:
-                                case GBL_DOWFM:
-                                    xAxisValue = local.toString("EEE");
-                                    break;
-                                default:
-                                    xAxisValue = yAxisValue;
-                                    yAxisValue = "Employee";
-                                    break;
-                            }
-                        }
-
-                        for (int y = 0; y < yAxis.length; y++) {
-                            String yAxisFocus = yAxis[y];
-//                            System.out.println("yAxisFocus : " + yAxisFocus);
-//                            System.out.println("yAxisValue : " + yAxisValue);
-                            if (yAxisFocus.equals(yAxisValue)) {
-                                int[] dataSet = yxData[y];
-                                for (int x = 0; x < xAxis.length; x++) {
-                                    String xAxisFocus = xAxis[x];
-                                    if (xAxisFocus.equals(xAxisValue)) {
-                                        dataSet[x] += 1;
-                                        yxData[y] = dataSet;
+                                }
+                                break;
+                            case GBL_FOCUS_IN_AND_OUT:
+                                // use record object as value (asset) lost its
+                                // asset fields in casting.
+                                if (record instanceof Asset) {
+                                    Asset asset = (Asset) record;
+                                    // null check for assignment
+                                    // null == in
+                                    // not null == out
+                                    if (asset.getResourceId() != null
+                                            && !asset.getResourceId().trim().isEmpty()) {
+                                        yAxisValue = MDL_ASSET_STATUS_OUT;
+                                    } else {
+                                        yAxisValue = MDL_ASSET_STATUS_IN;
                                     }
+                                }
+                                break;
+                            case GBL_FOCUS_DEFAULT:
+                            default:
+                                if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
+                                    yAxisValue = MDL_ASSET_DEFAULT;
+                                } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
+                                    yAxisValue = MDL_EMPLOYEE_DEFAULT;
+                                }
+                                break;
+                        }
+                    }
+
+                    if (yAxisValue == null) {
+                        if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
+                            yAxisValue = MDL_ASSET_DEFAULT;
+                        } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
+                            yAxisValue = MDL_EMPLOYEE_DEFAULT;
+                        }
+                    }
+
+                    // Calculate date filter
+                    DateTime dateTime = new DateTime();
+                    if (null != graphInfo.getGraphDateType()) {
+                        switch (graphInfo.getGraphDateType()) {
+                            case GBL_FOCUS_LAST_MODIFIED:
+                                dateTime = DateUtil.parseDate(value.getLastModifiedDate(), FMT_CREATED_DATE);
+                                break;
+                            case GBL_FOCUS_CREATED_DATE:
+                                dateTime = DateUtil.parseDate(value.getCreatedDate(), FMT_CREATED_DATE);
+                                break;
+                            case GBL_FOCUS_FREE_FIELD:
+                                for (FieldValue field : value.getDetails()) {
+                                    if (field.getId().equals(graphInfo.getFreeDateFieldId())) {
+                                        dateTime = DateUtil.parseJavaScriptDateTime(field.getValue());
+                                        break;
+                                    }
+                                }
+                                break;
+                            default:
+                                dateTime = DateUtil.parseDate(value.getCreatedDate(), FMT_CREATED_DATE);
+                                break;
+                        }
+                    } else {
+                        dateTime = DateUtil.parseDate(value.getCreatedDate(), FMT_CREATED_DATE);
+                    }
+
+                    String strDate = new SimpleDateFormat(FMT_FILTER_DATE).format(dateTime.toDate());
+                    DateTime filterDate = DateUtil.parseDate(strDate, FMT_FILTER_DATE);
+                    LocalDate local = filterDate.toLocalDate();
+
+                    String xAxisValue = "";
+                    if (null != graphInfo.getGraphView()) {
+                        switch (graphInfo.getGraphView()) {
+                            case GBL_OFTD:
+                                xAxisValue = local.toString(FMT_FILTER_DATE);
+                                break;
+                            case GBL_MTMTFY:
+                            case GBL_MTMFD:
+                                xAxisValue = local.toString(FMT_MONTH_NAME);
+                                break;
+                            case GBL_DOWFY:
+                            case GBL_DOWFM:
+                                xAxisValue = local.toString(FMT_DAY_NAME);
+                                break;
+                            default:
+                                // SWAP DATA HERE
+                                xAxisValue = yAxisValue;
+                                if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
+                                    yAxisValue = MDL_ASSET_DEFAULT;
+                                } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
+                                    yAxisValue = MDL_EMPLOYEE_DEFAULT;
+                                }
+                                break;
+                        }
+                    }
+
+                    for (int y = 0; y < yAxis.length; y++) {
+                        String yAxisFocus = yAxis[y];
+//                        System.out.println("yAxisFocus : " + yAxisFocus);
+//                        System.out.println("yAxisValue : " + yAxisValue);
+                        if (yAxisFocus.equals(yAxisValue)) {
+                            int[] dataSet = yxData[y];
+                            for (int x = 0; x < xAxis.length; x++) {
+                                String xAxisFocus = xAxis[x];
+//                                System.out.println("xAxisFocus : " + xAxisFocus);
+//                                System.out.println("xAxisValue : " + xAxisValue);
+                                if (xAxisFocus.equals(xAxisValue)) {
+                                    dataSet[x] += 1;
+                                    yxData[y] = dataSet;
                                 }
                             }
                         }
-
-                    } else if (record instanceof Asset) {
-                        Asset asset = (Asset) record;
-
                     }
                 }
 
@@ -251,7 +323,6 @@ public class GraphBuilder {
                 data.setXlabels(xAxis);
                 data.setYlabels(yAxis);
                 return data;
-
             }
         }
 
@@ -267,8 +338,8 @@ public class GraphBuilder {
                     });
                     break;
                 case GBL_FOCUS_IN_AND_OUT:
-                    xAxis.add("IN");
-                    xAxis.add("OUT");
+                    xAxis.add(MDL_ASSET_STATUS_IN);
+                    xAxis.add(MDL_ASSET_STATUS_OUT);
                     break;
                 case GBL_FOCUS_FREE_FIELD:
                     if (graphInfo.getFreefieldId() != null) {
@@ -290,9 +361,9 @@ public class GraphBuilder {
                 case GBL_FOCUS_DEFAULT:
                     Menu menu = menuRep.findOne(graphInfo.getMenuId());
                     if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
-                        xAxis.add("Assets");
+                        xAxis.add(MDL_ASSET_DEFAULT);
                     } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
-                        xAxis.add("Employee");
+                        xAxis.add(MDL_EMPLOYEE_DEFAULT);
                     }
                     break;
                 default:

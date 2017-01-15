@@ -226,15 +226,33 @@ public class TemplateController {
         return response;
     }
 
-    @RequestMapping(value = "/template/{id}/fields", method = RequestMethod.POST)
+    @RequestMapping(value = "/template/dropdown/{id}/fields", method = RequestMethod.POST)
     public @ResponseBody
-    TemplateResponse getTemplateFields(@PathVariable String id) {
+    TemplateResponse getTemplateDropdownFields(@PathVariable String id) {
         TemplateResponse response = new TemplateResponse();
         Template template = typeRep.findOne(id);
         List<FieldDetail> fields = new ArrayList<>();
 
         template.getDetails().stream().filter((field)
                 -> (GlobalFieldType.GBL_INPUT_DRP_TYPE.equals(field.getType())))
+                .forEach((field) -> {
+                    fields.add(field);
+                });
+
+        response.setFields(fields);
+
+        return response;
+    }
+
+    @RequestMapping(value = "/template/date/{id}/fields", method = RequestMethod.POST)
+    public @ResponseBody
+    TemplateResponse getTemplateDateFieldFields(@PathVariable String id) {
+        TemplateResponse response = new TemplateResponse();
+        Template template = typeRep.findOne(id);
+        List<FieldDetail> fields = new ArrayList<>();
+
+        template.getDetails().stream().filter((field)
+                -> (GlobalFieldType.GBL_INPUT_DAT_TYPE.equals(field.getType())))
                 .forEach((field) -> {
                     fields.add(field);
                 });
