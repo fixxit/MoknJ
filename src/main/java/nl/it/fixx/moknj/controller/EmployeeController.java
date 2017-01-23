@@ -15,6 +15,7 @@ import java.util.Objects;
 import nl.it.fixx.moknj.bal.EmployeeBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
+import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
@@ -57,7 +58,7 @@ public class EmployeeController {
     @Autowired
     private EmployeeLinkRepository employeeLinkRep;
     @Autowired
-    private TemplateRepository typeRep;
+    private TemplateRepository templateRep;
 
     @RequestMapping(value = "/add/{id}", method = RequestMethod.POST)
     public EmployeeResponse add(@PathVariable String id,
@@ -172,7 +173,7 @@ public class EmployeeController {
                 audit.setCreatedBy(passedEmployee.getLastModifiedBy());
 
                 if (passedEmployee.getTypeId() != null) {
-                    Template template = typeRep.findOne(passedEmployee.getTypeId());
+                    Template template = templateRep.findOne(passedEmployee.getTypeId());
                     if (template != null) {
                         audit.setTemplate(template.getName());
                     }
@@ -213,7 +214,20 @@ public class EmployeeController {
                         audit.setChanges("NO_CHANGE");
                     }
                 } else {
-                    audit.setChanges("n/a");
+                    User emp = userRep.findOne(passedEmployee.getResourceId());
+                    if (emp != null) {
+                        passedEmployee.setEmployee(emp.getFirstName() + " " + emp.getSurname());
+                    }
+
+                    String menuId = passedEmployee.getMenuScopeIds().get(0);
+                    if (menuId != null && !menuId.trim().isEmpty()) {
+                        Menu menu = menuRep.findOne(menuId);
+                        if (menu != null) {
+                            passedEmployee.setMenu(menu.getName());
+                        }
+                    }
+
+                    audit.setChanges(passedEmployee.toAuditString(fieldRep));
                 }
 
                 // Set action

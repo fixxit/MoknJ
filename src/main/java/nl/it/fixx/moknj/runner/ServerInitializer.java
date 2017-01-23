@@ -7,7 +7,7 @@ package nl.it.fixx.moknj.runner;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.controller.UserController;
+import nl.it.fixx.moknj.bal.UserBal;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.repository.UserRepository;
 import static nl.it.fixx.moknj.security.OAuth2SecurityConfig.PSW_ENCODER;
@@ -47,13 +47,13 @@ public class ServerInitializer implements ApplicationRunner {
             resource.setSurname("");
             resource.setEmail("info@fixx.it");
             resource.setSystemUser(true);
-            resource.setUserName(UserController.ADMIN_NAME);
+            resource.setUserName(UserBal.ADMIN_NAME);
             resource.setPassword(passwordEncoder.encode("fix!2"));
             List<String> auths = new ArrayList<>();
             auths.add("Administrator rights");
             resource.setAuthorities(auths);
 
-            User indb = resp.findByUserName(UserController.ADMIN_NAME);
+            User indb = resp.findByUserName(UserBal.ADMIN_NAME);
             if (indb != null && indb.getId() != null) {
                 resource.setId(indb.getId());
             }

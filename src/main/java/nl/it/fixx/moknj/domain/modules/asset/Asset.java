@@ -10,6 +10,7 @@ import java.util.Objects;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.record.Record;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 /**
  *
@@ -27,6 +28,11 @@ public class Asset implements Record {
     private String createdDate;
     private String createdBy;
     private boolean hidden;
+
+    @Transient
+    private String freeDate;
+    @Transient
+    private String freeValue;
     /**
      * Scope id's define the menu's (cards) which this asset is visible on.
      */
@@ -220,6 +226,26 @@ public class Asset implements Record {
     @Override
     public String toString() {
         return "Asset{" + "id=" + id + ", typeId=" + typeId + ", details=" + details + ", resourceId=" + resourceId + ", lastModifiedDate=" + lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy + ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", hidden=" + hidden + ", menuScopeIds=" + menuScopeIds + '}';
+    }
+
+    @Override
+    public String getFreeDate() {
+        return this.freeDate;
+    }
+
+    @Override
+    public void setFreeDate(String freeDate) {
+        this.freeDate = freeDate;
+    }
+
+    @Override
+    public String getFreeValue() {
+        return this.freeValue;
+    }
+
+    @Override
+    public void setFreeValue(String freeValue) {
+        this.freeValue = freeValue;
     }
 
 }

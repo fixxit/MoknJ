@@ -1,5 +1,6 @@
 package nl.it.fixx.moknj.domain.core.graph;
 
+import java.util.List;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphFocus;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
@@ -30,6 +31,10 @@ public class Graph {
     private String graphDate;
     private String freefieldId;
     private String freeDateFieldId;
+
+    private String creatorId;
+    private List<String> accessUserIds;
+
 
     /**
      * Display field value on home setup filter view.
@@ -244,6 +249,34 @@ public class Graph {
      */
     public void setGraphDateType(GlobalGraphDate graphDateType) {
         this.graphDateType = graphDateType;
+    }
+
+    /**
+     * @return the creatorId
+     */
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    /**
+     * @param creatorId the creatorId to set
+     */
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    /**
+     * @return the accessUserIds
+     */
+    public List<String> getAccessUserIds() {
+        return accessUserIds;
+    }
+
+    /**
+     * @param accessUserIds the accessUserIds to set
+     */
+    public void setAccessUserIds(List<String> accessUserIds) {
+        this.accessUserIds = accessUserIds;
     }
 
 }

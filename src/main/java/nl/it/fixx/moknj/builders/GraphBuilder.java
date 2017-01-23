@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Set;
 import nl.it.fixx.moknj.bal.AssetBal;
 import nl.it.fixx.moknj.bal.EmployeeBal;
-import nl.it.fixx.moknj.bal.EntityBal;
+import nl.it.fixx.moknj.bal.RecordBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
+import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
+import nl.it.fixx.moknj.domain.core.global.GlobalGraphView;
 import nl.it.fixx.moknj.domain.core.global.GlobalMenuType;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
@@ -22,8 +24,10 @@ import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
-import nl.it.fixx.moknj.domain.core.util.DateUtil;
+import nl.it.fixx.moknj.util.DateUtil;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
+import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
+import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
 import nl.it.fixx.moknj.repository.MenuRepository;
@@ -33,6 +37,8 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to group the graph data for display in the UI
@@ -41,22 +47,29 @@ import org.json.simple.JSONValue;
  */
 public class GraphBuilder {
 
+    private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
+
     private final AssetRepository assetRep;
     private final MenuRepository menuRep;
     private final TemplateRepository templateRep;
     private final EmployeeRepository employeeRep;
     private final UserRepository userRep;
+    private final AssetLinkRepository auditRep; // Asset Audit Repository
+    private DateTime endDate;
+    private DateTime startDate;
+
     private static final String MDL_ASSET_DEFAULT = "Asset";
     private static final String MDL_EMPLOYEE_DEFAULT = "Employee";
-    private static final String MDL_ASSET_STATUS_IN = "IN";
-    private static final String MDL_ASSET_STATUS_OUT = "OUT";
+    private static final String MDL_ASSET_STATUS_IN = "In";
+    private static final String MDL_ASSET_STATUS_OUT = "Out";
 
-    public GraphBuilder(AssetRepository assetRep, MenuRepository menuRep, TemplateRepository templateRep, EmployeeRepository employeeRep, UserRepository userRep) {
+    public GraphBuilder(AssetRepository assetRep, AssetLinkRepository auditRep, MenuRepository menuRep, TemplateRepository templateRep, EmployeeRepository employeeRep, UserRepository userRep) {
         this.assetRep = assetRep;
         this.menuRep = menuRep;
         this.templateRep = templateRep;
         this.employeeRep = employeeRep;
         this.userRep = userRep;
+        this.auditRep = auditRep;
     }
 
     private final String FMT_CREATED_DATE = "yyyy-MM-dd HH:mm";
@@ -76,10 +89,10 @@ public class GraphBuilder {
         GraphData data = new GraphData();
         // get all records for template.
         if (graphInfo != null) {
-//            System.out.println("======================================================");
-//            System.out.println("Graph Name : " + graphInfo.getName());
+            LOG.info("======================================================");
+            LOG.info("Graph Name : " + graphInfo.getName());
             // Business access layer.
-            EntityBal bal = null;
+            RecordBal bal = null;
             Menu menu = menuRep.findOne(graphInfo.getMenuId());
             Template template = templateRep.findOne(graphInfo.getTemplateId());
 
@@ -96,38 +109,116 @@ public class GraphBuilder {
             // X-AXIS Label Logic
             if (bal != null) {
                 List records = bal.getAll(graphInfo.getTemplateId(), graphInfo.getMenuId());
-                DateTime datetime = DateUtil.parseJavaScriptDateTime(graphInfo.getGraphDate());
-                List<String> xAxisLabels = new ArrayList<>();
+                // duplicate records for all entries which have the same id.
+                // Basically a left join...
+//                if (GlobalGraphFocus.GBL_FOCUS_IN_AND_OUT.equals(graphInfo.getGraphFocus())) {
+                if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                    List<Asset> inOutAssetJoinList = new ArrayList<>();
+                    for (Object record : records) {
+                        if (record instanceof Asset) {
+                            Asset asset = (Asset) record;
+                            // gets all the checked in/out records for asset.
+                            List<AssetLink> links = auditRep.getAllByAssetId(asset.getId());
+                            for (AssetLink link : links) {
+                                // create new instance of asset... prototype pattern would be nice here...
+                                Asset newAsset = new Asset();
+                                if (link.getAssetId().equals(asset.getId())) {
+                                    DateTime date = DateUtil.parseJavaScriptDateTime(link.getDate());
+                                    String freeDate = new SimpleDateFormat(
+                                            FMT_CREATED_DATE
+                                    ).format(date.plusDays(1).toDate());
+                                    newAsset.setFreeDate(freeDate);
+                                    newAsset.setFreeValue(link.isChecked() ? MDL_ASSET_STATUS_OUT : MDL_ASSET_STATUS_IN);
+                                    newAsset.setCreatedBy(asset.getCreatedBy());
+                                    newAsset.setCreatedDate(asset.getCreatedDate());
+                                    newAsset.setDetails(asset.getDetails());
+                                    newAsset.setLastModifiedBy(asset.getLastModifiedBy());
+                                    newAsset.setLastModifiedDate(asset.getLastModifiedDate());
+                                    newAsset.setMenuScopeIds(asset.getMenuScopeIds());
+                                    newAsset.setResourceId(asset.getResourceId());
+                                    newAsset.setTypeId(asset.getTypeId());
+                                    inOutAssetJoinList.add(newAsset);
+                                }
+                            }
+                        }
+                    }
+                    records = inOutAssetJoinList;
+                }
+//                }
 
+                endDate = DateUtil.parseJavaScriptDateTime(graphInfo.getGraphDate());
+                startDate = new DateTime();
+                //javascript is one day off todo with date type UCT
+                endDate = endDate.plusDays(1);
+
+                List<String> xAxisLabels = new ArrayList<>();
                 boolean xAxisSwapped = false;
 
                 if (null != graphInfo.getGraphView()) {
                     switch (graphInfo.getGraphView()) {
-                        case GBL_MTMTFY:
-                            xAxisLabels = DateUtil.geMonthsForYear(datetime.getYear());
-                            break;
-                        case GBL_MTMFD:
-                            xAxisLabels = DateUtil.geMonthsForDate(datetime);
-                            break;
-                        case GBL_DOWFY:
-                        case GBL_DOWFM:
-                            xAxisLabels = DateUtil.getDaysOfWeek(datetime);
-                            break;
+                        case GBL_MTMTFY: {
+                            xAxisLabels = DateUtil.geMonthsForYear(endDate.getYear());
+                            initialiseYearDates();
+                        }
+                        break;
+                        case GBL_MTMFD: {
+                            xAxisLabels = DateUtil.geMonthsForDate(endDate);
+                            initialiseMonthDates();
+                        }
+                        break;
+                        case GBL_DOWFY: {
+                            xAxisLabels = DateUtil.getDaysOfWeek(endDate);
+                            initialiseYearDates();
+                        }
+                        break;
+                        case GBL_DOWFM: {
+                            xAxisLabels = DateUtil.getDaysOfWeek(endDate);
+                            initialiseMonthDates();
+                        }
+                        break;
                         case GBL_OFTD:
                             DateTime today = new DateTime();
                             xAxisLabels.add(today.toLocalDate().toString(FMT_FILTER_DATE));
+                            // Set end and start date to today/current date
+                            endDate = today;
+                            startDate = today;
                             break;
-                        case GBL_SMTEOM:
-                        case GBL_SYTEOY:
-                        case GBL_SYTD:
+                        case GBL_SMTEOM: {
+                            getXAxisLabels(xAxisLabels, graphInfo, template);
+                            xAxisSwapped = true;
+                            initialiseMonthDates();
+                        }
+                        break;
+                        case GBL_SYTEOY: {
+                            getXAxisLabels(xAxisLabels, graphInfo, template);
+                            xAxisSwapped = true;
+                            initialiseYearDates();
+                        }
+                        break;
+                        case GBL_SYTD: {
                             // SWOPS THE data set for x axis labels
                             getXAxisLabels(xAxisLabels, graphInfo, template);
                             xAxisSwapped = true;
-                            break;
+
+                            String startDateStr = endDate.getYear() + "-01-01";
+                            LocalDate localstratDate = new LocalDate(startDateStr);
+                            startDate = localstratDate.toDateTimeAtStartOfDay();
+                        }
+                        break;
                         default:
                             break;
                     }
                 }
+
+                LOG.info("Type : " + graphInfo.getGraphView().getDisplayName());
+                LOG.info("End Date : " + endDate.toString(FMT_FILTER_DATE));
+                LOG.info("Start Date : " + startDate.toString(FMT_FILTER_DATE));
+
+                String endDateStr = new SimpleDateFormat(FMT_FILTER_DATE).format(endDate.toDate());
+                DateTime endDateRule = DateUtil.parseDate(endDateStr, FMT_FILTER_DATE);
+
+                String startDateStr = new SimpleDateFormat(FMT_FILTER_DATE).format(startDate.toDate());
+                DateTime startDateRule = DateUtil.parseDate(startDateStr, FMT_FILTER_DATE);
 
                 Set<String> yAxisLabels = new HashSet<>();
 
@@ -151,8 +242,15 @@ public class GraphBuilder {
                                         String jsonStr = "{\"" + name + "\":" + array + "}";
                                         JSONObject json = (JSONObject) JSONValue.parse(jsonStr);
                                         List<String> drpValues = (List<String>) json.get(name);
-                                        for (String value : drpValues) {
-                                            yAxisLabels.add(value);
+                                        if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                            for (String value : drpValues) {
+                                                yAxisLabels.add(value + "-" + MDL_ASSET_STATUS_IN);
+                                                yAxisLabels.add(value + "-" + MDL_ASSET_STATUS_OUT);
+                                            }
+                                        } else {
+                                            for (String value : drpValues) {
+                                                yAxisLabels.add(value);
+                                            }
                                         }
                                         break;
                                     }
@@ -178,7 +276,12 @@ public class GraphBuilder {
                 if (xAxisSwapped) {
                     yAxisLabels = new HashSet<>();
                     if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
+//                        if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+//                            yAxisLabels.add(MDL_ASSET_STATUS_IN);
+//                            yAxisLabels.add(MDL_ASSET_STATUS_OUT);
+//                        } else {
                         yAxisLabels.add(MDL_ASSET_DEFAULT);
+//                        }
                     } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
                         yAxisLabels.add(MDL_EMPLOYEE_DEFAULT);
                     }
@@ -189,20 +292,30 @@ public class GraphBuilder {
                 String[] xAxis = xAxisLabels.toArray(new String[xAxisLabels.size()]);
 
                 for (Object record : records) {
-                    Record value = (Record) record;
+                    Record recodValue = (Record) record;
 
                     // y- axis value should come here
                     String yAxisValue = null;
                     if (null != graphInfo.getGraphFocus()) {
                         switch (graphInfo.getGraphFocus()) {
                             case GBL_FOCUS_CREATED_BY:
-                                String createdBy = value.getCreatedBy();
+                                String createdBy = recodValue.getCreatedBy();
                                 yAxisValue = createdBy;
                                 break;
                             case GBL_FOCUS_FREE_FIELD:
-                                for (FieldValue field : value.getDetails()) {
+                                for (FieldValue field : recodValue.getDetails()) {
                                     if (field.getId().equals(graphInfo.getFreefieldId())) {
-                                        yAxisValue = field.getValue();
+                                        String value = field.getValue();
+                                        if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                            if (MDL_ASSET_STATUS_IN.equals(recodValue.getFreeValue())) {
+                                                yAxisValue = value + "-" + MDL_ASSET_STATUS_IN;
+                                            } else if (MDL_ASSET_STATUS_OUT.equals(recodValue.getFreeValue())) {
+                                                yAxisValue = value + "-" + MDL_ASSET_STATUS_OUT;
+                                            }
+                                        } else {
+                                            yAxisValue = value;
+                                        }
+
                                         break;
                                     }
                                 }
@@ -215,11 +328,15 @@ public class GraphBuilder {
                                     // null check for assignment
                                     // null == in
                                     // not null == out
-                                    if (asset.getResourceId() != null
-                                            && !asset.getResourceId().trim().isEmpty()) {
-                                        yAxisValue = MDL_ASSET_STATUS_OUT;
-                                    } else {
-                                        yAxisValue = MDL_ASSET_STATUS_IN;
+                                    if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                        yAxisValue = asset.getFreeValue();
+                                    } else if (!GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                        if (asset.getResourceId() != null
+                                                && !asset.getResourceId().trim().isEmpty()) {
+                                            yAxisValue = MDL_ASSET_STATUS_OUT;
+                                        } else {
+                                            yAxisValue = MDL_ASSET_STATUS_IN;
+                                        }
                                     }
                                 }
                                 break;
@@ -243,80 +360,104 @@ public class GraphBuilder {
                     }
 
                     // Calculate date filter
-                    DateTime dateTime = new DateTime();
+                    DateTime recodDateTime = new DateTime();
                     if (null != graphInfo.getGraphDateType()) {
                         switch (graphInfo.getGraphDateType()) {
                             case GBL_FOCUS_LAST_MODIFIED:
-                                dateTime = DateUtil.parseDate(value.getLastModifiedDate(), FMT_CREATED_DATE);
+                                recodDateTime = DateUtil.parseDate(recodValue.getLastModifiedDate(), FMT_CREATED_DATE);
+                                break;
+                            case GBL_FOCUS_ASSET_IN_OUT_DATE:
+                                recodDateTime = DateUtil.parseDate(recodValue.getFreeDate(), FMT_CREATED_DATE);
                                 break;
                             case GBL_FOCUS_CREATED_DATE:
-                                dateTime = DateUtil.parseDate(value.getCreatedDate(), FMT_CREATED_DATE);
+                                recodDateTime = DateUtil.parseDate(recodValue.getCreatedDate(), FMT_CREATED_DATE);
                                 break;
                             case GBL_FOCUS_FREE_FIELD:
-                                for (FieldValue field : value.getDetails()) {
+                                for (FieldValue field : recodValue.getDetails()) {
                                     if (field.getId().equals(graphInfo.getFreeDateFieldId())) {
-                                        dateTime = DateUtil.parseJavaScriptDateTime(field.getValue());
+                                        recodDateTime = DateUtil.parseJavaScriptDateTime(field.getValue());
                                         break;
                                     }
                                 }
                                 break;
                             default:
-                                dateTime = DateUtil.parseDate(value.getCreatedDate(), FMT_CREATED_DATE);
+                                recodDateTime = DateUtil.parseDate(recodValue.getCreatedDate(), FMT_CREATED_DATE);
                                 break;
                         }
                     } else {
-                        dateTime = DateUtil.parseDate(value.getCreatedDate(), FMT_CREATED_DATE);
+                        recodDateTime = DateUtil.parseDate(recodValue.getCreatedDate(), FMT_CREATED_DATE);
                     }
 
-                    String strDate = new SimpleDateFormat(FMT_FILTER_DATE).format(dateTime.toDate());
-                    DateTime filterDate = DateUtil.parseDate(strDate, FMT_FILTER_DATE);
-                    LocalDate local = filterDate.toLocalDate();
-
-                    String xAxisValue = "";
-                    if (null != graphInfo.getGraphView()) {
-                        switch (graphInfo.getGraphView()) {
-                            case GBL_OFTD:
-                                xAxisValue = local.toString(FMT_FILTER_DATE);
-                                break;
-                            case GBL_MTMTFY:
-                            case GBL_MTMFD:
-                                xAxisValue = local.toString(FMT_MONTH_NAME);
-                                break;
-                            case GBL_DOWFY:
-                            case GBL_DOWFM:
-                                xAxisValue = local.toString(FMT_DAY_NAME);
-                                break;
-                            default:
-                                // SWAP DATA HERE
-                                xAxisValue = yAxisValue;
-                                if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
-                                    yAxisValue = MDL_ASSET_DEFAULT;
-                                } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
-                                    yAxisValue = MDL_EMPLOYEE_DEFAULT;
-                                }
-                                break;
+                    // This is used to bypass the filterdate and filter rule logic
+                    boolean bypassDateRulle = false;
+                    if (GlobalGraphDate.GBL_FOCUS_NO_DATE_RULE.equals(graphInfo.getGraphDateType())) {
+                        if (!GlobalGraphView.GBL_OFTD.equals(graphInfo.getGraphView())) {
+                            bypassDateRulle = true;
                         }
                     }
 
-                    for (int y = 0; y < yAxis.length; y++) {
-                        String yAxisFocus = yAxis[y];
-//                        System.out.println("yAxisFocus : " + yAxisFocus);
-//                        System.out.println("yAxisValue : " + yAxisValue);
-                        if (yAxisFocus.equals(yAxisValue)) {
-                            int[] dataSet = yxData[y];
-                            for (int x = 0; x < xAxis.length; x++) {
-                                String xAxisFocus = xAxis[x];
-//                                System.out.println("xAxisFocus : " + xAxisFocus);
-//                                System.out.println("xAxisValue : " + xAxisValue);
-                                if (xAxisFocus.equals(xAxisValue)) {
-                                    dataSet[x] += 1;
-                                    yxData[y] = dataSet;
+                    String recordDateStr = new SimpleDateFormat(FMT_FILTER_DATE).format(recodDateTime.toDate());
+                    DateTime recordDate = DateUtil.parseDate(recordDateStr, FMT_FILTER_DATE);
+                    LOG.info("recordDate : " + recordDate.toString(FMT_FILTER_DATE));
+
+                    // Check if view date and record date is in correct range
+                    // AKA date rule implementation.
+                    if ( // Before Date comparison (End Date)
+                            (recordDate.isBefore(endDateRule)
+                            || recordDate.isEqual(endDateRule))
+                            && // After Date comparison (Start Date)
+                            (recordDate.isAfter(startDateRule)
+                            || recordDate.isEqual(startDateRule))
+                            // Bypass date
+                            || bypassDateRulle) {
+
+                        LocalDate local = recordDate.toLocalDate();
+
+                        String xAxisValue = "";
+                        if (null != graphInfo.getGraphView()) {
+                            switch (graphInfo.getGraphView()) {
+                                case GBL_OFTD:
+                                    xAxisValue = local.toString(FMT_FILTER_DATE);
+                                    break;
+                                case GBL_MTMTFY:
+                                case GBL_MTMFD:
+                                    xAxisValue = local.toString(FMT_MONTH_NAME);
+                                    break;
+                                case GBL_DOWFY:
+                                case GBL_DOWFM:
+                                    xAxisValue = local.toString(FMT_DAY_NAME);
+                                    break;
+                                default:
+                                    // SWAP DATA HERE
+                                    xAxisValue = yAxisValue;
+                                    if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
+                                        yAxisValue = MDL_ASSET_DEFAULT;
+                                    } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
+                                        yAxisValue = MDL_EMPLOYEE_DEFAULT;
+                                    }
+                                    break;
+                            }
+                        }
+
+                        for (int y = 0; y < yAxis.length; y++) {
+                            String yAxisFocus = yAxis[y];
+                            LOG.info("yAxisFocus : " + yAxisFocus);
+                            LOG.info("yAxisValue : " + yAxisValue);
+                            if (yAxisFocus.equals(yAxisValue)) {
+                                int[] dataSet = yxData[y];
+                                for (int x = 0; x < xAxis.length; x++) {
+                                    String xAxisFocus = xAxis[x];
+                                    LOG.info("xAxisFocus : " + xAxisFocus);
+                                    LOG.info("xAxisValue : " + xAxisValue);
+                                    if (xAxisFocus.equals(xAxisValue)) {
+                                        dataSet[x] += 1;
+                                        yxData[y] = dataSet;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
                 // Set grpah data for page display
                 data.setGraphTitle(graphInfo.getName());
                 data.setGraphData(yxData);
@@ -351,8 +492,18 @@ public class GraphBuilder {
                                 String array = drpValue.substring(n + 1, drpValue.length());
                                 String jsonStr = "{\"" + name + "\":" + array + "}";
                                 JSONObject json = (JSONObject) JSONValue.parse(jsonStr);
-                                List<String> list = (List<String>) json.get(name);
-                                xAxis.addAll(list);
+                                List<String> xlabels = (List<String>) json.get(name);
+
+                                if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                    for (String value : xlabels) {
+                                        xAxis.add(value + "-" + MDL_ASSET_STATUS_IN);
+                                        xAxis.add(value + "-" + MDL_ASSET_STATUS_OUT);
+                                    }
+                                } else {
+                                    for (String value : xlabels) {
+                                        xAxis.add(value);
+                                    }
+                                }
                                 break;
                             }
                         }
@@ -370,6 +521,42 @@ public class GraphBuilder {
                     break;
             }
         }
+    }
+
+    /**
+     * Initializes the start date and end date for a year
+     *
+     * @param endDate
+     * @param startDate
+     */
+    private void initialiseYearDates() throws Exception {
+        String endDateStr = endDate.getYear() + "-12-31";
+        LocalDate localDateEnd = new LocalDate(endDateStr);
+        endDate = localDateEnd.toDateTimeAtStartOfDay();
+
+        String startDateStr = endDate.getYear() + "-01-01";
+        LocalDate localstratDate = new LocalDate(startDateStr);
+        startDate = localstratDate.toDateTimeAtStartOfDay();
+    }
+
+    /**
+     * Initializes the start date and end date for a month
+     *
+     * @param endDate
+     * @param startDate
+     */
+    private void initialiseMonthDates() throws Exception {
+        String endDateStr = endDate.getYear()
+                + "-" + endDate.getMonthOfYear()
+                + "-" + endDate.dayOfMonth().getMaximumValue();
+        LocalDate localEndDate = new LocalDate(endDateStr);
+        endDate = localEndDate.toDateTimeAtStartOfDay();
+
+        String startDateStr = endDate.getYear()
+                + "-" + endDate.getMonthOfYear()
+                + "-" + endDate.dayOfMonth().getMinimumValue();
+        LocalDate localStartDate = new LocalDate(startDateStr);
+        startDate = localStartDate.toDateTimeAtStartOfDay();
     }
 
 }

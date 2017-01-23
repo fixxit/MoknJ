@@ -9,12 +9,12 @@ import java.util.List;
  */
 public enum UserAuthority {
     ALL_ACCESS("Administrator rights"),
-    ASSET("Access to edit/create/delete of assets"),
-    MENU("Access to edit/create/delete of Menu's"),
-    TYPE("Access to edit/create/delete of templates"),
-    RESOURCE("Access to edit/create/delete of system users"),
-    LINK("Access to edit/create of Audit trails"),
-    DASH("Access to edit/create of Home Dashboard");
+    ASSET("Access to Assets api"),
+    MENU("Access to Menu api"),
+    TYPE("Access to Template api"),
+    RESOURCE("Access to User api"),
+    LINK("Access to Audit trail api"),
+    DASH("Access to Home Dashboard api");
 
     final String displayName;
 

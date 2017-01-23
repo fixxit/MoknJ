@@ -98,4 +98,24 @@ public interface Record {
      * @param createdBy the createdBy to set
      */
     public void setCreatedBy(String createdBy);
+
+    /**
+     * @return the freeDate
+     */
+    public String getFreeDate();
+
+    /**
+     * @param freedate the freeDate to set
+     */
+    public void setFreeDate(String freedate);
+
+    /**
+     * @return the freeValue
+     */
+    public String getFreeValue();
+
+    /**
+     * @param freeValue the freeValue to set
+     */
+    public void setFreeValue(String freeValue);
 }

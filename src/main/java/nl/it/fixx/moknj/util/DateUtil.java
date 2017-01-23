@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nl.it.fixx.moknj.domain.core.util;
+package nl.it.fixx.moknj.util;
 
 import java.util.ArrayList;
 import java.util.Date;

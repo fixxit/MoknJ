@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author adriaan
  */
-public interface EntityBal {
+public interface RecordBal {
 
     /**
      * Gets all the records for entity record.

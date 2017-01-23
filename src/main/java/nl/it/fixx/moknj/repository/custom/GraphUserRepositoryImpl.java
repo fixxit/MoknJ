@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nl.it.fixx.moknj.security;
-// *
-// * @author adriaan
-// */
-//public class SecurityWebApplicationInitializer extends AbstractSecurityWebApplicationInitializer {
-//
-//}
+package nl.it.fixx.moknj.repository.custom;
+
+/**
+ *
+ * @author adriaan
+ */
+public class GraphUserRepositoryImpl {
+
+}

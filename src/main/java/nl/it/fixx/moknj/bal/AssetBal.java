@@ -18,7 +18,7 @@ import nl.it.fixx.moknj.repository.MenuRepository;
  *
  * @author adriaan
  */
-public class AssetBal implements EntityBal {
+public class AssetBal implements RecordBal, BusinessAccessLayer {
 
     private final AssetRepository assetRep;
     private final MenuRepository menuRep;

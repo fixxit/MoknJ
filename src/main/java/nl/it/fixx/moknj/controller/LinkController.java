@@ -11,6 +11,7 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
+import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
@@ -112,18 +113,17 @@ public class LinkController {
     public LinkResponse getAllEmployeeLinks() {
         final LinkResponse response = new LinkResponse();
         response.setEmployeeLinks(employeeLinkRep.findAll(new Sort(Sort.Direction.DESC, "createdDate")));
-        response.getEmployeeLinks().stream().map((link) -> {
+        for (EmployeeLink link : response.getEmployeeLinks()) {
             // gets the user edited the record.
             Employee dbEmployee = employeeRep.findOne(link.getEmployeeId());
-            if (dbEmployee.getResourceId() != null) {
+            if (dbEmployee != null
+                    && dbEmployee.getResourceId() != null) {
                 User linkedUser = userRep.findById(dbEmployee.getResourceId());
                 String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
                 link.setUser(fullname);
             }
-            return link;
-        }).forEach((link) -> {
             link.setActionValue(link.getAction().getDisplayValue());
-        });
+        }
         return response;
     }
 

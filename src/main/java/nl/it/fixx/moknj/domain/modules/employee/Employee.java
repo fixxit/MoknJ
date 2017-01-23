@@ -2,9 +2,12 @@ package nl.it.fixx.moknj.domain.modules.employee;
 
 import java.util.List;
 import java.util.Objects;
+import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.record.Record;
+import nl.it.fixx.moknj.repository.FieldDetailRepository;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 /**
  *
@@ -22,6 +25,16 @@ public class Employee implements Record {
     private String createdDate;
     private String createdBy;
     private boolean hidden;
+
+    @Transient
+    private String freeDate;
+    @Transient
+    private String freeValue;
+    @Transient
+    private String menu;
+    @Transient
+    private String employee;
+
     /**
      * Scope id's define the menu's (cards) which this asset is visible on.
      */
@@ -207,9 +220,81 @@ public class Employee implements Record {
         this.createdBy = createdBy;
     }
 
+    public String toAuditString(FieldDetailRepository fieldRep) {
+        String str = "";
+
+        str += menu + ", " + employee;
+
+        if (details != null && !details.isEmpty()) {
+            String fields = "";
+            for (FieldValue field : details) {
+                FieldDetail dbField = fieldRep.findOne(field.getId());
+                String fieldName = dbField.getName();
+                String fieldValue = field.getValue();
+                fields += fieldName + "=" + fieldValue + ",";
+            }
+            if (fields.endsWith(",")) {
+                fields = fields.substring(0, fields.length() - 1);
+            }
+            str += ", value={" + fields + "}";
+        }
+
+        str += ", createdDate=" + createdDate
+                + ", createdBy=" + createdBy;
+        return str;
+    }
+
     @Override
     public String toString() {
         return "Employee{" + "id=" + id + ", typeId=" + typeId + ", details=" + details + ", resourceId=" + resourceId + ", lastModifiedDate=" + lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy + ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", hidden=" + hidden + ", menuScopeIds=" + menuScopeIds + '}';
+    }
+
+    @Override
+    public String getFreeDate() {
+        return this.freeDate;
+    }
+
+    @Override
+    public void setFreeDate(String freeDate) {
+        this.freeDate = freeDate;
+    }
+
+    @Override
+    public String getFreeValue() {
+        return this.freeValue;
+    }
+
+    @Override
+    public void setFreeValue(String freeValue) {
+        this.freeValue = freeValue;
+    }
+
+    /**
+     * @return the menu
+     */
+    public String getMenu() {
+        return menu;
+    }
+
+    /**
+     * @param menu the menu to set
+     */
+    public void setMenu(String menu) {
+        this.menu = menu;
+    }
+
+    /**
+     * @return the employee
+     */
+    public String getEmployee() {
+        return employee;
+    }
+
+    /**
+     * @param employee the employee to set
+     */
+    public void setEmployee(String employee) {
+        this.employee = employee;
     }
 
 }
