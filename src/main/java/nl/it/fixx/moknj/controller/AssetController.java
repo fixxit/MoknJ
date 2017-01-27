@@ -1,24 +1,9 @@
 package nl.it.fixx.moknj.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import nl.it.fixx.moknj.bal.AssetBal;
-import nl.it.fixx.moknj.domain.core.field.FieldDetail;
-import nl.it.fixx.moknj.domain.core.field.FieldValue;
-import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.repository.AssetLinkRepository;
-import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.MenuRepository;
-import nl.it.fixx.moknj.repository.UserRepository;
+import nl.it.fixx.moknj.repository.RepositoryFactory;
 import nl.it.fixx.moknj.response.AssetResponse;
-import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,130 +19,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssetController {
 
     @Autowired
-    private AssetRepository assetRep;// main asset Repository
-    @Autowired
-    private FieldDetailRepository fieldRep; // Asset FieldValue Detail Repository
-    @Autowired
-    private AssetLinkRepository auditRep; // Asset Audit Repository
-    @Autowired
-    private UserRepository resourceRep;
-    @Autowired
-    private MenuRepository menuRep;
+    private RepositoryFactory factory;
 
     @RequestMapping(value = "/add/{id}", method = RequestMethod.POST)
     public AssetResponse add(@PathVariable String id,
-            @RequestBody Asset saveAsset,
+            @RequestBody Asset asset,
             @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
         try {
-            if (id != null) {
-                saveAsset.setTypeId(id);
-
-                // checks if the original object differs from new saved object
-                // stop the unique filter form check for duplicates on asset
-                // which has not changed from the db version...
-                String flag = null;
-                if (saveAsset.getId() != null) {
-                    Asset dbAsset = assetRep.findOne(saveAsset.getId());
-                    if (saveAsset.equals(dbAsset)) {
-                        flag = "no_changes";
-                    } else {
-                        flag = "has_changes";
-                    }
-                }
-
-                /**
-                 * Find unique fields for asset and check if the current list of
-                 * assets is unique for the field...
-                 */
-                Map<String, String> uniqueFields = new HashMap<>();
-                Map<String, Boolean> unifieldIndicator = new HashMap<>();
-                Map<String, List<String>> uniqueValues = new HashMap<>();
-
-                // Get all the unique field ids
-                List<FieldValue> newAssetFields = saveAsset.getDetails();
-                newAssetFields.stream().forEach((field) -> {
-                    FieldDetail detail = fieldRep.findOne(field.getId());
-                    if (detail != null && detail.isUnique()) {
-                        uniqueFields.put(field.getId(), detail.getName());
-                    }
-                });
-
-                // Create a list of all the values for the unique assets
-                for (Asset asset : assetRep.getAllByTypeId(id)) {
-                    // if statement below checks that if update asset does not check
-                    // it self to flag for duplication
-                    if (!asset.getId().equals(saveAsset.getId())
-                            && !"no_changes".equals(flag)) {
-                        List<FieldValue> details = asset.getDetails();
-                        details.stream().filter((field) -> (uniqueFields.keySet().contains(field.getId()))).map((field) -> {
-                            if (uniqueValues.get(field.getId()) == null) {
-                                uniqueValues.put(field.getId(), new ArrayList<>());
-                            }
-                            return field;
-                        }).filter((field) -> (!uniqueValues.get(field.getId()).contains(field.getValue()))).forEach((field) -> {
-                            uniqueValues.get(field.getId()).add(field.getValue());
-                        });
-                    }
-                }
-
-                // check if fields to be saved for asset has duplicates
-                if (!uniqueValues.isEmpty()) {
-                    newAssetFields.stream().filter((field) -> (uniqueValues.containsKey(field.getId()))).filter((field) -> (uniqueValues.get(field.getId()).contains(field.getValue()))).forEach((field) -> {
-                        unifieldIndicator.put(field.getId(), true);
-                    });
-                }
-
-                // generate duplication message
-                if (!unifieldIndicator.isEmpty()) {
-                    String message = unifieldIndicator.size() > 1
-                            ? "Non unique values for fields ["
-                            : "Non unique value for field ";
-                    message = unifieldIndicator.keySet().stream().map((typeId) -> uniqueFields.get(typeId)).map((fieldName) -> fieldName + ",").reduce(message, String::concat);
-                    if (message.endsWith(",")) {
-                        message = message.substring(0, message.length() - 1);
-                    }
-
-                    message += unifieldIndicator.size() > 1
-                            ? "]. Please check values"
-                            : ". Please input new value";
-                    response.setSuccess(false);
-                    response.setMessage(message);
-                    return response;
-                }
-
-                // Get user details who logged this asset using the token.
-                User user = resourceRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
-                if (user != null && user.isSystemUser()) {
-                    saveAsset.setLastModifiedBy(user.getUserName());
-                } else {
-                    response.setSuccess(false);
-                    response.setMessage("Asset save error, could not find system"
-                            + " user for this token");
-                    return response;
-                }
-                // Save asset
-                String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
-                saveAsset.setLastModifiedDate(date);
-                if (saveAsset.getId() == null) {
-                    saveAsset.setCreatedBy(user.getUserName());
-                    saveAsset.setCreatedDate(date);
-                } else {
-                    Asset dbAsset = assetRep.findOne(saveAsset.getId());
-                    saveAsset.setCreatedBy(dbAsset.getCreatedBy());
-                    saveAsset.setCreatedDate(dbAsset.getCreatedDate());
-                }
-
-                Asset savedAsset = assetRep.save(saveAsset);
-                response.setSuccess(true);
-                response.setAsset(saveAsset);
-                response.setMessage("saved asset[" + savedAsset.getId() + "]");
-                return response;
-            } else {
-                response.setSuccess(false);
-                response.setMessage("No asset type id provided.");
-                return response;
+            AssetBal bal = new AssetBal(factory);
+            if (asset == null || asset.getMenuScopeIds().isEmpty()) {
+                throw new Exception("No menu id provided for the asset record");
             }
+
+            String menuId = asset.getMenuScopeIds().get(0);
+            Asset savedAsset = bal.save(id, menuId, asset, access_token);
+            response.setSuccess(true);
+            response.setAsset(savedAsset);
+            response.setMessage("Successfully saved asset");
+            return response;
         } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
@@ -170,13 +50,23 @@ public class AssetController {
      *
      * @param templateId
      * @param menuId
+     * @param access_token
      * @return
+     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/get/all/{templateId}/{menuId}", method = RequestMethod.POST)
-    public AssetResponse getAllAssets(@PathVariable String templateId, @PathVariable String menuId) {
+    public AssetResponse getAllAssets(@PathVariable String templateId,
+            @PathVariable String menuId, @RequestParam String access_token)
+            throws Exception {
         AssetResponse response = new AssetResponse();
-        response.setAssets(new AssetBal(assetRep, menuRep).getAll(templateId, menuId));
-        return response;
+        try {
+            response.setAssets(new AssetBal(factory).getAll(templateId, menuId, access_token));
+            return response;
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+            return response;
+        }
     }
 
     /**
@@ -188,7 +78,13 @@ public class AssetController {
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public AssetResponse get(@PathVariable String id) {
         AssetResponse response = new AssetResponse();
-        response.setAsset(assetRep.findOne(id));
+        try {
+            response.setAsset(new AssetBal(factory).get(id));
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+            return response;
+        }
         return response;
     }
 
@@ -196,54 +92,20 @@ public class AssetController {
      * Deletes or hides asset depending on if it is linked to audit trail
      *
      * @param asset
+     * @param access_token
      * @return
      */
     @RequestMapping(value = "/delete/", method = RequestMethod.POST)
-    public AssetResponse delete(@RequestBody Asset asset) {
-        // to insure that the below fields have no influence on find all.
+    public AssetResponse delete(@RequestBody Asset asset, @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
-        Asset result = assetRep.findOne(asset.getId());
-        List<AssetLink> assets = auditRep.getAllByAssetId(result.getId());
         try {
-            // todo needs a check for linked resources ...
-            if (result != null) {
-                if (assets.size() > 0) {
-                    // hide asset by updating hidden field=
-                    result.setHidden(true);
-                    assetRep.save(result);
-                    response.setSuccess(true);
-                    response.setMessage("Hid asset "
-                            + "[" + asset.getId() + "] successfully.");
-                } else {
-                    // delete asset from the asset list.
-                    assetRep.delete(result);
-                    response.setSuccess(true);
-                    response.setMessage("Removed asset "
-                            + "[" + asset.getId() + "] successfully.");
-                }
-            } else {
-                response.setSuccess(false);
-                response.setMessage("Could not remove asset "
-                        + "[" + asset.getId() + "] not found in db");
-            }
+            new AssetBal(factory).delete(asset, access_token, false);
+            response.setSuccess(true);
+            response.setMessage("Asset record was deleted successfully.");
         } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
-        return response;
-    }
-
-    /**
-     * Gets all assets
-     *
-     * @return
-     */
-    @RequestMapping(value = "/all", method = RequestMethod.POST)
-    public AssetResponse all() {
-        AssetResponse response = new AssetResponse();
-        ArrayList assets = new ArrayList<>();
-        assets.addAll(assetRep.findAll());
-        response.setAssets(assets);
         return response;
     }
 

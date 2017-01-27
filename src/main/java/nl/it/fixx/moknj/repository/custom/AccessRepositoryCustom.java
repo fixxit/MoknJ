@@ -16,6 +16,8 @@ public interface AccessRepositoryCustom {
 
     public boolean hasAccess(String userId, String menuId, String templateId) throws Exception;
 
+    public Access getAccess(String userId, String menuId, String templateId) throws Exception;
+
     public List<Access> getAccessList(String userId) throws Exception;
 
 }

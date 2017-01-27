@@ -10,4 +10,5 @@ import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
 public interface EmployeeLinkRepositoryCustom {
 
     public List<EmployeeLink> getAllByEmployeeId(String id);
+
 }

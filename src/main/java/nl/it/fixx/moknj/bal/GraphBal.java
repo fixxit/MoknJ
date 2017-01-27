@@ -1,18 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.bal;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import nl.it.fixx.moknj.builders.GraphBuilder;
+import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
+import nl.it.fixx.moknj.domain.core.graph.GraphData;
+import nl.it.fixx.moknj.domain.core.menu.Menu;
+import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
-import nl.it.fixx.moknj.repository.GraphRepository;
-import nl.it.fixx.moknj.repository.MenuRepository;
-import nl.it.fixx.moknj.repository.TemplateRepository;
-import nl.it.fixx.moknj.repository.UserRepository;
-import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
+import nl.it.fixx.moknj.repository.RepositoryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,62 +27,173 @@ public class GraphBal implements BusinessAccessLayer {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
-    private final MenuRepository menuRep;
-    private final TemplateRepository templateRep;
-    private final GraphRepository graphRep;
-    private final UserRepository userRep;
+    private final RepositoryFactory factory;
 
-    public GraphBal(MenuRepository menuRep, TemplateRepository templateRep,
-            GraphRepository graphRep, UserRepository userRep) {
-        this.menuRep = menuRep;
-        this.templateRep = templateRep;
-        this.graphRep = graphRep;
-        this.userRep = userRep;
+    public GraphBal(RepositoryFactory factory) {
+        this.factory = factory;
     }
 
     /**
-     * Checks if the user is creator or has ALL_ACCESS assigned to his user
-     * rights.
+     * Saves the graph... Sets the creator id by the token. Only a user with
+     * correct token can access this graph.
      *
-     * @param graph to check for user access.
-     * @param token token is used to determine user
-     *
-     * @return boolean
+     * @param payload
+     * @param access_token
+     * @return
+     * @throws Exception
      */
-    public boolean checkEditAccess(Graph graph, String token) {
+    public Graph saveGraph(Graph payload, String access_token) throws Exception {
         try {
-            User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(token));
-            return (user.getId().equals(graph.getCreatorId())
-                    || user.getAuthorities().contains(ALL_ACCESS.toString()));
+            // For updates if the type has a id then bypass the exists
+            boolean bypassExists = false;
+            if (payload.getId() != null && !payload.getId().trim().isEmpty()) {
+                bypassExists = true;
+                Graph dbGraph = factory.getGraphRep().findOne(payload.getId());
+                payload.setCreatorId(dbGraph.getCreatorId());
+            } else {
+                User user = new UserBal(factory).getUserByToken(access_token);
+                if (user != null && user.isSystemUser()) {
+                    payload.setCreatorId(user.getId());
+                }
+            }
+
+            boolean exists = factory.getGraphRep().existsByName(payload.getName());
+            if (!exists || bypassExists) {
+                Graph graph = factory.getGraphRep().save(payload);
+                return graph;
+            } else {
+                throw new Exception("Graph with the name " + payload.getName() + " exists");
+            }
         } catch (Exception e) {
-            LOG.error("Error when trying to check user access...");
-            LOG.error("Exception:", e);
+            LOG.error("Could not save the graph setup", e);
+            throw e;
         }
-        return false;
     }
 
     /**
-     * Check if the user has view access. This will not check ALL_ACCESS as only
-     * users to see graph is user who created it and users who are assigned to
-     * the graph
+     * Gets all the graphs templates saved, this is used for the edit screen.
+     * filtered by user access token.
      *
-     * @param graph
+     * @param access_token
+     * @return list of graphs
+     * @throws java.lang.Exception
+     */
+    public List<Graph> getAllGraphs(String access_token) throws Exception {
+        try {
+            User user = new UserBal(factory).getUserByToken(access_token);
+            Set<Graph> graphs = new HashSet();
+            if (user != null) {
+                List<Graph> savedGraphs = factory.getGraphRep().findAll();
+                for (Graph graph : savedGraphs) {
+                    // check if user has access to view and edit this graph template
+                    if (user.getId().equals(graph.getCreatorId())) {
+                        if (graph.getTemplateId() != null) {
+                            Template template = new TemplateBal(factory).getTemplateById(graph.getTemplateId());
+                            if (template != null) {
+                                graph.setTemplate(template.getName());
+                            }
+                        }
+
+                        graph.setType(graph.getGraphType().getName());
+                        graph.setView(graph.getGraphView().getDisplayName());
+
+                        Menu menu = new MenuBal(factory).getMenuById(graph.getMenuId());
+                        if (menu != null) {
+                            graph.setMenu(menu.getName());
+                        }
+                        graphs.add(graph);
+                    }
+                }
+            }
+            return graphs.stream().collect(Collectors.toList());
+        } catch (Exception e) {
+            LOG.error("Could not get all saved graph templates", e);
+            throw e;
+        }
+    }
+
+    /**
+     * Get the graph data for user, this graph is checked against the creator id
+     * which is the user id. The user id is determined from the access token.
+     *
+     * @param graphId
      * @param token
-     * @return boolean
+     * @return
+     * @throws Exception
      */
-    public boolean checkViewAccess(Graph graph, String token) {
+    public GraphData getGraphData(String graphId, String token) throws Exception {
         try {
-            User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(token));
-            return (user.getId().equals(graph.getCreatorId())
-                    || (user.getAuthorities() != null
-                    && user.getAuthorities().contains(ALL_ACCESS.name()))
-                    || (graph.getAccessUserIds() != null
-                    && graph.getAccessUserIds().contains(user.getId())));
+            User user = new UserBal(factory).getUserByToken(token);
+            Graph graph = factory.getGraphRep().findOne(graphId);
+            if (user.getId().equals(graph.getCreatorId())) {
+                GraphBuilder builder = new GraphBuilder(factory, token);
+                return builder.buildGraphData(graph);
+            }
         } catch (Exception e) {
-            LOG.error("Error when trying to check user access...");
-            LOG.error("Exception:", e);
+            LOG.error("Could no get graph data", e);
+            throw e;
         }
-        return false;
+        return null;
     }
 
+    /**
+     * Gets all graphs created by this user. The user id is determined from the
+     * access toke
+     *
+     * @param token
+     * @return list of graph data
+     * @throws Exception
+     */
+    public Map<String, List<GraphData>> getAllGraphData(String token) throws Exception {
+        try {
+            Map<String, List<GraphData>> allDataSets = new HashMap<>();
+            for (Graph graph : getAllGraphs(token)) {
+                GraphData data = getGraphData(graph.getId(), token);
+                if (data != null) {
+                    GlobalGraphType type = graph.getGraphType();
+                    List<GraphData> dataSet = allDataSets.get(type.getProperty());
+                    if (dataSet == null) {
+                        dataSet = new ArrayList<>();
+                    }
+
+                    dataSet.add(data);
+                    allDataSets.put(type.getProperty(), dataSet);
+                }
+            }
+            return allDataSets;
+        } catch (Exception e) {
+            LOG.error("Could no get all the user graphs data", e);
+            throw e;
+        }
+    }
+
+    /**
+     * Deletes the graph only if the user has access to it. Which he is the
+     * creator.
+     *
+     * @param id
+     * @param token
+     * @throws Exception
+     */
+    public void deleteGraph(String id, String token) throws Exception {
+        try {
+            if (factory.getGraphRep().exists(id)) {
+                Graph graph = factory.getGraphRep().findOne(id);
+                User user = new UserBal(factory).getUserByToken(token);
+                if (graph.getCreatorId().equals(user.getId())
+                        || user.getAuthorities().contains(ALL_ACCESS.toString())) {
+                    factory.getGraphRep().delete(id);
+                } else {
+                    throw new Exception("Delete failed. "
+                            + "This user is not the creator"
+                            + " of this graph template.");
+                }
+            } else {
+                throw new Exception("No graph by id[" + id + "] exists");
+            }
+        } catch (Exception e) {
+            LOG.error("Could not delete this graph[" + id + "]", e);
+            throw e;
+        }
+    }
 }

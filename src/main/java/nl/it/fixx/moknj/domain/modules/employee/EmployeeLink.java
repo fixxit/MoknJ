@@ -1,5 +1,6 @@
 package nl.it.fixx.moknj.domain.modules.employee;
 
+import java.util.Objects;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -150,6 +151,60 @@ public class EmployeeLink {
                 + ", createdBy=" + createdBy
                 + ", createdDate=" + createdDate
                 + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + Objects.hashCode(this.id);
+        hash = 37 * hash + Objects.hashCode(this.action);
+        hash = 37 * hash + Objects.hashCode(this.actionValue);
+        hash = 37 * hash + Objects.hashCode(this.changes);
+        hash = 37 * hash + Objects.hashCode(this.template);
+        hash = 37 * hash + Objects.hashCode(this.user);
+        hash = 37 * hash + Objects.hashCode(this.employeeId);
+        hash = 37 * hash + Objects.hashCode(this.createdBy);
+        hash = 37 * hash + Objects.hashCode(this.createdDate);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final EmployeeLink other = (EmployeeLink) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.actionValue, other.actionValue)) {
+            return false;
+        }
+        if (!Objects.equals(this.changes, other.changes)) {
+            return false;
+        }
+        if (!Objects.equals(this.template, other.template)) {
+            return false;
+        }
+        if (!Objects.equals(this.user, other.user)) {
+            return false;
+        }
+        if (!Objects.equals(this.employeeId, other.employeeId)) {
+            return false;
+        }
+        if (!Objects.equals(this.createdBy, other.createdBy)) {
+            return false;
+        }
+        if (!Objects.equals(this.createdDate, other.createdDate)) {
+            return false;
+        }
+        return this.action == other.action;
     }
 
 }

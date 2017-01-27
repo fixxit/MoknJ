@@ -6,6 +6,7 @@
 package nl.it.fixx.moknj.domain.core.template;
 
 import java.util.List;
+import java.util.Objects;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import org.springframework.data.annotation.Id;
@@ -25,6 +26,22 @@ public class Template {
     protected boolean hidden;
     // This would allow you to bypass scope, scopes are set to the template entries.
     private boolean allowScopeChallenge;
+
+    /**
+     *
+     * @param temp
+     * @return
+     */
+    public static Template copy(Template temp) {
+        Template template = new Template();
+        template.id = temp.id;
+        template.name = temp.name;
+        template.templateType = temp.templateType;
+        template.details = temp.details;
+        template.hidden = temp.hidden;
+        template.allowScopeChallenge = temp.allowScopeChallenge;
+        return template;
+    }
 
     /**
      * @return the id
@@ -101,6 +118,46 @@ public class Template {
      */
     public void setAllowScopeChallenge(boolean allowScopeChallenge) {
         this.allowScopeChallenge = allowScopeChallenge;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.id);
+        hash = 97 * hash + Objects.hashCode(this.name);
+        hash = 97 * hash + Objects.hashCode(this.templateType);
+        hash = 97 * hash + Objects.hashCode(this.details);
+        hash = 97 * hash + (this.hidden ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        final Template other = (Template) obj;
+        if (this.hidden != other.hidden) {
+            return false;
+        }
+
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (this.templateType != other.templateType) {
+            return false;
+        }
+        return Objects.equals(this.details, other.details);
     }
 
     @Override

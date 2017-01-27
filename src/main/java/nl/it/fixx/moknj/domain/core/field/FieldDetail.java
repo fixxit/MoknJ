@@ -5,6 +5,7 @@
  */
 package nl.it.fixx.moknj.domain.core.field;
 
+import java.util.Objects;
 import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
 import org.springframework.data.annotation.Id;
 
@@ -102,6 +103,51 @@ public class FieldDetail {
      */
     public void setDisplay(boolean display) {
         this.display = display;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + Objects.hashCode(this.id);
+        hash = 89 * hash + Objects.hashCode(this.type);
+        hash = 89 * hash + Objects.hashCode(this.name);
+        hash = 89 * hash + (this.unique ? 1 : 0);
+        hash = 89 * hash + (this.mandatory ? 1 : 0);
+        hash = 89 * hash + (this.display ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final FieldDetail other = (FieldDetail) obj;
+        if (this.unique != other.unique) {
+            return false;
+        }
+        if (this.mandatory != other.mandatory) {
+            return false;
+        }
+        if (this.display != other.display) {
+            return false;
+        }
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (this.type != other.type) {
+            return false;
+        }
+        return true;
     }
 
 }

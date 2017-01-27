@@ -5,6 +5,7 @@
  */
 package nl.it.fixx.moknj.domain.modules.asset;
 
+import java.util.Objects;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -122,6 +123,55 @@ public class AssetLink {
                 + ", assetId=" + assetId
                 + ", createdBy=" + createdBy
                 + ", createdDate=" + createdDate + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + Objects.hashCode(this.id);
+        hash = 71 * hash + (this.checked ? 1 : 0);
+        hash = 71 * hash + Objects.hashCode(this.date);
+        hash = 71 * hash + Objects.hashCode(this.resourceId);
+        hash = 71 * hash + Objects.hashCode(this.assetId);
+        hash = 71 * hash + Objects.hashCode(this.createdBy);
+        hash = 71 * hash + Objects.hashCode(this.createdDate);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AssetLink other = (AssetLink) obj;
+        if (this.checked != other.checked) {
+            return false;
+        }
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.date, other.date)) {
+            return false;
+        }
+        if (!Objects.equals(this.resourceId, other.resourceId)) {
+            return false;
+        }
+        if (!Objects.equals(this.assetId, other.assetId)) {
+            return false;
+        }
+        if (!Objects.equals(this.createdBy, other.createdBy)) {
+            return false;
+        }
+        if (!Objects.equals(this.createdDate, other.createdDate)) {
+            return false;
+        }
+        return true;
     }
 
 }

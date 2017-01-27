@@ -6,9 +6,7 @@
 package nl.it.fixx.moknj.response;
 
 import java.util.List;
-import java.util.Map;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.domain.core.graph.GraphData;
 
 /**
  *
@@ -18,7 +16,6 @@ public class AssetResponse extends Response {
 
     private Asset asset;
     private List<Asset> assets;
-    private Map<String, GraphData> graphData;
 
     /**
      * @return the asset

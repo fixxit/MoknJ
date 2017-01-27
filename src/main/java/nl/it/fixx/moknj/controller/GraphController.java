@@ -3,34 +3,21 @@ package nl.it.fixx.moknj.controller;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import nl.it.fixx.moknj.builders.GraphBuilder;
+import nl.it.fixx.moknj.bal.GraphBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphFocus;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphView;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
-import nl.it.fixx.moknj.domain.core.graph.GraphData;
 import nl.it.fixx.moknj.domain.core.graph.GraphDate;
 import nl.it.fixx.moknj.domain.core.graph.GraphFocus;
 import nl.it.fixx.moknj.domain.core.graph.GraphType;
 import nl.it.fixx.moknj.domain.core.graph.GraphView;
-import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
-import nl.it.fixx.moknj.domain.core.user.User;
-import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
-import nl.it.fixx.moknj.repository.AssetLinkRepository;
-import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.repository.GraphRepository;
-import nl.it.fixx.moknj.repository.MenuRepository;
-import nl.it.fixx.moknj.repository.TemplateRepository;
-import nl.it.fixx.moknj.repository.UserRepository;
+import nl.it.fixx.moknj.repository.RepositoryFactory;
 import nl.it.fixx.moknj.response.GraphResponse;
-import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,21 +38,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class GraphController {
 
     @Autowired
-    private AssetRepository assetRep;
-    @Autowired
-    private MenuRepository menuRep;
-    @Autowired
-    private TemplateRepository templateRep;
-    @Autowired
-    private GraphRepository graphRep;
-    @Autowired
-    private EmployeeRepository employeeRep;
-    @Autowired
-    private UserRepository userRep;
-    @Autowired
-    private AssetLinkRepository auditRep;
+    private RepositoryFactory factory;
 
     /**
+     * Saves the graph... Sets the creator id by the token. Only a user with
+     * correct token can access this graph.
      *
      * @param payload
      * @param access_token
@@ -76,43 +53,18 @@ public class GraphController {
     GraphResponse add(@RequestBody Graph payload,
             @RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
-        response.setAction("POST");
-        response.setMethod("/graph/add");
-
-        if (payload.getName() == null && payload.getName().isEmpty()) {
-            response.setMessage("TO DO!!");//todo
-            return response;
-        }
-
         try {
-            // For updates if the type has a id then bypass the exists
-            boolean bypassExists = false;
-            if (payload.getId() != null && !payload.getId().trim().isEmpty()) {
-                bypassExists = true;
-                Graph dbGraph = graphRep.findOne(payload.getId());
-                payload.setCreatorId(dbGraph.getCreatorId());
-            } else {
-                User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
-                if (user != null && user.isSystemUser()) {
-                    payload.setCreatorId(user.getId());
-                }
-            }
+            response.setGraphTemplate(
+                    new GraphBal(factory).
+                    saveGraph(payload, access_token)
+            );
+            response.setSuccess(true);
+            response.setMessage("Saved graph successfully");
 
-            boolean exists = graphRep.existsByName(payload.getName());
-            if (!exists || bypassExists) {
-                Graph graphTemplate = graphRep.save(payload);
-                response.setSuccess(graphTemplate != null);
-                response.setMessage("Saved graph[" + graphTemplate.getId() + "]");
-                response.setGraphTemplate(graphTemplate);
-            } else {
-                response.setSuccess(false);
-                response.setMessage("graph by name " + payload.getName() + " exists");
-            }
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
-
         return response;
     }
 
@@ -163,7 +115,7 @@ public class GraphController {
     GraphResponse getDateTypes(@PathVariable String id) {
         GraphResponse response = new GraphResponse();
         GlobalGraphDate[] types = GlobalGraphDate.values();
-        Template template = templateRep.findOne(id);
+        Template template = factory.getTemplateRep().findOne(id);
         if (template != null) {
             List<GraphDate> graphDateOptions = new ArrayList<>();
             for (GlobalGraphDate type : types) {
@@ -189,7 +141,7 @@ public class GraphController {
     GraphResponse getFocuses(@PathVariable String id) {
         GraphResponse response = new GraphResponse();
         GlobalGraphFocus[] graphFocuses = GlobalGraphFocus.values();
-        Template template = templateRep.findOne(id);
+        Template template = factory.getTemplateRep().findOne(id);
         if (template != null) {
             List<GraphFocus> graphFocusOptions = new ArrayList<>();
             for (GlobalGraphFocus type : graphFocuses) {
@@ -214,32 +166,16 @@ public class GraphController {
     public @ResponseBody
     GraphResponse getAllSavedGraphs(@RequestParam String access_token) throws ParseException {
         GraphResponse response = new GraphResponse();
-        User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
-        List<Graph> graphs = graphRep.findAll();
-        if (user != null) {
-            for (Graph graph : graphs) {
-                // check if user has access to edit the graph
-                if (user.getId().equals(graph.getCreatorId())
-                        || user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                    if (graph.getTemplateId() != null) {
-                        Template template = templateRep.findOne(graph.getTemplateId());
-                        if (template != null) {
-                            graph.setTemplate(template.getName());
-                        }
-                    }
-
-                    graph.setType(graph.getGraphType().getName());
-                    graph.setView(graph.getGraphView().getDisplayName());
-
-                    Menu menu = menuRep.findOne(graph.getMenuId());
-                    if (menu != null) {
-                        graph.setMenu(menu.getName());
-                    }
-                }
-            }
+        try {
+            GraphBal bal = new GraphBal(factory);
+            response.setSavedGraphs(bal.getAllGraphs(access_token));
+            response.setSuccess(true);
+            response.setMessage("found all user graph templates");
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
         }
 
-        response.setSavedGraphs(graphs);
         return response;
     }
 
@@ -254,37 +190,15 @@ public class GraphController {
     public @ResponseBody
     GraphResponse getAllGraphsData(@RequestParam String access_token) throws Exception {
         GraphResponse response = new GraphResponse();
-        Map<String, List<GraphData>> allDataSets = new HashMap<>();
-        GraphBuilder builder = new GraphBuilder(assetRep, auditRep, menuRep, templateRep, employeeRep, userRep);
-        User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
-        List<Graph> graphSetup = graphRep.findAll();
-
-        System.out.println("user.getAuthorities() : " + user.getAuthorities());
-
-        for (Graph graph : graphSetup) {
-            System.out.println("graph.getAccessUserIds() : " + graph.getAccessUserIds());
-            System.out.println("graph.getCreatorId() : " + graph.getCreatorId());
-            System.out.println("user.getId() : " + graph.getId());
-            if (user.getId().equals(graph.getCreatorId())
-                    || (user.getAuthorities() != null
-                    && user.getAuthorities().contains(ALL_ACCESS.toString()))
-                    || (graph.getAccessUserIds() != null
-                    && graph.getAccessUserIds().contains(user.getId()))) {
-
-                GraphData data = builder.buildGraphData(graph);
-                GlobalGraphType type = graph.getGraphType();
-
-                List<GraphData> dataSet = allDataSets.get(type.getProperty());
-                if (dataSet == null) {
-                    dataSet = new ArrayList<>();
-                }
-
-                dataSet.add(data);
-                allDataSets.put(type.getProperty(), dataSet);
-            }
+        try {
+            GraphBal bal = new GraphBal(factory);
+            response.setAllGraphsData(bal.getAllGraphData(access_token));
+            response.setSuccess(true);
+            response.setMessage("found all user graphs data");
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setMessage(e.getMessage());
         }
-
-        response.setAllGraphsData(allDataSets);
         return response;
     }
 
@@ -298,17 +212,17 @@ public class GraphController {
      */
     @RequestMapping(value = "/get/data/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    GraphResponse getGraphData(@PathVariable String id, @RequestParam String access_token) throws Exception {
+    GraphResponse getGraphData(@PathVariable String id,
+            @RequestParam String access_token) throws Exception {
         GraphResponse response = new GraphResponse();
-        User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(access_token));
-        Graph graph = graphRep.findOne(id);
-        if (user.getId().equals(graph.getCreatorId())
-                || (user.getAuthorities() != null
-                && user.getAuthorities().contains(ALL_ACCESS.name()))
-                || (graph.getAccessUserIds() != null
-                && graph.getAccessUserIds().contains(user.getId()))) {
-            GraphBuilder builder = new GraphBuilder(assetRep, auditRep, menuRep, templateRep, employeeRep, userRep);
-            response.setGraphData(builder.buildGraphData(graph));
+        try {
+            GraphBal bal = new GraphBal(factory);
+            response.setGraphData(bal.getGraphData(id, access_token));
+            response.setSuccess(true);
+            response.setMessage("Graph data found");
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setMessage(e.getMessage());
         }
         return response;
     }
@@ -317,18 +231,18 @@ public class GraphController {
      * To do add delete method for getGlobalFields.
      *
      * @param id
+     * @param access_token
      * @return
      */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    GraphResponse delete(@PathVariable String id) {
+    GraphResponse delete(@PathVariable String id, @RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
-        Graph graph = graphRep.findOne(id);
         try {
-            graphRep.delete(graph);
+            new GraphBal(factory).deleteGraph(id, access_token);
             response.setSuccess(true);
-            response.setMessage("Graph [" + graph.getName() + "] removed from home dashboard");
-        } catch (IllegalArgumentException ex) {
+            response.setMessage("Graph successfully deleted from system");
+        } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }

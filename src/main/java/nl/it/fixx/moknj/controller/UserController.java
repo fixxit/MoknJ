@@ -2,21 +2,14 @@ package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.UserAccessBal;
+import nl.it.fixx.moknj.bal.AccessBal;
 import nl.it.fixx.moknj.bal.UserBal;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.access.AccessRight;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.core.user.UserAuthority;
-import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.repository.AccessRepository;
-import nl.it.fixx.moknj.repository.AssetLinkRepository;
-import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.repository.MenuRepository;
-import nl.it.fixx.moknj.repository.TemplateRepository;
-import nl.it.fixx.moknj.repository.UserRepository;
+import nl.it.fixx.moknj.repository.RepositoryFactory;
 import nl.it.fixx.moknj.response.UserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin // added for cors, allow access from another web server
@@ -35,28 +29,27 @@ public class UserController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
     @Autowired
-    private UserRepository userRep;
-    @Autowired
-    private AssetRepository assetRep;
-    @Autowired
-    private AssetLinkRepository auditRep;
-    @Autowired
-    private AccessRepository accessRep;
-    @Autowired
-    private MenuRepository menuRep;
-    @Autowired
-    private TemplateRepository templateRep;
-
-    // business layers
-    public UserController() {
-
-    }
+    private RepositoryFactory factory;
 
     @RequestMapping(value = "/get/all", method = RequestMethod.POST)
-    public UserResponse all() throws Exception {
+    public UserResponse all(@RequestParam String access_token) throws Exception {
         UserResponse userResponse = new UserResponse();
         try {
-            UserBal userBal = new UserBal(userRep);
+            UserBal userBal = new UserBal(factory);
+            userResponse.setResources(userBal.getAll(true, access_token));
+        } catch (Exception ex) {
+            userResponse.setSuccess(false);
+            userResponse.setMessage(ex.getMessage());
+            LOG.error("Error while geting all user", ex);
+        }
+        return userResponse;
+    }
+
+    @RequestMapping(value = "/get/employee/all", method = RequestMethod.POST)
+    public UserResponse getAllUsersForEmployee() throws Exception {
+        UserResponse userResponse = new UserResponse();
+        try {
+            UserBal userBal = new UserBal(factory);
             userResponse.setResources(userBal.getAll());
         } catch (Exception ex) {
             userResponse.setSuccess(false);
@@ -67,11 +60,12 @@ public class UserController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public UserResponse add(@RequestBody User payload) throws Exception {
+    public UserResponse add(@RequestBody User payload,
+            @RequestParam String access_token) throws Exception {
         UserResponse userResponse = new UserResponse();
         try {
-            UserBal userBal = new UserBal(userRep);
-            User user = userBal.save(payload);
+            UserBal userBal = new UserBal(factory);
+            User user = userBal.save(payload, access_token);
             userResponse.setSuccess(user != null);
             userResponse.setMessage("Saved user[" + user.getId() + "]");
             userResponse.setResource(user);
@@ -85,9 +79,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
-    public UserResponse get(@PathVariable String id) {
+    public UserResponse get(@PathVariable String id, @RequestParam String access_token) {
         UserResponse userResponse = new UserResponse();
-        User resourceRet = userRep.findById(id);
+        User resourceRet = factory.getUserRep().findById(id);
         if (resourceRet != null) {
             userResponse.setResource(resourceRet);
         }
@@ -126,18 +120,13 @@ public class UserController {
 
     // DELETE SHOULD DELETE THE RESOUCRE IF NO ASSET OR AUDIT IS linked else hide
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
-    public UserResponse delete(@PathVariable String id) {
+    public UserResponse delete(@PathVariable String id, @RequestParam String access_token) {
         UserResponse userResponse = new UserResponse();
         try {
-            User resource = userRep.findById(id);
-            List<Asset> assets = assetRep.getAllByResourceId(id);
-            List<AssetLink> links = auditRep.getAllByResourceId(id);
-            if (!assets.isEmpty() || !links.isEmpty()) {
-                resource.setHidden(true);
-                userRep.save(resource);
-            } else {
-                userRep.delete(resource);
-            }
+            UserBal userBal = new UserBal(factory);
+            userBal.delete(id, access_token);
+            userResponse.setSuccess(true);
+            userResponse.setMessage("User deleted");
         } catch (Exception ex) {
             userResponse.setSuccess(false);
             userResponse.setMessage(ex.getMessage());
@@ -148,11 +137,13 @@ public class UserController {
 
     // ACCESS SAVING
     @RequestMapping(value = "/add/{id}/accesss", method = RequestMethod.POST)
-    public UserResponse addAccess(@PathVariable String id, @RequestBody List<Access> access) {
+    public UserResponse addAccess(@PathVariable String id, @
+            RequestBody List<Access> access,
+            @RequestParam String access_token) {
         final UserResponse userResponse = new UserResponse();
         try {
-            UserAccessBal userAccessBal = new UserAccessBal(accessRep, userRep, menuRep, templateRep);
-            userAccessBal.addAccess(id, access);
+            AccessBal userAccessBal = new AccessBal(factory);
+            userAccessBal.addAccess(id, access, access_token);
             userResponse.setSuccess(true);
             userResponse.setMessage("Added user access");
         } catch (Exception ex) {
@@ -166,10 +157,11 @@ public class UserController {
 
     // GET ACCESS LIST
     @RequestMapping(value = "/get/{id}/accesss", method = RequestMethod.POST)
-    public UserResponse getAccessList(@PathVariable String id) {
+    public UserResponse getAccessList(@PathVariable String id,
+            @RequestParam String access_token) {
         final UserResponse userResponse = new UserResponse();
         try {
-            UserAccessBal userAccessBal = new UserAccessBal(accessRep, userRep, menuRep, templateRep);
+            AccessBal userAccessBal = new AccessBal(factory);
             userResponse.setAccessRules(userAccessBal.getAccessList(id));
             userResponse.setSuccess(true);
         } catch (Exception ex) {

@@ -85,10 +85,11 @@ public class Access {
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 29 * hash + Objects.hashCode(this.menuId);
-        hash = 29 * hash + Objects.hashCode(this.templateId);
-        hash = 29 * hash + Objects.hashCode(this.userId);
+        int hash = 7;
+        hash = 23 * hash + Objects.hashCode(this.menuId);
+        hash = 23 * hash + Objects.hashCode(this.templateId);
+        hash = 23 * hash + Objects.hashCode(this.userId);
+        hash = 23 * hash + Objects.hashCode(this.rights);
         return hash;
     }
 
@@ -110,7 +111,15 @@ public class Access {
         if (!Objects.equals(this.templateId, other.templateId)) {
             return false;
         }
-        return Objects.equals(this.userId, other.userId);
+        if (!Objects.equals(this.userId, other.userId)) {
+            return false;
+        }
+        return Objects.equals(this.rights, other.rights);
+    }
+
+    @Override
+    public String toString() {
+        return "Access{" + "id=" + id + ", menuId=" + menuId + ", templateId=" + templateId + ", userId=" + userId + ", rights=" + rights + '}';
     }
 
 }

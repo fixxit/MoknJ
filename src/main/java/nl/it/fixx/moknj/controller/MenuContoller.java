@@ -1,22 +1,20 @@
 package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import nl.it.fixx.moknj.bal.MainAccessBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalMenuType;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.menu.MenuType;
-import nl.it.fixx.moknj.domain.core.template.Template;
-import nl.it.fixx.moknj.repository.MenuRepository;
-import nl.it.fixx.moknj.repository.TemplateRepository;
+import nl.it.fixx.moknj.repository.RepositoryFactory;
 import nl.it.fixx.moknj.response.MenuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.comparator.NullSafeComparator;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,46 +28,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class MenuContoller {
 
     @Autowired
-    private MenuRepository menuRep;
-    @Autowired
-    private TemplateRepository templateRep;
+    private RepositoryFactory factory;
 
     /**
      *
      * @param payload
+     * @param access_token
      * @return
+     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody
-    MenuResponse add(@RequestBody Menu payload) {
+    MenuResponse add(@RequestBody Menu payload, @RequestParam String access_token) throws Exception {
         MenuResponse response = new MenuResponse();
-        response.setAction("POST");
-        response.setMethod("/menu/add");
-
-        if (payload.getTemplates() == null && payload.getTemplates().isEmpty()) {
-            response.setMessage("No templates recieved to save. Aborting insert "
-                    + "due to empty template list!");
-            return response;
-        }
-
         try {
-            // For updates if the type has a id then bypass the exists
-            boolean bypassExists = false;
-            if (payload.getId() != null) {
-                bypassExists = true;
-            }
-
-            boolean exists = menuRep.existsByName(payload.getName());
-            if (!exists || bypassExists) {
-                Menu menu = menuRep.save(payload);
-                response.setSuccess(menu != null);
-                response.setMessage("Saved menu[" + menu.getId() + "]");
-                response.setMenu(menu);
-            } else {
-                response.setSuccess(false);
-                response.setMessage("Menu by name " + payload.getName() + " exists");
-            }
-        } catch (IllegalArgumentException ex) {
+            MainAccessBal bal = new MainAccessBal(factory);
+            Menu menu = bal.saveMenu(payload, access_token);
+            response.setSuccess(menu != null);
+            response.setMessage("Saved " + menu.getName());
+            response.setMenu(menu);
+        } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
@@ -81,86 +59,43 @@ public class MenuContoller {
      * Gets menu by id.
      *
      * @param id
+     * @param access_token
      * @return
+     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    MenuResponse get(@PathVariable String id) {
+    MenuResponse get(@PathVariable String id, @RequestParam String access_token) throws Exception {
         MenuResponse response = new MenuResponse();
-        Menu menu = menuRep.findOne(id);
-        if (menu != null) {
-            List<Template> templates = menu.getTemplates();
-            for (int tempIndex = 0; tempIndex < templates.size(); tempIndex++) {
-                Template temp = templates.get(tempIndex);
-
-                Template globalTemplate = templateRep.findOne(temp.getId());
-                if (globalTemplate != null) {
-                    // sets teh template menu rules down to template passed back
-                    globalTemplate.setAllowScopeChallenge(temp.isAllowScopeChallenge());
-
-                    // check if template is hidden
-                    if (globalTemplate.isHidden()) {
-                        templates.remove(tempIndex);
-                    } else {
-                        templates.set(tempIndex, globalTemplate);
-                    }
-                } else {
-                    templates.remove(tempIndex);
-                }
-            }
+        try {
+            MainAccessBal bal = new MainAccessBal(factory);
+            Menu menu = bal.getMenu(id, access_token);
             response.setMenu(menu);
-        } else {
+        } catch (Exception ex) {
             response.setSuccess(false);
-            response.setMessage("Menu not found could be delete?");
+            response.setMessage(ex.getMessage());
         }
         return response;
     }
 
     /**
-     * Used to get all mapped menu's from db.
+     * Used to getMenu all mapped menu's from db.
      *
+     * @param access_token
      * @return
+     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public @ResponseBody
-    MenuResponse all() {
+    MenuResponse all(@RequestParam String access_token) throws Exception {
         MenuResponse response = new MenuResponse();
-        List<Menu> array = menuRep.findAll();
-        List<Menu> menus = new ArrayList<>();
-
-        array.stream().forEach((menu) -> {
-            List<Template> templates = menu.getTemplates();
-            for (int tempIndex = 0; tempIndex < templates.size(); tempIndex++) {
-                Template temp = templates.get(tempIndex);
-
-                Template globalTemplate = templateRep.findOne(temp.getId());
-                // check if template is in db
-                if (globalTemplate != null) {
-                    // sets teh template menu rules down to template passed back
-                    globalTemplate.setAllowScopeChallenge(temp.isAllowScopeChallenge());
-
-                    // check if template is hidden
-                    if (globalTemplate.isHidden()) {
-                        // remove from list if so
-                        templates.remove(tempIndex);
-                    } else {
-                        // update template with db version
-                        templates.set(tempIndex, globalTemplate);
-                    }
-                } else {
-                    // if db does not contain the template remove it from list.
-                    templates.remove(tempIndex);
-                }
-            }
-            menus.add(menu);
-        });
-
-        Collections.sort(menus, (Menu a1, Menu a2) -> {
-            return new NullSafeComparator<>(String::compareTo,
-                    true).compare(a1.getIndex(), a2.getIndex());
-        });
-
-        response.setMenus(menus);
+        try {
+            MainAccessBal bal = new MainAccessBal(factory);
+            response.setMenus(bal.getUserMenus(access_token));
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+        }
         return response;
     }
 
@@ -168,18 +103,21 @@ public class MenuContoller {
      * To do add delete method for getGlobalFields.
      *
      * @param id
+     * @param access_token
      * @return
+     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    MenuResponse delete(@PathVariable String id) {
+    MenuResponse delete(@PathVariable String id, @RequestParam String access_token) throws Exception {
         MenuResponse response = new MenuResponse();
-        Menu meun = menuRep.findOne(id);
         try {
-            menuRep.delete(meun);
+            MainAccessBal bal = new MainAccessBal(factory);
+            bal.deleteMenu(id, access_token);
+
             response.setSuccess(true);
-            response.setMessage("Menu [" + meun.getName() + "] removed from active menu list");
-        } catch (IllegalArgumentException ex) {
+            response.setMessage("Menu deleted from active menu list");
+        } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }

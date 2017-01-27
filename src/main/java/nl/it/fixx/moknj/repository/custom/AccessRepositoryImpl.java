@@ -47,6 +47,7 @@ public class AccessRepositoryImpl implements AccessRepositoryCustom {
     }
 
     /**
+     * Gets a list of access records for the user id.
      *
      * @param userId
      * @return
@@ -57,6 +58,27 @@ public class AccessRepositoryImpl implements AccessRepositoryCustom {
         Query query = new Query();
         query.addCriteria(Criteria.where("userId").is(userId));
         return operations.findAll(Access.class);
+    }
+
+    /**
+     * Gets the access record for the template and menu id for the user.
+     *
+     * @param userId
+     * @param menuId
+     * @param templateId
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Access getAccess(String userId, String menuId, String templateId) throws Exception {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userId").is(userId)
+                .andOperator(Criteria.where("menuId").is(menuId),
+                        Criteria.where("templateId").is(templateId))
+        );
+
+        Access access = operations.findOne(query, Access.class);
+        return access;
     }
 
 }

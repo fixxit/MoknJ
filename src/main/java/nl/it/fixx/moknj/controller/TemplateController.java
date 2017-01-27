@@ -7,18 +7,15 @@ package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import nl.it.fixx.moknj.bal.MainAccessBal;
+import nl.it.fixx.moknj.bal.TemplateBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.template.TemplateType;
-import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.repository.AssetLinkRepository;
-import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.TemplateRepository;
+import nl.it.fixx.moknj.repository.RepositoryFactory;
 import nl.it.fixx.moknj.response.TemplateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -40,51 +37,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class TemplateController {
 
     @Autowired
-    private TemplateRepository typeRep;
-
-    @Autowired
-    private FieldDetailRepository fieldDetailRep;
-
-    @Autowired
-    private AssetRepository assetRep;
-
-    @Autowired
-    private AssetLinkRepository auditRep;
+    private RepositoryFactory factory;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody
-    TemplateResponse add(@RequestBody Template payload) {
+    TemplateResponse add(@RequestBody Template payload, @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        response.setAction("POST");
-        response.setMethod("/add");
-
-        if (payload.getDetails() == null && payload.getDetails().isEmpty()) {
-            response.setMessage("No field types recieved to save. " + "Aborting insert due to empty type!");
-            return response;
-        }
-
         try {
-            // For updates if the type has a id then bypass the exists
-            boolean bypassExists = false;
-            if (payload.getId() != null) {
-                bypassExists = true;
-            }
-
-            boolean exists = typeRep.existsByName(payload.getName());
-            if (!exists || bypassExists) {
-                payload.getDetails().stream().forEach((detail) -> {
-                    this.fieldDetailRep.save(detail);
-                });
-
-                Template type = this.typeRep.save(payload);
-                response.setSuccess(type != null);
-                response.setMessage("Saved type[" + type.getId() + "]");
-                response.setType(type);
-            } else {
-                response.setSuccess(false);
-                response.setMessage("Asset type by name " + payload.getName() + " exists");
-            }
-        } catch (IllegalArgumentException ex) {
+            MainAccessBal bal = new MainAccessBal(factory);
+            Template template = bal.saveTemplate(payload, access_token);
+            response.setSuccess(template != null);
+            response.setMessage("Saved " + template.getName());
+            response.setType(template);
+        } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
@@ -94,38 +59,51 @@ public class TemplateController {
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    TemplateResponse get(@PathVariable String id) {
+    TemplateResponse get(@PathVariable String id, @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        response.setType(typeRep.findOne(id));
+        try {
+            MainAccessBal bal = new MainAccessBal(factory);
+            response.setType(bal.getTemplate(id, access_token));
+            response.setSuccess(true);
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+        }
+
         return response;
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public @ResponseBody
-    TemplateResponse all() {
+    TemplateResponse all(@RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        List<Template> templates = typeRep.findAll();
-        List<Template> types = new ArrayList<>();
-
-        templates.stream().filter((type) -> (!type.isHidden())).forEach((type) -> {
-            types.add(type);
-        });
-
-        response.setTypes(types);
+        try {
+            MainAccessBal bal = new MainAccessBal(factory);
+            response.setTypes(bal.getAllTemplatesForToken(access_token));
+            response.setSuccess(true);
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+        }
         return response;
     }
 
     @RequestMapping(value = "/hidden", method = RequestMethod.POST)
     public @ResponseBody
-    TemplateResponse hidden() {
+    TemplateResponse hidden(@RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        List<Template> templates = typeRep.findAll();
-        List<Template> types = new ArrayList<>();
-        templates.stream().filter((type) -> (type.isHidden())).forEach((type) -> {
-            types.add(type);
-        });
-
-        response.setTypes(types);
+        try {
+            List<Template> templates = factory.getTemplateRep().findAll();
+            List<Template> types = new ArrayList<>();
+            templates.stream().filter((type) -> (type.isHidden())).forEach((type) -> {
+                types.add(type);
+            });
+            response.setTypes(types);
+            response.setSuccess(true);
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+        }
         return response;
     }
 
@@ -133,20 +111,23 @@ public class TemplateController {
      * change template state to visible...
      *
      * @param id
+     * @param access_token
      * @return
      */
     @RequestMapping(value = "/unhide/{id}", method = RequestMethod.POST)
-    public TemplateResponse unhide(@PathVariable String id) {
+    public TemplateResponse unhide(@PathVariable String id,
+            @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            Template template = typeRep.findOne(id);
+            MainAccessBal mainAccessBall = new MainAccessBal(factory);
+            Template template = new TemplateBal(factory).getTemplateById(id);
             template.setHidden(false);
-            template = this.typeRep.save(template);
-            response.setSuccess(template != null);
+            mainAccessBall.saveTemplate(template, access_token);
             response.setMessage("Template [" + template.getName() + "] "
                     + " set to visible!");
             response.setType(template);
-        } catch (IllegalArgumentException ex) {
+            response.setSuccess(true);
+        } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
@@ -158,43 +139,23 @@ public class TemplateController {
      *
      * @param id
      * @param cascade
+     * @param access_token
      * @return
      */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    TemplateResponse delete(@PathVariable String id, @RequestParam boolean cascade) {
+    TemplateResponse delete(@PathVariable String id,
+            @RequestParam boolean cascade,
+            @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        Template template = typeRep.findOne(id);
-        if (!cascade) {
-            try {
-                template.setHidden(true);
-                template = this.typeRep.save(template);
-                response.setSuccess(template != null);
-                response.setMessage("Template [" + template.getName() + "] "
-                        + "is set to hidden");
-                response.setType(template);
-            } catch (IllegalArgumentException ex) {
-                response.setSuccess(false);
-                response.setMessage(ex.getMessage());
-            }
-        } else {
-            try {
-                List<Asset> assets = assetRep.getAllByTypeId(id);
-                assets.stream().forEach((asset) -> {
-                    List<AssetLink> links = auditRep.getAllByAssetId(asset.getId());
-                    links.stream().forEach((link) -> {
-                        auditRep.delete(link);
-                    });
-                    assetRep.delete(asset);
-                });
-                typeRep.delete(template);
-                response.setSuccess(true);
-                response.setMessage("Template [" + template.getName() + "] and "
-                        + "all assets/audits relating to this template");
-            } catch (IllegalArgumentException ex) {
-                response.setSuccess(false);
-                response.setMessage(ex.getMessage());
-            }
+        try {
+            MainAccessBal bal = new MainAccessBal(factory);
+            bal.deleteTemplate(id, cascade, access_token);
+            response.setSuccess(true);
+            response.setMessage("Deleted template");
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
         }
 
         return response;
@@ -228,37 +189,50 @@ public class TemplateController {
 
     @RequestMapping(value = "/template/dropdown/{id}/fields", method = RequestMethod.POST)
     public @ResponseBody
-    TemplateResponse getTemplateDropdownFields(@PathVariable String id) {
+    TemplateResponse getTemplateDropdownFields(@PathVariable String id,
+            @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        Template template = typeRep.findOne(id);
-        List<FieldDetail> fields = new ArrayList<>();
+        try {
+            MainAccessBal bal = new MainAccessBal(factory);
+            Template template = bal.getTemplate(id, access_token);
+            List<FieldDetail> fields = new ArrayList<>();
 
-        template.getDetails().stream().filter((field)
-                -> (GlobalFieldType.GBL_INPUT_DRP_TYPE.equals(field.getType())))
-                .forEach((field) -> {
-                    fields.add(field);
-                });
+            template.getDetails().stream().filter((field)
+                    -> (GlobalFieldType.GBL_INPUT_DRP_TYPE.equals(field.getType())))
+                    .forEach((field) -> {
+                        fields.add(field);
+                    });
 
-        response.setFields(fields);
+            response.setFields(fields);
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+        }
 
         return response;
     }
 
     @RequestMapping(value = "/template/date/{id}/fields", method = RequestMethod.POST)
     public @ResponseBody
-    TemplateResponse getTemplateDateFieldFields(@PathVariable String id) {
+    TemplateResponse getTemplateDateFieldFields(@PathVariable String id,
+            @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        Template template = typeRep.findOne(id);
-        List<FieldDetail> fields = new ArrayList<>();
+        try {
+            MainAccessBal bal = new MainAccessBal(factory);
+            Template template = bal.getTemplate(id, access_token);
+            List<FieldDetail> fields = new ArrayList<>();
 
-        template.getDetails().stream().filter((field)
-                -> (GlobalFieldType.GBL_INPUT_DAT_TYPE.equals(field.getType())))
-                .forEach((field) -> {
-                    fields.add(field);
-                });
+            template.getDetails().stream().filter((field)
+                    -> (GlobalFieldType.GBL_INPUT_DAT_TYPE.equals(field.getType())))
+                    .forEach((field) -> {
+                        fields.add(field);
+                    });
 
-        response.setFields(fields);
-
+            response.setFields(fields);
+        } catch (Exception ex) {
+            response.setSuccess(false);
+            response.setMessage(ex.getMessage());
+        }
         return response;
     }
 
