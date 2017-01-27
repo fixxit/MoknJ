@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
+import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_ASSET;
+import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_EMPLOYEE;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
@@ -44,12 +46,14 @@ public class LinkBal implements BusinessAccessLayer {
     /**
      * Saves the link for a asset, this is used as audit in and out history
      *
+     * @param menuId
+     * @param templateId
      * @param payload
      * @param token
      * @return
      * @throws Exception
      */
-    public AssetLink linkAssetToUser(AssetLink payload, String token) throws Exception {
+    public AssetLink linkAssetToUser(String menuId, String templateId, AssetLink payload, String token) throws Exception {
         try {
             User user = userBal.getUserByToken(token);
 
@@ -60,10 +64,9 @@ public class LinkBal implements BusinessAccessLayer {
             if (payload.getAssetId() != null) {
                 Asset asset = assetBal.get(payload.getAssetId());
                 if (asset != null) {
-                    String templateId = asset.getTypeId();
-                    String menuId = asset.getMenuScopeIds().get(0);
-
                     // check if user has any access asigned to him.
+                    LOG.info("user : " + user.getAuthorities());
+
                     if (!accessBal.hasAccess(user, menuId, templateId, GlobalAccessRights.EDIT)) {
                         throw new Exception("Unable to check out/in this asset. "
                                 + "This user does not have "
@@ -100,8 +103,19 @@ public class LinkBal implements BusinessAccessLayer {
      */
     public List<EmployeeLink> getAllEmployeeLinks(String token) throws Exception {
         try {
-            return checkEmployeeRecordAccess(factory.getEmployeeLinkRep().findAll(),
-                    userBal.getUserByToken(token));
+            Set<EmployeeLink> results = new HashSet<>();
+            for (Menu menu : new MainAccessBal(factory).getUserMenus(token)) {
+                if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
+                    for (Template temp : menu.getTemplates()) {
+                        results.addAll(checkEmployeeRecordAccess(
+                                factory.getEmployeeLinkRep().findAll(),
+                                menu.getId(),
+                                temp.getId(),
+                                userBal.getUserByToken(token)));
+                    }
+                }
+            }
+            return results.stream().collect(Collectors.toList());
         } catch (Exception e) {
             LOG.error("Error while trying to find all employee links", e);
             throw e;
@@ -119,13 +133,31 @@ public class LinkBal implements BusinessAccessLayer {
      */
     public List<EmployeeLink> getAllEmployeeLinksForEmployee(String employeeId, String token) throws Exception {
         try {
-            return checkEmployeeRecordAccess(factory.getEmployeeLinkRep().getAllByEmployeeId(employeeId),
-                    userBal.getUserByToken(token));
+            Set<EmployeeLink> results = new HashSet<>();
+            for (Menu menu : new MainAccessBal(factory).getUserMenus(token)) {
+                if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
+                    for (Template temp : menu.getTemplates()) {
+                        results.addAll(checkEmployeeRecordAccess(
+                                factory.getEmployeeLinkRep().getAllByEmployeeId(employeeId),
+                                menu.getId(),
+                                temp.getId(),
+                                userBal.getUserByToken(token)));
+                    }
+                }
+            }
+            return results.stream().collect(Collectors.toList());
         } catch (Exception e) {
             LOG.error("Error while trying to find all employee links", e);
             throw e;
         }
+    }
 
+    private void setEmployeelinkDetails(String employeeId, EmployeeLink link) throws Exception {
+        Employee employee = employeeBal.get(employeeId);
+        User linkedUser = factory.getUserRep().findById(employee.getResourceId());
+        String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
+        link.setUser(fullname);
+        link.setActionValue(link.getAction().getDisplayValue());
     }
 
     /**
@@ -135,62 +167,42 @@ public class LinkBal implements BusinessAccessLayer {
      * used over different menu to the list and bypasses the access rights.
      *
      * @param empLinks
+     * @param menuId
+     * @param templateId
      * @param user
      * @return
      * @throws Exception
      */
-    public List<EmployeeLink> checkEmployeeRecordAccess(List<EmployeeLink> empLinks, User user) throws Exception {
+    public List<EmployeeLink> checkEmployeeRecordAccess(List<EmployeeLink> empLinks, String menuId, String templateId, User user) throws Exception {
         try {
             Set<EmployeeLink> links = new HashSet<>();
             for (EmployeeLink link : empLinks) {
                 if (factory.getEmployeeRep().exists(link.getEmployeeId())) {
                     if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
                         Employee employee = employeeBal.get(link.getEmployeeId());
-                        String templateId = employee.getTypeId();
-                        String menuId = employee.getMenuScopeIds().get(0);
-                        // Get template from menu item
-                        Template memTemplate = getMenuTemplate(menuId, templateId);
-                        if (memTemplate == null) {
-                            continue;
-                        }
-                        // if scope challenge then get all menus ids with this template
-                        if (!memTemplate.isAllowScopeChallenge()) {
-                            List<Menu> menus = new MenuBal(factory).getMenusForTemplateId(templateId);
-                            for (Menu menu : menus) {
-                                List<EmployeeLink> menuLinks = factory.getEmployeeLinkRep().findAll(new Sort(Sort.Direction.DESC, "createdDate"));
-                                for (EmployeeLink menuLink : menuLinks) {
-                                    if (factory.getEmployeeRep().exists(menuLink.getEmployeeId())) {
-                                        Employee memEmployee = employeeBal.get(menuLink.getEmployeeId());
-                                        String challengeTempId = memEmployee.getTypeId();
-                                        if (challengeTempId.equals(templateId)) {
-                                            if (accessBal.hasAccess(user, menu.getId(),
-                                                    templateId, GlobalAccessRights.VIEW)) {
-                                                // Sets the user full name for display purpesus
-                                                User linkedUser = factory.getUserRep().findById(memEmployee.getResourceId());
-                                                String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
-                                                menuLink.setUser(fullname);
-                                                menuLink.setActionValue(menuLink.getAction().getDisplayValue());
-                                                links.add(menuLink);
-                                            }
-                                        }
-                                    }
-                                }
+                        if (employee.getTypeId().equals(templateId)) {
+                            // Get template from menu item
+                            Template template = getMenuTemplate(menuId, templateId);
+                            if (template == null) {
+                                continue;
                             }
-                        } else if (accessBal.hasAccess(user, menuId,
-                                templateId, GlobalAccessRights.VIEW)) {
-                            // Sets the user full name for display purpesus
-                            User linkedUser = factory.getUserRep().findById(employee.getResourceId());
-                            String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
-                            link.setUser(fullname);
-                            link.setActionValue(link.getAction().getDisplayValue());
-                            links.add(link);
+
+                            if (!template.isAllowScopeChallenge()) {
+                                if (accessBal.hasAccess(
+                                        user,
+                                        menuId,
+                                        templateId,
+                                        GlobalAccessRights.VIEW)) {
+                                    setEmployeelinkDetails(link.getEmployeeId(), link);
+                                    links.add(link);
+                                }
+                            } else {
+                                setEmployeelinkDetails(link.getEmployeeId(), link);
+                                links.add(link);
+                            }
                         }
                     } else {
-                        Employee employee = employeeBal.get(link.getEmployeeId());
-                        User linkedUser = factory.getUserRep().findById(employee.getResourceId());
-                        String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
-                        link.setUser(fullname);
-                        link.setActionValue(link.getAction().getDisplayValue());
+                        setEmployeelinkDetails(link.getEmployeeId(), link);
                         links.add(link);
                     }
                 }
@@ -209,41 +221,36 @@ public class LinkBal implements BusinessAccessLayer {
      * used over different menu to the list and bypasses the access rights.
      *
      * @param assetLinks
+     * @param menuId
+     * @param templateId
      * @param user
      * @return
      * @throws Exception
      */
-    public List<AssetLink> checkAssetRecordAccess(List<AssetLink> assetLinks, User user) throws Exception {
+    public List<AssetLink> checkAssetRecordAccess(List<AssetLink> assetLinks, String menuId, String templateId, User user) throws Exception {
         try {
             Set<AssetLink> links = new HashSet<>();
             for (AssetLink link : assetLinks) {
                 if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
                     Asset asset = assetBal.get(link.getAssetId());
-                    String templateId = asset.getTypeId();
-                    String menuId = asset.getMenuScopeIds().get(0);
-                    // Get template from menu item
-                    Template memTemplate = getMenuTemplate(menuId, templateId);
-                    if (memTemplate == null) {
-                        continue;
-                    }
-                    // if scope challenge then get all menus ids with this template
-                    if (!memTemplate.isAllowScopeChallenge()) {
-                        List<Menu> menus = new MenuBal(factory).getMenusForTemplateId(templateId);
-                        for (Menu menu : menus) {
-                            List<AssetLink> menuLinks = factory.getAssetLinkRep().findAll(new Sort(Sort.Direction.DESC, "createdDate"));
-                            for (AssetLink menuLink : menuLinks) {
-                                String challengeTempId = assetBal.get(menuLink.getAssetId()).getTypeId();
-                                if (challengeTempId.equals(templateId)) {
-                                    if (accessBal.hasAccess(user, menu.getId(),
-                                            templateId, GlobalAccessRights.VIEW)) {
-                                        links.add(menuLink);
-                                    }
-                                }
-                            }
+                    if (templateId.equals(asset.getTypeId())) {
+                        // Get template from menu item
+                        Template template = getMenuTemplate(menuId, templateId);
+                        if (template == null) {
+                            continue;
                         }
-                    } else if (accessBal.hasAccess(user, menuId,
-                            templateId, GlobalAccessRights.VIEW)) {
-                        links.add(link);
+
+                        if (!template.isAllowScopeChallenge()) {
+                            if (accessBal.hasAccess(
+                                    user,
+                                    menuId,
+                                    templateId,
+                                    GlobalAccessRights.VIEW)) {
+                                links.add(link);
+                            }
+                        } else {
+                            links.add(link);
+                        }
                     }
                 } else {
                     links.add(link);
@@ -286,9 +293,21 @@ public class LinkBal implements BusinessAccessLayer {
      */
     public List<AssetLink> getAllAssetLinks(String token) throws Exception {
         try {
-            return checkAssetRecordAccess(factory.getAssetLinkRep().findAll(
-                    new Sort(Sort.Direction.DESC, "createdDate")),
-                    userBal.getUserByToken(token));
+            Set<AssetLink> results = new HashSet<>();
+            for (Menu menu : new MainAccessBal(factory).getUserMenus(token)) {
+                if (menu.getMenuType().equals(GBL_MT_ASSET)) {
+                    for (Template temp : menu.getTemplates()) {
+                        results.addAll(checkAssetRecordAccess(
+                                factory.getAssetLinkRep().findAll(
+                                        new Sort(Sort.Direction.DESC, "createdDate")
+                                ),
+                                menu.getId(),
+                                temp.getId(),
+                                userBal.getUserByToken(token)));
+                    }
+                }
+            }
+            return results.stream().collect(Collectors.toList());
         } catch (Exception e) {
             LOG.error("Error while trying to find all asset links", e);
             throw e;
@@ -305,7 +324,42 @@ public class LinkBal implements BusinessAccessLayer {
      */
     public List<AssetLink> getAllAssetLinksByAssetId(String assetId, String token) throws Exception {
         try {
-            return checkAssetRecordAccess(factory.getAssetLinkRep().getAllByAssetId(assetId),
+            Set<AssetLink> results = new HashSet<>();
+            for (Menu menu : new MainAccessBal(factory).getUserMenus(token)) {
+                if (menu.getMenuType().equals(GBL_MT_ASSET)) {
+                    for (Template temp : menu.getTemplates()) {
+                        results.addAll(checkAssetRecordAccess(
+                                factory.getAssetLinkRep().getAllByAssetId(assetId),
+                                menu.getId(),
+                                temp.getId(),
+                                userBal.getUserByToken(token)));
+                    }
+                }
+            }
+            return results.stream().collect(Collectors.toList());
+        } catch (Exception e) {
+            LOG.error("Error while trying to find all asset links", e);
+            throw e;
+        }
+    }
+
+    /**
+     * Gets all in out audit logs for asset id and token (access check).
+     * Enforces the menuId. For scope challenge.
+     *
+     * @param assetId
+     * @param menuId
+     * @param templateId
+     * @param token
+     * @return
+     * @throws Exception
+     */
+    public List<AssetLink> getAllAssetLinksByAssetId(String assetId, String menuId, String templateId, String token) throws Exception {
+        try {
+            return checkAssetRecordAccess(
+                    factory.getAssetLinkRep().getAllByAssetId(assetId),
+                    menuId,
+                    templateId,
                     userBal.getUserByToken(token));
         } catch (Exception e) {
             LOG.error("Error while trying to find all asset links", e);
@@ -323,8 +377,19 @@ public class LinkBal implements BusinessAccessLayer {
      */
     public List<AssetLink> getAllAssetLinksByResourceId(String userId, String token) throws Exception {
         try {
-            return checkAssetRecordAccess(factory.getAssetLinkRep().getAllByResourceId(userId),
-                    userBal.getUserByToken(token));
+            Set<AssetLink> results = new HashSet<>();
+            for (Menu menu : new MainAccessBal(factory).getUserMenus(token)) {
+                if (menu.getMenuType().equals(GBL_MT_ASSET)) {
+                    for (Template temp : menu.getTemplates()) {
+                        results.addAll(checkAssetRecordAccess(
+                                factory.getAssetLinkRep().getAllByResourceId(userId),
+                                menu.getId(),
+                                temp.getId(),
+                                 userBal.getUserByToken(token)));
+                    }
+                }
+            }
+            return results.stream().collect(Collectors.toList());
         } catch (Exception e) {
             LOG.error("Error while trying to find all asset links", e);
             throw e;

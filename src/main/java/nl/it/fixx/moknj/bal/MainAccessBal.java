@@ -221,25 +221,16 @@ public class MainAccessBal implements BusinessAccessLayer {
 
             for (Menu menu : array) {
                 List<Template> templates = getMenuTemplates(menu, user, false);
-                menu.setTemplates(templates);
-                menus.add(menu);
+                if (!templates.isEmpty()) {
+                    menu.setTemplates(templates);
+                    menus.add(menu);
+                }
             }
 
             Collections.sort(menus, (Menu a1, Menu a2) -> {
                 return new NullSafeComparator<>(String::compareTo,
                         true).compare(a1.getIndex(), a2.getIndex());
             });
-
-            // Remove any menu which has not templates
-            for (Iterator<Menu> iterator = menus.iterator(); iterator.hasNext();) {
-                Menu menu = iterator.next();
-                if (menu.getTemplates().isEmpty()) {
-//                    LOG.info("Removing menu [" + menu.getName() + "] from menu list");
-                    iterator.remove();
-                } else {
-//                    LOG.info("Menu [" + menu.getName() + "] has list [" + menu.getTemplates().size() + "]");
-                }
-            }
 
             return menus;
         } catch (Exception e) {
@@ -356,18 +347,27 @@ public class MainAccessBal implements BusinessAccessLayer {
             }
 
             if (cascade) {
-//                LOG.info("Cascading delete!");
-                Template template = tempBal.getTemplateById(id);
-                if (template.getId().equals(id)) {
-                    if (GlobalTemplateType.GBL_TT_ASSET.equals(template.getTemplateType())) {
-                        List<Asset> assets = factory.getAssetRep().getAllByTypeId(id);
-                        for (Asset asset : assets) {
-                            assetBal.delete(asset, token, true);
-                        }
-                    } else if (GlobalTemplateType.GBL_TT_EMPLOYEE.equals(template.getTemplateType())) {
-                        List<Employee> employees = factory.getEmployeeRep().getAllByTypeId(id);
-                        for (Employee emp : employees) {
-                            employeeBal.delete(emp, token, true);
+                List<Menu> menus = new MenuBal(factory).getMenusForTemplateId(id);
+                for (Menu menu : menus) {
+                    for (Iterator<Template> iterator = menu.getTemplates().iterator(); iterator.hasNext();) {
+                        Template template = iterator.next();
+                        if (template.getId().equals(id)) {
+                            if (GlobalTemplateType.GBL_TT_ASSET.equals(template.getTemplateType())) {
+                                List<Asset> assets = factory.getAssetRep().getAllByTypeId(id);
+                                for (Asset asset : assets) {
+                                    assetBal.delete(asset, menu.getId(), token, true);
+                                    iterator.remove();
+                                    menuBal.saveMenu(menu);
+                                }
+
+                            } else if (GlobalTemplateType.GBL_TT_EMPLOYEE.equals(template.getTemplateType())) {
+                                List<Employee> employees = factory.getEmployeeRep().getAllByTypeId(id);
+                                for (Employee emp : employees) {
+                                    employeeBal.delete(emp, menu.getId(), token, true);
+                                    iterator.remove();
+                                    menuBal.saveMenu(menu);
+                                }
+                            }
                         }
                     }
                 }

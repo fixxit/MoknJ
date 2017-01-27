@@ -21,8 +21,9 @@ public class AssetController {
     @Autowired
     private RepositoryFactory factory;
 
-    @RequestMapping(value = "/add/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/add/{menuId}/{id}", method = RequestMethod.POST)
     public AssetResponse add(@PathVariable String id,
+            @PathVariable String menuId,
             @RequestBody Asset asset,
             @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
@@ -32,7 +33,6 @@ public class AssetController {
                 throw new Exception("No menu id provided for the asset record");
             }
 
-            String menuId = asset.getMenuScopeIds().get(0);
             Asset savedAsset = bal.save(id, menuId, asset, access_token);
             response.setSuccess(true);
             response.setAsset(savedAsset);
@@ -92,14 +92,16 @@ public class AssetController {
      * Deletes or hides asset depending on if it is linked to audit trail
      *
      * @param asset
+     * @param menuId
      * @param access_token
      * @return
      */
-    @RequestMapping(value = "/delete/", method = RequestMethod.POST)
-    public AssetResponse delete(@RequestBody Asset asset, @RequestParam String access_token) {
+    @RequestMapping(value = "/delete/{menuId}", method = RequestMethod.POST)
+    public AssetResponse delete(@RequestBody Asset asset, @PathVariable String menuId,
+            @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
         try {
-            new AssetBal(factory).delete(asset, access_token, false);
+            new AssetBal(factory).delete(asset, menuId, access_token, false);
             response.setSuccess(true);
             response.setMessage("Asset record was deleted successfully.");
         } catch (Exception ex) {

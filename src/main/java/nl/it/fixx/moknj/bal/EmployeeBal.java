@@ -336,13 +336,12 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
     }
 
     @Override
-    public void delete(Object record, String token, boolean cascade) throws Exception {
+    public void delete(Object record, String menuId, String token, boolean cascade) throws Exception {
         try {
             if (record instanceof Employee) {
                 Employee employee = (Employee) record;
                 Employee result = employeeRep.findOne(employee.getId());
                 if (result != null) {
-                    String menuId = employee.getMenuScopeIds().get(0);
                     String templateId = employee.getTypeId();
 
                     User user = userBal.getUserByToken(token);

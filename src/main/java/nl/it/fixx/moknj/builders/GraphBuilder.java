@@ -100,16 +100,25 @@ public class GraphBuilder {
                         // X-AXIS Label Logic
                         if (recordBal != null) {
                             List records = recordBal.getAll(template.getId(), menu.getId(), token);
+
                             // duplicate records for all entries which have the same id.
                             // Basically a left join...
-
                             if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+
                                 List<Asset> inOutAssetJoinList = new ArrayList<>();
                                 for (Object record : records) {
                                     if (record instanceof Asset) {
                                         Asset asset = (Asset) record;
                                         // gets all the checked in/out records for asset.
-                                        List<AssetLink> links = new LinkBal(factory).getAllAssetLinksByAssetId(asset.getId(), token);
+                                        List<AssetLink> links
+                                                = new LinkBal(factory).
+                                                getAllAssetLinksByAssetId(
+                                                        asset.getId(),
+                                                        menu.getId(),
+                                                        template.getId(),
+                                                        token);
+
+
                                         for (AssetLink link : links) {
                                             // create new instance of asset... prototype pattern would be nice here...
                                             Asset newAsset = new Asset();
@@ -135,6 +144,7 @@ public class GraphBuilder {
                                 }
                                 records = inOutAssetJoinList;
                             }
+
 
                             // This is used to bypass the filterdate and filter rule logic
                             boolean bypassDateRulle = false;

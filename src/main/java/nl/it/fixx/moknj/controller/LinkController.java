@@ -9,6 +9,8 @@ import nl.it.fixx.moknj.bal.LinkBal;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.repository.RepositoryFactory;
 import nl.it.fixx.moknj.response.LinkResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,19 +29,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/link")
 public class LinkController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(LinkController.class);
     @Autowired
     private RepositoryFactory factory;
 
-    @RequestMapping(value = "/asset/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/asset/{menuId}/{templateId}/add", method = RequestMethod.POST)
     public LinkResponse addAssetLink(@RequestBody AssetLink payload,
+            @PathVariable String templateId,
+            @PathVariable String menuId,
             @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
         try {
             LinkBal bal = new LinkBal(factory);
-            AssetLink link = bal.linkAssetToUser(payload, access_token);
+
+            LOG.info("templateId : " + templateId);
+            LOG.info("menuId : " + menuId);
+
+            AssetLink link = bal.linkAssetToUser(menuId, templateId,
+                    payload, access_token);
             response.setLink(link);
             response.setSuccess(link != null);
-            response.setMessage("Saved link");
+            response.setMessage("Saved link successfully");
         } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());

@@ -1,7 +1,6 @@
 package nl.it.fixx.moknj.bal;
 
 import java.util.List;
-import java.util.Set;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
@@ -228,29 +227,11 @@ public class AccessBal {
             // plain access check...
             if (accessRep.hasAccess(user.getId(), menuId, templateId)) {
                 Access access = accessRep.getAccess(user.getId(), menuId, templateId);
-                return access.getRights().contains(right);
-            } else {
-                // This is for debuging...
-                // get access from db.
-                List<Access> accessRules = getAccessList(user.getId());
-                for (Access accesRule : accessRules) {
-                    if (accesRule.getMenuId().equals(menuId)) {
-                        if (accesRule.getTemplateId().equals(templateId)) {
-                            Set<GlobalAccessRights> rights = accesRule.getRights();
-                            // empty check
-                            if (rights == null || rights.isEmpty()) {
-                                return false;
-                            }
-
-                            if (rights.stream().anyMatch((dbRight)
-                                    -> (dbRight.equals(right)))) {
-                                return true;
-                            }
-                            // check if set contains the right.
-                            return rights.contains(right);
-                        }
-                    }
+                // empty check
+                if (access.getRights() == null || access.getRights().isEmpty()) {
+                    return false;
                 }
+                return access.getRights().contains(right);
             }
 
             // always return false if logic above is fails.

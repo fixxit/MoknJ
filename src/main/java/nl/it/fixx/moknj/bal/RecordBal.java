@@ -50,5 +50,5 @@ public interface RecordBal {
      * @param cascade delete asset/employee link data
      * @throws java.lang.Exception
      */
-    public void delete(Object record, String access_token, boolean cascade) throws Exception;
+    public void delete(Object record, String menuId, String access_token, boolean cascade) throws Exception;
 }

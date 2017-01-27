@@ -30,8 +30,9 @@ public class EmployeeController {
     @Autowired
     private RepositoryFactory factory;
 
-    @RequestMapping(value = "/add/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/add/{menuId}/{id}", method = RequestMethod.POST)
     public EmployeeResponse add(@PathVariable String id,
+            @PathVariable String menuId,
             @RequestBody Employee employee,
             @RequestParam String access_token) {
         EmployeeResponse response = new EmployeeResponse();
@@ -41,7 +42,6 @@ public class EmployeeController {
                 throw new Exception("No menu id provided for the employee record");
             }
 
-            String menuId = employee.getMenuScopeIds().get(0);
             Employee savedEmployee = bal.save(id, menuId, employee, access_token);
             response.setSuccess(true);
             response.setEmployee(savedEmployee);
@@ -101,15 +101,18 @@ public class EmployeeController {
      * Deletes employee
      *
      * @param employee
+     * @param menuId
      * @param access_token
      * @return
      */
-    @RequestMapping(value = "/delete/", method = RequestMethod.POST)
-    public EmployeeResponse delete(@RequestBody Employee employee, @RequestParam String access_token) {
+    @RequestMapping(value = "/delete/{menuId}", method = RequestMethod.POST)
+    public EmployeeResponse delete(@RequestBody Employee employee,
+            @PathVariable String menuId,
+            @RequestParam String access_token) {
         // to insure that the below fields have no influence on find all.
         EmployeeResponse response = new EmployeeResponse();
         try {
-            new EmployeeBal(factory).delete(employee, access_token, false);
+            new EmployeeBal(factory).delete(employee, menuId, access_token, false);
             response.setMessage("Removed employee record successfully.");
             response.setSuccess(true);
         } catch (Exception ex) {

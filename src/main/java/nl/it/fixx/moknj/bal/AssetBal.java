@@ -255,17 +255,18 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
     /**
      *
      * @param record
+     * @param menuId
      * @param token
+     * @param cascade
      * @throws Exception
      */
     @Override
-    public void delete(Object record, String token, boolean cascade) throws Exception {
+    public void delete(Object record, String menuId, String token, boolean cascade) throws Exception {
         try {
             if (record instanceof Asset) {
                 Asset asset = (Asset) record;
                 Asset result = assetRep.findOne(asset.getId());
                 if (result != null) {
-                    String menuId = result.getMenuScopeIds().get(0);
                     String templateId = result.getTypeId();
                     User user = userBal.getUserByToken(token);
                     if (!userAccessBall.hasAccess(user, menuId, templateId,
