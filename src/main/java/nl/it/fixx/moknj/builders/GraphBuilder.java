@@ -80,8 +80,8 @@ public class GraphBuilder {
             GraphData data = new GraphData();
             // get all records for template.
             if (graphInfo != null) {
-                LOG.info("======================================================");
-                LOG.info("Graph Name : " + graphInfo.getName());
+//                LOG.info("======================================================");
+//                LOG.info("Graph Name : " + graphInfo.getName());
                 // Business access layer.
                 RecordBal recordBal = null;
                 Menu menu = new MainAccessBal(factory).getMenu(graphInfo.getMenuId(), token);
@@ -213,9 +213,9 @@ public class GraphBuilder {
                                 }
                             }
 
-                            LOG.info("Type : " + graphInfo.getGraphView().getDisplayName());
-                            LOG.info("End Date : " + endDate.toString(FMT_FILTER_DATE));
-                            LOG.info("Start Date : " + startDate.toString(FMT_FILTER_DATE));
+//                            LOG.info("Type : " + graphInfo.getGraphView().getDisplayName());
+//                            LOG.info("End Date : " + endDate.toString(FMT_FILTER_DATE));
+//                            LOG.info("Start Date : " + startDate.toString(FMT_FILTER_DATE));
                             String endDateStr = new SimpleDateFormat(FMT_FILTER_DATE).format(endDate.toDate());
                             DateTime endDateRule = DateUtil.parseDate(endDateStr, FMT_FILTER_DATE);
 
@@ -430,14 +430,14 @@ public class GraphBuilder {
 
                                     for (int y = 0; y < yAxis.length; y++) {
                                         String yAxisFocus = yAxis[y];
-                                        LOG.info("yAxisFocus : " + yAxisFocus);
-                                        LOG.info("yAxisValue : " + yAxisValue);
+//                                        LOG.info("yAxisFocus : " + yAxisFocus);
+//                                        LOG.info("yAxisValue : " + yAxisValue);
                                         if (yAxisFocus.equals(yAxisValue)) {
                                             int[] dataSet = yxData[y];
                                             for (int x = 0; x < xAxis.length; x++) {
                                                 String xAxisFocus = xAxis[x];
-                                                LOG.info("xAxisFocus : " + xAxisFocus);
-                                                LOG.info("xAxisValue : " + xAxisValue);
+//                                                LOG.info("xAxisFocus : " + xAxisFocus);
+//                                                LOG.info("xAxisValue : " + xAxisValue);
                                                 if (xAxisFocus.equals(xAxisValue)) {
                                                     dataSet[x] += 1;
                                                     yxData[y] = dataSet;
