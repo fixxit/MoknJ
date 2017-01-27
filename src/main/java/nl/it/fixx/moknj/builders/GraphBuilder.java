@@ -387,7 +387,7 @@ public class GraphBuilder {
 
                                 String recordDateStr = new SimpleDateFormat(FMT_FILTER_DATE).format(recodDateTime.toDate());
                                 DateTime recordDate = DateUtil.parseDate(recordDateStr, FMT_FILTER_DATE);
-                                LOG.info("recordDate : " + recordDate.toString(FMT_FILTER_DATE));
+//                                LOG.info("recordDate : " + recordDate.toString(FMT_FILTER_DATE));
 
                                 // Check if view date and record date is in correct range
                                 // AKA date rule implementation.
