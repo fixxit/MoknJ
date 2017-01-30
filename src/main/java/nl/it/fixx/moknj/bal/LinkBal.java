@@ -20,7 +20,6 @@ import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
 import nl.it.fixx.moknj.repository.RepositoryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 
 /**
  *
@@ -94,35 +93,6 @@ public class LinkBal implements BusinessAccessLayer {
     }
 
     /**
-     * Gets all the employee audits for the current user token (access check
-     * included), this is only used as audit log.
-     *
-     * @param token
-     * @return
-     * @throws Exception
-     */
-    public List<EmployeeLink> getAllEmployeeLinks(String token) throws Exception {
-        try {
-            Set<EmployeeLink> results = new HashSet<>();
-            for (Menu menu : new MainAccessBal(factory).getUserMenus(token)) {
-                if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
-                    for (Template temp : menu.getTemplates()) {
-                        results.addAll(checkEmployeeRecordAccess(
-                                factory.getEmployeeLinkRep().findAll(),
-                                menu.getId(),
-                                temp.getId(),
-                                userBal.getUserByToken(token)));
-                    }
-                }
-            }
-            return results.stream().collect(Collectors.toList());
-        } catch (Exception e) {
-            LOG.error("Error while trying to find all employee links", e);
-            throw e;
-        }
-    }
-
-    /**
      * Gets all the audit for specific employee id and for the current user
      * token (access check included).
      *
@@ -179,27 +149,24 @@ public class LinkBal implements BusinessAccessLayer {
             for (EmployeeLink link : empLinks) {
                 if (factory.getEmployeeRep().exists(link.getEmployeeId())) {
                     if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                        Employee employee = employeeBal.get(link.getEmployeeId());
-                        if (employee.getTypeId().equals(templateId)) {
-                            // Get template from menu item
-                            Template template = getMenuTemplate(menuId, templateId);
-                            if (template == null) {
-                                continue;
-                            }
+                        // Get template from menu item
+                        Template template = getMenuTemplate(menuId, templateId);
+                        if (template == null) {
+                            continue;
+                        }
 
-                            if (!template.isAllowScopeChallenge()) {
-                                if (accessBal.hasAccess(
-                                        user,
-                                        menuId,
-                                        templateId,
-                                        GlobalAccessRights.VIEW)) {
-                                    setEmployeelinkDetails(link.getEmployeeId(), link);
-                                    links.add(link);
-                                }
-                            } else {
+                        if (!template.isAllowScopeChallenge()) {
+                            if (accessBal.hasAccess(
+                                    user,
+                                    menuId,
+                                    templateId,
+                                    GlobalAccessRights.VIEW)) {
                                 setEmployeelinkDetails(link.getEmployeeId(), link);
                                 links.add(link);
                             }
+                        } else {
+                            setEmployeelinkDetails(link.getEmployeeId(), link);
+                            links.add(link);
                         }
                     } else {
                         setEmployeelinkDetails(link.getEmployeeId(), link);
@@ -231,29 +198,27 @@ public class LinkBal implements BusinessAccessLayer {
         try {
             Set<AssetLink> links = new HashSet<>();
             for (AssetLink link : assetLinks) {
-                if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                    Asset asset = assetBal.get(link.getAssetId());
-                    if (templateId.equals(asset.getTypeId())) {
+                if (factory.getAssetRep().exists(link.getAssetId())) {
+                    if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
                         // Get template from menu item
                         Template template = getMenuTemplate(menuId, templateId);
                         if (template == null) {
                             continue;
                         }
-
                         if (!template.isAllowScopeChallenge()) {
                             if (accessBal.hasAccess(
                                     user,
                                     menuId,
-                                    templateId,
+                                    template.getId(),
                                     GlobalAccessRights.VIEW)) {
                                 links.add(link);
                             }
                         } else {
                             links.add(link);
                         }
+                    } else {
+                        links.add(link);
                     }
-                } else {
-                    links.add(link);
                 }
             }
             return links.stream().collect(Collectors.toList());
@@ -285,6 +250,38 @@ public class LinkBal implements BusinessAccessLayer {
     }
 
     /**
+     * Gets all the employee audits for the current user token (access check
+     * included), this is only used as audit log.
+     *
+     * @param token
+     * @return
+     * @throws Exception
+     */
+    public List<EmployeeLink> getAllEmployeeLinks(String token) throws Exception {
+        try {
+            Set<EmployeeLink> results = new HashSet<>();
+            for (Menu menu : new MainAccessBal(factory).getUserMenus(token)) {
+                if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
+                    for (Template temp : menu.getTemplates()) {
+                        List<Employee> employees = employeeBal.getAll(temp.getId(), menu.getId(), token);
+                        for (Employee employee : employees) {
+                            results.addAll(checkEmployeeRecordAccess(
+                                    getAllEmployeeLinksForEmployee(employee.getId(), token),
+                                    menu.getId(),
+                                    temp.getId(),
+                                    userBal.getUserByToken(token)));
+                        }
+                    }
+                }
+            }
+            return results.stream().collect(Collectors.toList());
+        } catch (Exception e) {
+            LOG.error("Error while trying to find all employee links", e);
+            throw e;
+        }
+    }
+
+    /**
      * Gets all asset in and out audit links for user token.
      *
      * @param token
@@ -297,13 +294,18 @@ public class LinkBal implements BusinessAccessLayer {
             for (Menu menu : new MainAccessBal(factory).getUserMenus(token)) {
                 if (menu.getMenuType().equals(GBL_MT_ASSET)) {
                     for (Template temp : menu.getTemplates()) {
-                        results.addAll(checkAssetRecordAccess(
-                                factory.getAssetLinkRep().findAll(
-                                        new Sort(Sort.Direction.DESC, "createdDate")
-                                ),
-                                menu.getId(),
-                                temp.getId(),
-                                userBal.getUserByToken(token)));
+                        List<Asset> assets = assetBal.getAll(temp.getId(), menu.getId(), token);
+                        for (Asset asset : assets) {
+                            results.addAll(checkAssetRecordAccess(
+                                    getAllAssetLinksByAssetId(
+                                            asset.getId(),
+                                            menu.getId(),
+                                            temp.getId(),
+                                            token),
+                                    menu.getId(),
+                                    temp.getId(),
+                                    userBal.getUserByToken(token)));
+                        }
                     }
                 }
             }
@@ -385,7 +387,7 @@ public class LinkBal implements BusinessAccessLayer {
                                 factory.getAssetLinkRep().getAllByResourceId(userId),
                                 menu.getId(),
                                 temp.getId(),
-                                 userBal.getUserByToken(token)));
+                                userBal.getUserByToken(token)));
                     }
                 }
             }
