@@ -10,6 +10,15 @@ MoknJ is a simple but effective solution to move data from excel sheets to an cu
 ## Trello Board ##
 [Bugs and Fixes and future expansion](https://trello.com/b/Uw1TjVAL/asset-management-project)
 
+## Live URLs ##
+[GUI](http://assetmanagergui-fixxhr.rhcloud.com/)
+[API](http://assetmanagerapi-fixxhr.rhcloud.com/FixxITAssetTracker/)
+
+## SSH LINK ##
+To use the ssh you need add your git or SSH-2RSA certificate to openshift use putty keygen if dont have key...
+ssh 5834115389f5cfe0220001f4@assetmanagerapi-fixxhr.rhcloud.com
+
+
 ## High level break down ##
 * MoknJ is rest API which which uses token authentication to identify the logged in user. 
 * The platform is split up in 2 applications ([GUI](https://bitbucket.org/fixxitprofessionalservices/fixxassettrackerui)) (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
