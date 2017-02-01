@@ -1,7 +1,9 @@
 # MoknJ 0.0.1b #
 ## Introduction ##
 This dragon scroll would serve for who ever takes on this project to unlock the unknowns and travel to far lands and slay dragons.
-One might ask ones self why would I be reading about dragons and I the writer would reply cause words can make a logical argument, the dragon represents the unknown which you have found yourself (netherlands) in and mission of acquiring skills to strengthening your stats, so you too can one day rain___fire___on_____your___________colleagues...
+One might ask ones self why would I be reading about dragons and I the writer would reply cause words can make a logical argument, the dragon represents the unknown which you have found yourself (netherlands) in and mission of acquiring skills to strengthening your stats, so you too can one day rain......fire...on...your...colleagues...
+
+![tumblr_inline_ngc8ik5Hft1t6v9pj.gif](https://bitbucket.org/repo/aEK7Ey/images/1843827414-tumblr_inline_ngc8ik5Hft1t6v9pj.gif)
 
 ## Mission ##
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform which makes it easy build custom templates that behave like predefined business components. The system helps the user to consolidate his company spreadsheet data which results in more effective management of the data.
