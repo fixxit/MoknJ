@@ -1,5 +1,6 @@
-# MoknJ 0.0.1b #
+# MoknJ #
 ![logo.png](https://bitbucket.org/repo/aEK7Ey/images/4055636824-logo.png)
+# 0.0.1b #
 
 ## Introduction ##
 This dragon scroll would serve for who ever takes on this project as a guide to unlock the unknowns and travel to far lands and slay dragons... One might ask ones self why would I be reading about dragons and I the writer would reply cause words can make a logical argument, the dragon represents the unknown(Netherlands) which you have found yourself in and mission of acquiring skills to strengthening your stats, so you too can one day ride...a...dragon...and...rain......fire...on...your...colleagues..............................
