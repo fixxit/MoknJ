@@ -7,7 +7,7 @@ One might ask ones self why would I be reading about dragons and I the writer wo
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform which makes it easy build custom templates that behave like predefined business components. The system helps the user to consolidate his company spreadsheet data which results in more effective management of the data.
 
 ## High level break down ##
-* MoknJ is rest API which which uses token authentication to identify the logged in user. 
+* MoknJ is rest API ([Link Text](Link URL)) which which uses token authentication to identify the logged in user. 
 * The platform is split up in 2 applications GUI (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
 * As the GUI only handles rest (ajax) request and display (data manipulation) with the free API which is  tomcat/tomee/wildfly to handle db related requests and access based data manipulation.
 * GUI is pure HTML5 and javascript which makes it easy for most developers to contribute to it.
@@ -25,7 +25,6 @@ Templates represent components in the platform. Templates are hold the component
 * Field Index, the index of the field on the view of the template. (Shown in blue box of screen shot)
 * Drop down fields are fields which have multiple values. These fields are displayed as you guessed a drop down... 
 * Templates also have behavior (Asset, Employee) assigned to them.  
-
 
 See screen shot for example:
 ![2017-02-01_13-13-05.jpg](https://bitbucket.org/repo/aEK7Ey/images/193534309-2017-02-01_13-13-05.jpg)
@@ -50,7 +49,20 @@ Modules can be seen as view and behavior of a template and menu. The module dict
 ![2017-02-01_13-04-33.jpg](https://bitbucket.org/repo/aEK7Ey/images/4291436877-2017-02-01_13-04-33.jpg)
 
 ### User ###
+Users and employees are one of the same, a user is just an employee with user access. Employees are linked to the assets and employee templates records.
+
+Example of user view/new screen
+
+![2017-02-01_13-33-36.jpg](https://bitbucket.org/repo/aEK7Ey/images/382843295-2017-02-01_13-33-36.jpg)
+
 ### Access ###
+User access can be defined once menu and template is loaded to the platform. **The user access is stored in the access table**, note that user access is assigned to template and menu id and user id with a right (new,update,delete,view). This access is linked to user and the user is linked to token. The token is used to check if any action to rest api is allowed like view or deleting. Also keep in mind that this system has no session for the front end but token expiry date. 
+
+![2017-02-01_13-28-02.jpg](https://bitbucket.org/repo/aEK7Ey/images/1871385246-2017-02-01_13-28-02.jpg) 
+
+Screen shot info
+* MoknJ API Access rights in the red box, is used to define access to rest controller or path. Simple terms may this token access this url on the platform.
+* Page access in blue box this used to give the user access to the template and menu item.
 
 ## How do I get set up? ##
 ### Dependencies ###
@@ -90,6 +102,8 @@ system.username =
 system.password = 
 system.environment =
 ```
+
+Oh no design flaw... If you read to this point I have 1st improvement for you to take on. The login/token auth is done over GET request this needs to be changed to post. Because sending passwords and usernames over open channel is lunacy!
 
 ### Who do I talk to? ###
 Riaan Schoeman (riaan.schoeman@fixx.it)
