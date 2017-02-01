@@ -1,5 +1,7 @@
 # MoknJ 0.0.1b #
-This dragon scroll would serve for who ever takes on this project to unlock the unknowns and travel to far lands and capture/slay dragons.
+## Introduction ##
+This dragon scroll would serve for who ever takes on this project to unlock the unknowns and travel to far lands and slay dragons.
+One might ask ones self why would I be reading about dragons and I the writer would reply cause words can make a logical argument, the dragon represents the unknown which you have found yourself (netherlands) in and mission of acquiring skills to strengthening your stats, so you too can one day rain___fire___on_____your___________colleagues...
 
 ## Mission ##
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform which makes it easy build custom templates that behave like predefined business components. The system helps the user to consolidate his company spreadsheet data which results in more effective management of the data.
@@ -10,12 +12,35 @@ MoknJ is a simple but effective solution to move data from excel sheets to an cu
 * As the GUI only handles rest (ajax) request and display (data manipulation) with the free API which is  tomcat/tomee/wildfly to handle db related requests and access based data manipulation.
 * GUI is pure HTML5 and javascript which makes it easy for most developers to contribute to it.
 * Moknj app consists out of templates and menu item (pages), templates and menu's are dynamic or abstract.
-* MoKnj also has a high level graph stats system to setup and generate statistics on template created by the administrator.
+* Moknj also has a high level graph stats system to setup and generate statistics on template created by the administrator.
+* MoknJ overs the capability to change the database structure of save records on the fly as needs of the user grow.
 
-## Low level break down ##
+## Low level break down (Also high level but more detaaail hah!) ##
 ### Template ###
+Templates represent components in the platform. Templates are hold the component design. Template config contain the field names and field types which are linked. Templates are linked to menu (pages). See menu for more information.
+
+* Name of field to be displayed on the page.
+* Field Type consists out of few types namely text, number, date, monetary.
+* Field Index, the index of the field on the view of the template.
+* Drop down fields are fields which have multiple values. These fields are displayed as you guessed a drop down... 
+* Templates also have behavior (Asset, Employee) assigned to them.  
+
 ### Menu ###
+Menu item consists out a group of templates which represent a single page in the platform. The platform allows for multiple menu assigned to main modules.
+
+* Name of Page and Name of Menu Item to link to the page.
+* Index of menu item in menu list.
+* Group of templates. Templates can be order to display above one another.
+
 ### Module ###
+Modules can be seen as view and behavior of a template and menu. The module dictates the view display.  
+
+* Asset have horizontal view list views.
+
+
+* Employee have a horizontal user filter shown in red and tab view shown purple and list view shown in green.
+![2017-02-01_13-04-33.jpg](https://bitbucket.org/repo/aEK7Ey/images/4291436877-2017-02-01_13-04-33.jpg)
+
 ### User ###
 ### Access ###
 
