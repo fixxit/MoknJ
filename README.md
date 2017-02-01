@@ -25,6 +25,9 @@ Templates represent components in the platform. Templates are hold the component
 * Drop down fields are fields which have multiple values. These fields are displayed as you guessed a drop down... 
 * Templates also have behavior (Asset, Employee) assigned to them.  
 
+See screen shot for example:
+![2017-02-01_13-13-05.jpg](https://bitbucket.org/repo/aEK7Ey/images/193534309-2017-02-01_13-13-05.jpg)
+
 ### Menu ###
 Menu item consists out a group of templates which represent a single page in the platform. The platform allows for multiple menu assigned to main modules.
 
@@ -32,13 +35,16 @@ Menu item consists out a group of templates which represent a single page in the
 * Index of menu item in menu list.
 * Group of templates. Templates can be order to display above one another.
 
+See screen shot for example of edit menu screen.
+![2017-02-01_13-11-14.jpg](https://bitbucket.org/repo/aEK7Ey/images/3443332288-2017-02-01_13-11-14.jpg)
+
 ### Module ###
 Modules can be seen as view and behavior of a template and menu. The module dictates the view display.  
 
-* Asset have horizontal view list views.
+* Asset view contains a horizontal view list views.
+![2017-02-01_13-08-28.jpg](https://bitbucket.org/repo/aEK7Ey/images/3967650579-2017-02-01_13-08-28.jpg)
 
-
-* Employee have a horizontal user filter shown in red and tab view shown purple and list view shown in green.
+* Employee view contains a horizontal user filter shown in red and tab view shown purple and list view shown in green.
 ![2017-02-01_13-04-33.jpg](https://bitbucket.org/repo/aEK7Ey/images/4291436877-2017-02-01_13-04-33.jpg)
 
 ### User ###
@@ -53,6 +59,11 @@ Modules can be seen as view and behavior of a template and menu. The module dict
 * Mongo chef core (Mongo db editor)
 
 ### Configuration ###
+Keep in mind that all instances of this app will have full system admin to login in with.
+
+Usr: fixxit
+psw: fix!2
+
 This is to be added to the security.properties file the main Moknj package.
 ```
 #!xml
