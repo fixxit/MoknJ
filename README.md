@@ -18,7 +18,9 @@ MoknJ is a simple but effective solution to move data from excel sheets to an cu
 To use the ssh you need add your git or SSH-2RSA certificate to openshift use putty keygen if dont have key...
 
 * ssh 5834115389f5cfe0220001f4@assetmanagerapi-fixxhr.rhcloud.com
-
+* location of deployment wars ~/wildfly/standalone/deployments/
+* location of uploaded git (war) files  ~/app-root/repo/FixxITMoknj-0.1.0.war
+* location of logs ~/wildfly/logs/server.log
 
 ## High level break down ##
 * MoknJ is rest API which which uses token authentication to identify the logged in user. 
