@@ -105,7 +105,7 @@ system.password =
 system.environment =
 ```
 
-Oh no design flaw... If you read to this point I have 1st improvement for you to take on. The login/token auth is done over GET request this needs to be changed to post. Because sending passwords and usernames over open channel is lunacy!
+Oh! one design flaw... If you read to this point I have 1st improvement for you to take on. The login/token auth is done over GET request this needs to be changed to POST. Because sending passwords and usernames over open channel is lunacy!
 
 ### Who do I talk to? ###
 Riaan Schoeman (riaan.schoeman@fixx.it)
