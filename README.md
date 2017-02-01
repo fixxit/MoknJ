@@ -108,6 +108,6 @@ system.environment =
 Oh! one design flaw... If you read to this point I have 1st improvement for you to take on. The login/token auth is done over GET request this needs to be changed to POST. Because sending passwords and usernames over open channel is lunacy!
 
 ### Who do I talk to? ###
-Riaan Schoeman [Devin Alrighty](riaan.schoeman@fixx.it) (riaan.schoeman@fixx.it)
+Riaan Schoeman (Devin Alrighty) (riaan.schoeman@fixx.it)
 
 ![tumblr_mtxyuyRJZZ1s4xenlo1_400.gif](https://bitbucket.org/repo/aEK7Ey/images/1657564402-tumblr_mtxyuyRJZZ1s4xenlo1_400.gif)
