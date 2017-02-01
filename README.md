@@ -7,6 +7,9 @@ This dragon scroll would serve for who ever takes on this project as a guide to 
 ## Mission ##
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform which makes it easy build custom templates that behave like predefined business components. The system helps the user to consolidate his company spreadsheet data which results in more effective management of the data.
 
+## Trello Board ##
+[Bugs and Fixes and future expansion](https://trello.com/b/Uw1TjVAL/asset-management-project)
+
 ## High level break down ##
 * MoknJ is rest API which which uses token authentication to identify the logged in user. 
 * The platform is split up in 2 applications ([GUI](https://bitbucket.org/fixxitprofessionalservices/fixxassettrackerui)) (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
