@@ -1,5 +1,5 @@
 # MoknJ 0.0.1b #
-This dragon scroll would serve for who ever takes on this project to unlock the unknowns and travel to far and capture dragons which could be hiding in the dark.
+This dragon scroll would serve for who ever takes on this project to unlock the unknowns and travel to far lands and capture/slay dragons.
 
 ## Mission ##
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform which makes it easy build custom templates that behave like predefined business components. The system helps the user to consolidate his company spreadsheet data which results in more effective management of the data.
