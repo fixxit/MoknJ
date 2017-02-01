@@ -7,8 +7,8 @@ One might ask ones self why would I be reading about dragons and I the writer wo
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform which makes it easy build custom templates that behave like predefined business components. The system helps the user to consolidate his company spreadsheet data which results in more effective management of the data.
 
 ## High level break down ##
-* MoknJ is rest API ([Link Text](https://bitbucket.org/fixxitprofessionalservices/fixxassettrackerui)) which which uses token authentication to identify the logged in user. 
-* The platform is split up in 2 applications GUI (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
+* MoknJ is rest API which which uses token authentication to identify the logged in user. 
+* The platform is split up in 2 applications ([GUI](https://bitbucket.org/fixxitprofessionalservices/fixxassettrackerui)) (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
 * As the GUI only handles rest (ajax) request and display (data manipulation) with the free API which is  tomcat/tomee/wildfly to handle db related requests and access based data manipulation.
 * GUI is pure HTML5 and javascript which makes it easy for most developers to contribute to it.
 * Moknj app consists out of templates and menu item (pages), templates and menu's are dynamic or abstract.
