@@ -18,7 +18,7 @@ MoknJ is a simple but effective solution to move data from excel sheets to an cu
 * https://openshift.redhat.com/app/console/applications
 
 ## SSH LINK ##
-To use the ssh you need add your git or SSH-2RSA certificate to openshift use putty keygen if dont have key...
+To use the ssh you need add your git or SSH-2RSA certificate to openshift use putty keygen if don't have a key...
 
 * ssh 5834115389f5cfe0220001f4@assetmanagerapi-fixxhr.rhcloud.com
 * location of deployment wars ~/wildfly/standalone/deployments/
