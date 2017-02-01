@@ -19,11 +19,13 @@ MoknJ is a simple but effective solution to move data from excel sheets to an cu
 ### Template ###
 Templates represent components in the platform. Templates are hold the component design. Template config contain the field names and field types which are linked. Templates are linked to menu (pages). See menu for more information.
 
-* Name of field to be displayed on the page.
+* Template consists out of multiple fields, which can be saved. (Showed in red box of screen shot)
+* Name of field to be displayed on the page. (Shown in green box of screen shot)
 * Field Type consists out of few types namely text, number, date, monetary.
-* Field Index, the index of the field on the view of the template.
+* Field Index, the index of the field on the view of the template. (Shown in blue box of screen shot)
 * Drop down fields are fields which have multiple values. These fields are displayed as you guessed a drop down... 
 * Templates also have behavior (Asset, Employee) assigned to them.  
+
 
 See screen shot for example:
 ![2017-02-01_13-13-05.jpg](https://bitbucket.org/repo/aEK7Ey/images/193534309-2017-02-01_13-13-05.jpg)
