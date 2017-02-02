@@ -10,6 +10,9 @@ This dragon scroll would serve for who ever takes on this project as a guide to 
 ## Mission ##
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform. This platform allows the user to easily build custom templates that behave like predefined business components. The platform helps the business to consolidate its spreadsheet data which results in more effective management of the data.
 
+## MoknJ UI ##
+([Bitbucket link](https://bitbucket.org/fixxitprofessionalservices/moknjui))
+
 ## Trello Board ##
 [Bugs and Fixes and future expansion](https://trello.com/b/Uw1TjVAL/asset-management-project)
 
@@ -43,9 +46,6 @@ To use the ssh you need add your git or SSH-2RSA certificate to openshift. Use p
 * location of deployment wars ~/wildfly/standalone/deployments/
 * location of uploaded git (war) files  ~/app-root/repo/FixxITMoknj-0.1.0.war
 * location of logs ~/wildfly/logs/server.log
-
-
-
 
 ## High level break down ##
 * MoknJ is rest API which which uses token authentication to identify the logged in user. 
