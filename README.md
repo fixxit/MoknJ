@@ -17,6 +17,14 @@ MoknJ is a simple but effective solution to move data from excel sheets to an cu
 * [GUI](http://assetmanagergui-fixxhr.rhcloud.com/)
 * [API](http://assetmanagerapi-fixxhr.rhcloud.com/FixxITAssetTracker/)
 
+### Login ###
+Keep in mind that all instances of this app will have full system admin to login in with.
+```
+#!xml
+Usr: fixxit
+psw: fix!2
+```
+
 ## Openshift link ##
 * https://openshift.redhat.com/app/console/applications
 
@@ -94,16 +102,10 @@ Screen shot info
 * Mongo 
 * Mongo chef core (Mongo db editor)
 
+
 ### Configuration ###
-Keep in mind that all instances of this app will have full system admin to login in with.
-
-```
-#!xml
-Usr: fixxit
-psw: fix!2
-```
-
 This is to be added to the security.properties file the main Moknj package.
+
 ```
 #!xml
 security.realm = FIXX_OAUTH_REALM
