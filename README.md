@@ -84,9 +84,11 @@ See screen shot for example of edit menu screen.
 Modules can be seen as view and behavior of a template and menu. The module dictates the view display.  
 
 * Asset view contains a horizontal view list views.
+
 ![2017-02-01_13-08-28.jpg](https://bitbucket.org/repo/aEK7Ey/images/3967650579-2017-02-01_13-08-28.jpg)
 
 * Employee view contains a horizontal user filter shown in red and tab view shown purple and list view shown in green.
+
 ![2017-02-01_13-04-33.jpg](https://bitbucket.org/repo/aEK7Ey/images/4291436877-2017-02-01_13-04-33.jpg)
 
 ### User ###
