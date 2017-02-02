@@ -41,7 +41,7 @@ To use the ssh you need add your git or SSH-2RSA certificate to openshift. Use p
 
 ![2017-02-02_09-03-29.png](https://bitbucket.org/repo/aEK7Ey/images/1706954445-2017-02-02_09-03-29.png)
 
-### Prod Folder Locations ###
+### Production server folder locations ###
 * ssh 5834115389f5cfe0220001f4@assetmanagerapi-fixxhr.rhcloud.com
 * location of deployment wars ~/wildfly/standalone/deployments/
 * location of uploaded git (war) files  ~/app-root/repo/FixxITMoknj-0.1.0.war
