@@ -28,13 +28,24 @@ psw: fix!2
 ## Openshift link ##
 * https://openshift.redhat.com/app/console/applications
 
-## SHH link ##
-To use the ssh you need add your git or SSH-2RSA certificate to openshift use putty keygen if don't have a key...
+## Connection to Production ##
 
+Use git bash to access the ssh link.
+
+![2017-02-02_09-05-53.png](https://bitbucket.org/repo/aEK7Ey/images/1372419474-2017-02-02_09-05-53.png)
+
+To use the ssh you need add your git or SSH-2RSA certificate to openshift. Use putty keygen if don't have a key... 
+
+![2017-02-02_09-03-29.png](https://bitbucket.org/repo/aEK7Ey/images/1706954445-2017-02-02_09-03-29.png)
+
+### Prod Folder Locations ###
 * ssh 5834115389f5cfe0220001f4@assetmanagerapi-fixxhr.rhcloud.com
 * location of deployment wars ~/wildfly/standalone/deployments/
 * location of uploaded git (war) files  ~/app-root/repo/FixxITMoknj-0.1.0.war
 * location of logs ~/wildfly/logs/server.log
+
+
+
 
 ## High level break down ##
 * MoknJ is rest API which which uses token authentication to identify the logged in user. 
