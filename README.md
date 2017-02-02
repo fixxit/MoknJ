@@ -11,7 +11,7 @@ This dragon scroll would serve for who ever takes on this project as a guide to 
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform. This platform allows the user to easily build custom templates that behave like predefined business components. The platform helps the business to consolidate its spreadsheet data which results in more effective management of the data.
 
 ## MoknJ UI ##
-([Bitbucket link](https://bitbucket.org/fixxitprofessionalservices/moknjui))
+[Bitbucket link](https://bitbucket.org/fixxitprofessionalservices/moknjui)
 
 ## Trello Board ##
 [Bugs and Fixes and future expansion](https://trello.com/b/Uw1TjVAL/asset-management-project)
