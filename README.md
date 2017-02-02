@@ -8,7 +8,7 @@ This dragon scroll would serve for who ever takes on this project as a guide to 
 ![tumblr_inline_ngc8ik5Hft1t6v9pj.gif](https://bitbucket.org/repo/aEK7Ey/images/1843827414-tumblr_inline_ngc8ik5Hft1t6v9pj.gif)
 
 ## Mission ##
-MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform which makes it easy build custom templates that behave like predefined business components. The system helps the user to consolidate his company spreadsheet data which results in more effective management of the data.
+MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform. This platform allows the user to easily build custom templates that behave like predefined business components. The platform helps the business to consolidate its spreadsheet data which results in more effective management of the data.
 
 ## Trello Board ##
 [Bugs and Fixes and future expansion](https://trello.com/b/Uw1TjVAL/asset-management-project)
