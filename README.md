@@ -47,6 +47,9 @@ To use the ssh you need add your git or SSH-2RSA certificate to openshift. Use p
 * location of uploaded git (war) files  ~/app-root/repo/FixxITMoknj-0.1.0.war
 * location of logs ~/wildfly/logs/server.log
 
+## Technology Stack ##
+HTML5, CSS, Bootstrap, AngularJS, AngularUI, Angular Routing, Node, Express, Spring Boot, Spring Security (OAuth 2), Mongo DB, Java, Rest (Jersey with Jackson), Netbeans, Tomcat, openshift, Maven, Junit, GIT, bitbucket
+
 ## High level break down ##
 * MoknJ is rest API which which uses token authentication to identify the logged in user. 
 * The platform is split up in 2 applications ([GUI](https://bitbucket.org/fixxitprofessionalservices/moknjui)) (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
