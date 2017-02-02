@@ -67,7 +67,8 @@ Templates represent components in the platform. Templates are hold the component
 * Drop down fields are fields which have multiple values. These fields are displayed as you guessed a drop down... 
 * Templates also have behavior (Asset, Employee) assigned to them.  
 
-See screen shot for example:
+### See screen shot for example: ###
+
 ![2017-02-01_13-13-05.jpg](https://bitbucket.org/repo/aEK7Ey/images/193534309-2017-02-01_13-13-05.jpg)
 
 ### Menu ###
