@@ -97,8 +97,11 @@ Screen shot info
 ### Configuration ###
 Keep in mind that all instances of this app will have full system admin to login in with.
 
+```
+#!xml
 Usr: fixxit
 psw: fix!2
+```
 
 This is to be added to the security.properties file the main Moknj package.
 ```
