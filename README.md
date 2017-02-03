@@ -65,8 +65,8 @@ Templates represent components in the platform. Templates define the fields and 
 
 * Template consists out of multiple fields, which can be saved. (Showed in red box of screen shot)
 * Name of field to be displayed on the page. (Shown in green box of screen shot)
-* Field Type consists out of few types namely text, number, date, monetary.
-* Field Index, the index of the field on the view of the template. (Shown in blue box of screen shot)
+* Field Type consists out of few types namely text, number, date, monetary. (Shown in blue box of screen shot)
+* Field Index, the index of the field on the view of the template. (Showed in red box of screen shot)
 * Drop down fields are fields which have multiple values. These fields are displayed as you guessed a drop down... 
 * Templates also have behavior (Asset, Employee) assigned to them.  
 
