@@ -14,7 +14,7 @@ MoknJ is a simple but effective solution to move data from excel sheets to an cu
 [Bitbucket link](https://bitbucket.org/fixxitprofessionalservices/moknjui)
 
 ## Trello Board ##
-Bugs and Fixes and future expansion ---> [access the expanse](https://trello.com/b/Uw1TjVAL/asset-management-project)
+Bugs and Fixes and future expansion :arrow_right: [access the expanse](https://trello.com/b/Uw1TjVAL/asset-management-project)
 
 ## Live URLs ##
 * [GUI](http://assetmanagergui-fixxhr.rhcloud.com/)
