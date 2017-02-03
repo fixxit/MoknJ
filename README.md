@@ -17,8 +17,8 @@ MoknJ is a simple but effective solution to move data from excel sheets to an cu
 Bugs and Fixes and future expansion :arrow_right: [access the expanse](https://trello.com/b/Uw1TjVAL/asset-management-project)
 
 ## Live URLs ##
-* [GUI](http://assetmanagergui-fixxhr.rhcloud.com/)
-* [API](http://assetmanagerapi-fixxhr.rhcloud.com/FixxITAssetTracker/)
+:arrow_right: [GUI](http://assetmanagergui-fixxhr.rhcloud.com/)
+:arrow_right: [API](http://assetmanagerapi-fixxhr.rhcloud.com/FixxITAssetTracker/)
 
 ### Login ###
 Keep in mind that all instances of this app will have full system admin to login in with.
@@ -29,7 +29,7 @@ psw: fix!2
 ```
 
 ## Openshift link ##
-* https://openshift.redhat.com/app/console/applications
+:arrow_right: https://openshift.redhat.com/app/console/applications
 
 ## Connection to Production ##
 
