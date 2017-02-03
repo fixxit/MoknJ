@@ -61,7 +61,7 @@ HTML5, CSS, Bootstrap, AngularJS, AngularUI, Angular Routing, Node, Express, Spr
 
 ## Low level break down (Also high level but more detaaail hah!) ##
 ### Template ###
-Templates represent components in the platform. Templates are hold the component design. Template config contain the field names and field types which are linked. Templates are linked to menu (pages). See menu for more information.
+Templates represent components in the platform. Templates define the fields and field behavior. Templates are linked to menu (pages). See menu for more information.
 
 * Template consists out of multiple fields, which can be saved. (Showed in red box of screen shot)
 * Name of field to be displayed on the page. (Shown in green box of screen shot)
