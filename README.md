@@ -10,12 +10,15 @@ This dragon scroll would serve for who ever takes on this project as a guide to 
 ## Mission ##
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform. This platform allows the user to easily build custom templates that behave like predefined business components. The platform helps the business to consolidate its spreadsheet data which results in more effective management of the data.
 
+## MoknJ UI ##
+:arrow_right: [Bitbucket link](https://bitbucket.org/fixxitprofessionalservices/moknjui)
+
 ## Trello Board ##
-[Bugs and Fixes and future expansion](https://trello.com/b/Uw1TjVAL/asset-management-project)
+Bugs and Fixes and future expansion :arrow_right: [access the expanse](https://trello.com/b/Uw1TjVAL/asset-management-project)
 
 ## Live URLs ##
-* [GUI](http://assetmanagergui-fixxhr.rhcloud.com/)
-* [API](http://assetmanagerapi-fixxhr.rhcloud.com/FixxITAssetTracker/)
+:arrow_right: [GUI](http://assetmanagergui-fixxhr.rhcloud.com/)
+:arrow_right: [API](http://assetmanagerapi-fixxhr.rhcloud.com/FixxITAssetTracker/)
 
 ### Login ###
 Keep in mind that all instances of this app will have full system admin to login in with.
@@ -26,7 +29,7 @@ psw: fix!2
 ```
 
 ## Openshift link ##
-* https://openshift.redhat.com/app/console/applications
+:arrow_right: https://openshift.redhat.com/app/console/applications
 
 ## Connection to Production ##
 
@@ -38,14 +41,14 @@ To use the ssh you need add your git or SSH-2RSA certificate to openshift. Use p
 
 ![2017-02-02_09-03-29.png](https://bitbucket.org/repo/aEK7Ey/images/1706954445-2017-02-02_09-03-29.png)
 
-### Prod Folder Locations ###
+### Production server folder locations ###
 * ssh 5834115389f5cfe0220001f4@assetmanagerapi-fixxhr.rhcloud.com
 * location of deployment wars ~/wildfly/standalone/deployments/
 * location of uploaded git (war) files  ~/app-root/repo/FixxITMoknj-0.1.0.war
 * location of logs ~/wildfly/logs/server.log
 
-
-
+## Technology Stack ##
+HTML5, CSS, Bootstrap, AngularJS, AngularUI, Angular Routing, Node, Express, Spring Boot, Spring Security (OAuth 2), Mongo DB, Java, Rest (Jersey with Jackson), Netbeans, Tomcat, openshift, Maven, Junit, GIT, bitbucket
 
 ## High level break down ##
 * MoknJ is rest API which which uses token authentication to identify the logged in user. 
@@ -58,16 +61,17 @@ To use the ssh you need add your git or SSH-2RSA certificate to openshift. Use p
 
 ## Low level break down (Also high level but more detaaail hah!) ##
 ### Template ###
-Templates represent components in the platform. Templates are hold the component design. Template config contain the field names and field types which are linked. Templates are linked to menu (pages). See menu for more information.
+Templates represent components in the platform. Templates define the fields and field behavior. Templates are linked to menu (pages). See menu for more information.
 
 * Template consists out of multiple fields, which can be saved. (Showed in red box of screen shot)
 * Name of field to be displayed on the page. (Shown in green box of screen shot)
-* Field Type consists out of few types namely text, number, date, monetary.
-* Field Index, the index of the field on the view of the template. (Shown in blue box of screen shot)
+* Field Type consists out of few types namely text, number, date, monetary. (Shown in blue box of screen shot)
+* Field Index, the index of the field on the view of the template. (Showed in red box of screen shot)
 * Drop down fields are fields which have multiple values. These fields are displayed as you guessed a drop down... 
 * Templates also have behavior (Asset, Employee) assigned to them.  
 
-See screen shot for example:
+### See screen shot for example: ###
+
 ![2017-02-01_13-13-05.jpg](https://bitbucket.org/repo/aEK7Ey/images/193534309-2017-02-01_13-13-05.jpg)
 
 ### Menu ###
