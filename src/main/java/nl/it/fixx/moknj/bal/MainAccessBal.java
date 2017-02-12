@@ -20,7 +20,9 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.AssetRepository;
+import nl.it.fixx.moknj.repository.EmployeeRepository;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.comparator.NullSafeComparator;
@@ -43,16 +45,16 @@ public class MainAccessBal implements BusinessAccessLayer {
     private final TemplateBal tempBal;
     private final AssetBal assetBal;
     private final EmployeeBal employeeBal;
-    private final RepositoryFactory factory;
+    private final RepositoryContext context;
 
-    public MainAccessBal(RepositoryFactory factory) {
-        this.menuBal = new MenuBal(factory);
-        this.tempBal = new TemplateBal(factory);
-        this.userBal = new UserBal(factory);
-        this.userAccessBal = new AccessBal(factory, userBal, tempBal, menuBal);
-        this.assetBal = new AssetBal(factory);
-        this.employeeBal = new EmployeeBal(factory);
-        this.factory = factory;
+    public MainAccessBal(RepositoryContext context) throws Exception {
+        this.menuBal = new MenuBal(context);
+        this.tempBal = new TemplateBal(context);
+        this.userBal = new UserBal(context);
+        this.userAccessBal = new AccessBal(context, userBal, tempBal, menuBal);
+        this.assetBal = new AssetBal(context);
+        this.employeeBal = new EmployeeBal(context);
+        this.context = context;
     }
 
     /**
@@ -347,13 +349,13 @@ public class MainAccessBal implements BusinessAccessLayer {
             }
 
             if (cascade) {
-                List<Menu> menus = new MenuBal(factory).getMenusForTemplateId(id);
+                List<Menu> menus = new MenuBal(context).getMenusForTemplateId(id);
                 for (Menu menu : menus) {
                     for (Iterator<Template> iterator = menu.getTemplates().iterator(); iterator.hasNext();) {
                         Template template = iterator.next();
                         if (template.getId().equals(id)) {
                             if (GlobalTemplateType.GBL_TT_ASSET.equals(template.getTemplateType())) {
-                                List<Asset> assets = factory.getAssetRep().getAllByTypeId(id);
+                                List<Asset> assets = context.getRepository(AssetRepository.class).getAllByTypeId(id);
                                 for (Asset asset : assets) {
                                     assetBal.delete(asset, menu.getId(), token, true);
                                     iterator.remove();
@@ -361,7 +363,7 @@ public class MainAccessBal implements BusinessAccessLayer {
                                 }
 
                             } else if (GlobalTemplateType.GBL_TT_EMPLOYEE.equals(template.getTemplateType())) {
-                                List<Employee> employees = factory.getEmployeeRep().getAllByTypeId(id);
+                                List<Employee> employees = context.getRepository(EmployeeRepository.class).getAllByTypeId(id);
                                 for (Employee emp : employees) {
                                     employeeBal.delete(emp, menu.getId(), token, true);
                                     iterator.remove();

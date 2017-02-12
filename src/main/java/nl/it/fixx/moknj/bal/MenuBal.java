@@ -11,7 +11,7 @@ import java.util.List;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.repository.MenuRepository;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.comparator.NullSafeComparator;
@@ -21,20 +21,20 @@ import org.springframework.util.comparator.NullSafeComparator;
  * @author adriaan
  */
 public class MenuBal implements BusinessAccessLayer {
-
+    
     private static final Logger LOG = LoggerFactory.getLogger(MenuBal.class);
     private final MenuRepository menuRep;
-
-    public MenuBal(RepositoryFactory factory) {
-        this.menuRep = factory.getMenuRep();
+    
+    public MenuBal(RepositoryContext factory) throws Exception {
+        this.menuRep = factory.getRepository(MenuRepository.class);
     }
-
+    
     public Menu saveMenu(Menu payload) throws Exception {
         try {
             if (payload == null) {
                 throw new Exception("No menu recieved to update/insert");
             }
-
+            
             if (payload.getTemplates() == null
                     && payload.getTemplates().isEmpty()) {
                 throw new Exception("No templates recieved to save. Aborting insert "
@@ -46,7 +46,7 @@ public class MenuBal implements BusinessAccessLayer {
             if (payload.getId() != null) {
                 bypassExists = true;
             }
-
+            
             boolean exists = menuRep.existsByName(payload.getName());
             if (!exists || bypassExists) {
                 Menu menu = menuRep.save(payload);
@@ -73,7 +73,7 @@ public class MenuBal implements BusinessAccessLayer {
                 LOG.info("No menu id recieved to find menu");
                 throw new Exception("No menu found, no menu id provided!");
             }
-
+            
             Menu menu = menuRep.findOne(id);
             if (menu == null) {
                 LOG.info("no menu found for id[" + id + "]");
@@ -115,8 +115,8 @@ public class MenuBal implements BusinessAccessLayer {
         try {
             List<Menu> array = getAllMenus();
             List<Menu> menus = new ArrayList<>();
-
-            for (Menu menu : array) {
+            
+            array.forEach((menu) -> {
                 List<Template> templates = new ArrayList<>();
                 for (Template temp : menu.getTemplates()) {
                     if (templateId.equals(temp.getId())) {
@@ -127,13 +127,13 @@ public class MenuBal implements BusinessAccessLayer {
                     menu.setTemplates(templates);
                     menus.add(menu);
                 }
-            }
-
+            });
+            
             Collections.sort(menus, (Menu a1, Menu a2) -> {
                 return new NullSafeComparator<>(String::compareTo,
                         true).compare(a1.getIndex(), a2.getIndex());
             });
-
+            
             return menus;
         } catch (Exception e) {
             LOG.error("Error while get all menus for user token");
@@ -152,7 +152,7 @@ public class MenuBal implements BusinessAccessLayer {
         if (menu == null) {
             throw new Exception("No menu object provided");
         }
-
+        
         return menu.getName();
     }
 

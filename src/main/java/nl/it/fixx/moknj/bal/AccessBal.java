@@ -6,7 +6,7 @@ import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.repository.AccessRepository;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,16 +28,16 @@ public class AccessBal {
     private final TemplateBal templateBal;
     private final MenuBal menuBal;
 
-    public AccessBal(RepositoryFactory factory) {
-        this.accessRep = factory.getAccessRep();
+    public AccessBal(RepositoryContext factory) throws Exception {
+        this.accessRep = factory.getRepository(AccessRepository.class);
         this.userBal = new UserBal(factory);
         this.menuBal = new MenuBal(factory);
         this.templateBal = new TemplateBal(factory);
     }
 
-    public AccessBal(RepositoryFactory factory, UserBal userBal,
-            TemplateBal templateBal, MenuBal menuBal) {
-        this.accessRep = factory.getAccessRep();
+    public AccessBal(RepositoryContext factory, UserBal userBal,
+            TemplateBal templateBal, MenuBal menuBal) throws Exception {
+        this.accessRep = factory.getRepository(AccessRepository.class);
         this.userBal = userBal;
         this.templateBal = templateBal;
         this.menuBal = menuBal;

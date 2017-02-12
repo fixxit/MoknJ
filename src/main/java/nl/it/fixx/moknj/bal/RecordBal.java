@@ -46,6 +46,7 @@ public interface RecordBal {
      * Delete a record.
      *
      * @param record to be deleted
+     * @param menuId
      * @param access_token
      * @param cascade delete asset/employee link data
      * @throws java.lang.Exception

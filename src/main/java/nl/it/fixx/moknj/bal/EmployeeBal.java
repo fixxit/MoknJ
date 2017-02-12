@@ -24,7 +24,7 @@ import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,15 +45,15 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
     private final TemplateBal tempBal;
     private final AccessBal userAccessBall;
 
-    public EmployeeBal(RepositoryFactory factory) {
-        this.employeeRep = factory.getEmployeeRep();
-        this.fieldRep = factory.getFieldDetailRep();
-        this.employeeLinkRep = factory.getEmployeeLinkRep();
+    public EmployeeBal(RepositoryContext context) throws Exception {
+        this.employeeRep = context.getRepository(EmployeeRepository.class);
+        this.fieldRep = context.getRepository(FieldDetailRepository.class);
+        this.employeeLinkRep = context.getRepository(EmployeeLinkRepository.class);
 
-        this.userBal = new UserBal(factory);
-        this.menuBal = new MenuBal(factory);
-        this.tempBal = new TemplateBal(factory);
-        this.userAccessBall = new AccessBal(factory);
+        this.userBal = new UserBal(context);
+        this.menuBal = new MenuBal(context);
+        this.tempBal = new TemplateBal(context);
+        this.userAccessBall = new AccessBal(context);
     }
 
     /**
@@ -111,9 +111,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
         try {
             if (templateId != null) {
                 Employee passedEmployee = (Employee) record;
-
                 passedEmployee.setTypeId(templateId);
-
                 // checks if the original object differs from new saved object
                 // stop the unique filter form check for duplicates on employee
                 // which has not changed from the db version...

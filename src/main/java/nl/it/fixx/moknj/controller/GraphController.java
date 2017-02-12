@@ -16,7 +16,8 @@ import nl.it.fixx.moknj.domain.core.graph.GraphFocus;
 import nl.it.fixx.moknj.domain.core.graph.GraphType;
 import nl.it.fixx.moknj.domain.core.graph.GraphView;
 import nl.it.fixx.moknj.domain.core.template.Template;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.TemplateRepository;
 import nl.it.fixx.moknj.response.GraphResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -38,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GraphController {
 
     @Autowired
-    private RepositoryFactory factory;
+    private RepositoryContext context;
 
     /**
      * Saves the graph... Sets the creator id by the token. Only a user with
@@ -55,8 +56,8 @@ public class GraphController {
         GraphResponse response = new GraphResponse();
         try {
             response.setGraphTemplate(
-                    new GraphBal(factory).
-                    saveGraph(payload, access_token)
+                    new GraphBal(context).
+                            saveGraph(payload, access_token)
             );
             response.setSuccess(true);
             response.setMessage("Saved graph successfully");
@@ -109,13 +110,14 @@ public class GraphController {
      *
      * @param id
      * @return
+     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/datetypes/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    GraphResponse getDateTypes(@PathVariable String id) {
+    GraphResponse getDateTypes(@PathVariable String id) throws Exception {
         GraphResponse response = new GraphResponse();
         GlobalGraphDate[] types = GlobalGraphDate.values();
-        Template template = factory.getTemplateRep().findOne(id);
+        Template template = context.getRepository(TemplateRepository.class).findOne(id);
         if (template != null) {
             List<GraphDate> graphDateOptions = new ArrayList<>();
             for (GlobalGraphDate type : types) {
@@ -135,13 +137,14 @@ public class GraphController {
      *
      * @param id
      * @return
+     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/focus/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    GraphResponse getFocuses(@PathVariable String id) {
+    GraphResponse getFocuses(@PathVariable String id) throws Exception {
         GraphResponse response = new GraphResponse();
         GlobalGraphFocus[] graphFocuses = GlobalGraphFocus.values();
-        Template template = factory.getTemplateRep().findOne(id);
+        Template template = context.getRepository(TemplateRepository.class).findOne(id);
         if (template != null) {
             List<GraphFocus> graphFocusOptions = new ArrayList<>();
             for (GlobalGraphFocus type : graphFocuses) {
@@ -167,7 +170,7 @@ public class GraphController {
     GraphResponse getAllSavedGraphs(@RequestParam String access_token) throws ParseException {
         GraphResponse response = new GraphResponse();
         try {
-            GraphBal bal = new GraphBal(factory);
+            GraphBal bal = new GraphBal(context);
             response.setSavedGraphs(bal.getAllGraphs(access_token));
             response.setSuccess(true);
             response.setMessage("found all user graph templates");
@@ -191,7 +194,7 @@ public class GraphController {
     GraphResponse getAllGraphsData(@RequestParam String access_token) throws Exception {
         GraphResponse response = new GraphResponse();
         try {
-            GraphBal bal = new GraphBal(factory);
+            GraphBal bal = new GraphBal(context);
             response.setAllGraphsData(bal.getAllGraphData(access_token));
             response.setSuccess(true);
             response.setMessage("found all user graphs data");
@@ -216,7 +219,7 @@ public class GraphController {
             @RequestParam String access_token) throws Exception {
         GraphResponse response = new GraphResponse();
         try {
-            GraphBal bal = new GraphBal(factory);
+            GraphBal bal = new GraphBal(context);
             response.setGraphData(bal.getGraphData(id, access_token));
             response.setSuccess(true);
             response.setMessage("Graph data found");
@@ -239,7 +242,7 @@ public class GraphController {
     GraphResponse delete(@PathVariable String id, @RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
-            new GraphBal(factory).deleteGraph(id, access_token);
+            new GraphBal(context).deleteGraph(id, access_token);
             response.setSuccess(true);
             response.setMessage("Graph successfully deleted from system");
         } catch (Exception ex) {

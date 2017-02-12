@@ -9,7 +9,8 @@ import nl.it.fixx.moknj.domain.core.access.AccessRight;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.core.user.UserAuthority;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.UserRepository;
 import nl.it.fixx.moknj.response.UserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +30,13 @@ public class UserController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
     @Autowired
-    private RepositoryFactory factory;
+    private RepositoryContext context;
 
     @RequestMapping(value = "/get/all", method = RequestMethod.POST)
     public UserResponse all(@RequestParam String access_token) throws Exception {
         UserResponse userResponse = new UserResponse();
         try {
-            UserBal userBal = new UserBal(factory);
+            UserBal userBal = new UserBal(context);
             userResponse.setResources(userBal.getAll(true, access_token));
         } catch (Exception ex) {
             userResponse.setSuccess(false);
@@ -49,7 +50,7 @@ public class UserController {
     public UserResponse getAllUsersForEmployee() throws Exception {
         UserResponse userResponse = new UserResponse();
         try {
-            UserBal userBal = new UserBal(factory);
+            UserBal userBal = new UserBal(context);
             userResponse.setResources(userBal.getAll());
         } catch (Exception ex) {
             userResponse.setSuccess(false);
@@ -64,7 +65,7 @@ public class UserController {
             @RequestParam String access_token) throws Exception {
         UserResponse userResponse = new UserResponse();
         try {
-            UserBal userBal = new UserBal(factory);
+            UserBal userBal = new UserBal(context);
             User user = userBal.save(payload, access_token);
             userResponse.setSuccess(user != null);
             userResponse.setMessage("Saved user[" + user.getId() + "]");
@@ -79,9 +80,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
-    public UserResponse get(@PathVariable String id, @RequestParam String access_token) {
+    public UserResponse get(@PathVariable String id, @RequestParam String access_token) throws Exception {
         UserResponse userResponse = new UserResponse();
-        User resourceRet = factory.getUserRep().findById(id);
+        User resourceRet = context.getRepository(UserRepository.class).findById(id);
         if (resourceRet != null) {
             userResponse.setResource(resourceRet);
         }
@@ -123,7 +124,7 @@ public class UserController {
     public UserResponse delete(@PathVariable String id, @RequestParam String access_token) {
         UserResponse userResponse = new UserResponse();
         try {
-            UserBal userBal = new UserBal(factory);
+            UserBal userBal = new UserBal(context);
             userBal.delete(id, access_token);
             userResponse.setSuccess(true);
             userResponse.setMessage("User deleted");
@@ -142,7 +143,7 @@ public class UserController {
             @RequestParam String access_token) {
         final UserResponse userResponse = new UserResponse();
         try {
-            AccessBal userAccessBal = new AccessBal(factory);
+            AccessBal userAccessBal = new AccessBal(context);
             userAccessBal.addAccess(id, access, access_token);
             userResponse.setSuccess(true);
             userResponse.setMessage("Added user access");
@@ -161,7 +162,7 @@ public class UserController {
             @RequestParam String access_token) {
         final UserResponse userResponse = new UserResponse();
         try {
-            AccessBal userAccessBal = new AccessBal(factory);
+            AccessBal userAccessBal = new AccessBal(context);
             userResponse.setAccessRules(userAccessBal.getAccessList(id));
             userResponse.setSuccess(true);
         } catch (Exception ex) {

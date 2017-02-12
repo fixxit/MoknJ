@@ -6,7 +6,7 @@ import nl.it.fixx.moknj.bal.MainAccessBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalMenuType;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.menu.MenuType;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import nl.it.fixx.moknj.response.MenuResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MenuContoller {
 
     @Autowired
-    private RepositoryFactory factory;
+    private RepositoryContext factory;
 
     /**
      *

@@ -29,7 +29,7 @@ import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import nl.it.fixx.moknj.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -48,7 +48,7 @@ public class GraphBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
     private final String token;
-    private final RepositoryFactory factory;
+    private final RepositoryContext factory;
 
     private DateTime endDate;
     private DateTime startDate;
@@ -58,7 +58,7 @@ public class GraphBuilder {
     private static final String MDL_ASSET_STATUS_IN = "In";
     private static final String MDL_ASSET_STATUS_OUT = "Out";
 
-    public GraphBuilder(RepositoryFactory factory, String token) {
+    public GraphBuilder(RepositoryContext factory, String token) {
         this.factory = factory;
         this.token = token;
     }
@@ -112,14 +112,13 @@ public class GraphBuilder {
                                         // gets all the checked in/out records for asset.
                                         List<AssetLink> links
                                                 = new LinkBal(factory).
-                                                getAllAssetLinksByAssetId(
-                                                        asset.getId(),
-                                                        menu.getId(),
-                                                        template.getId(),
-                                                        token);
+                                                        getAllAssetLinksByAssetId(
+                                                                asset.getId(),
+                                                                menu.getId(),
+                                                                template.getId(),
+                                                                token);
 
-
-                                        for (AssetLink link : links) {
+                                        links.forEach((link) -> {
                                             // create new instance of asset... prototype pattern would be nice here...
                                             Asset newAsset = new Asset();
                                             if (link.getAssetId().equals(asset.getId())) {
@@ -139,12 +138,11 @@ public class GraphBuilder {
                                                 newAsset.setTypeId(asset.getTypeId());
                                                 inOutAssetJoinList.add(newAsset);
                                             }
-                                        }
+                                        });
                                     }
                                 }
                                 records = inOutAssetJoinList;
                             }
-
 
                             // This is used to bypass the filterdate and filter rule logic
                             boolean bypassDateRulle = false;
@@ -500,14 +498,14 @@ public class GraphBuilder {
                                     List<String> xlabels = (List<String>) json.get(name);
 
                                     if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
-                                        for (String value : xlabels) {
+                                        xlabels.forEach((value) -> {
                                             xAxis.add(value + "-" + MDL_ASSET_STATUS_IN);
                                             xAxis.add(value + "-" + MDL_ASSET_STATUS_OUT);
-                                        }
+                                        });
                                     } else {
-                                        for (String value : xlabels) {
+                                        xlabels.forEach((value) -> {
                                             xAxis.add(value);
-                                        }
+                                        });
                                     }
                                     break;
                                 }

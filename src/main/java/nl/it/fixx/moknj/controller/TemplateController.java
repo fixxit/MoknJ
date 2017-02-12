@@ -15,7 +15,8 @@ import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.template.TemplateType;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.TemplateRepository;
 import nl.it.fixx.moknj.response.TemplateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -37,14 +38,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class TemplateController {
 
     @Autowired
-    private RepositoryFactory factory;
+    private RepositoryContext context;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody
     TemplateResponse add(@RequestBody Template payload, @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             Template template = bal.saveTemplate(payload, access_token);
             response.setSuccess(template != null);
             response.setMessage("Saved " + template.getName());
@@ -62,7 +63,7 @@ public class TemplateController {
     TemplateResponse get(@PathVariable String id, @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             response.setType(bal.getTemplate(id, access_token));
             response.setSuccess(true);
         } catch (Exception ex) {
@@ -78,7 +79,7 @@ public class TemplateController {
     TemplateResponse all(@RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             response.setTypes(bal.getAllTemplatesForToken(access_token));
             response.setSuccess(true);
         } catch (Exception ex) {
@@ -93,7 +94,7 @@ public class TemplateController {
     TemplateResponse hidden(@RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            List<Template> templates = factory.getTemplateRep().findAll();
+            List<Template> templates = context.getRepository(TemplateRepository.class).findAll();
             List<Template> types = new ArrayList<>();
             templates.stream().filter((type) -> (type.isHidden())).forEach((type) -> {
                 types.add(type);
@@ -119,8 +120,8 @@ public class TemplateController {
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal mainAccessBall = new MainAccessBal(factory);
-            Template template = new TemplateBal(factory).getTemplateById(id);
+            MainAccessBal mainAccessBall = new MainAccessBal(context);
+            Template template = new TemplateBal(context).getTemplateById(id);
             template.setHidden(false);
             mainAccessBall.saveTemplate(template, access_token);
             response.setMessage("Template [" + template.getName() + "] "
@@ -149,7 +150,7 @@ public class TemplateController {
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             bal.deleteTemplate(id, cascade, access_token);
             response.setSuccess(true);
             response.setMessage("Deleted template");
@@ -193,7 +194,7 @@ public class TemplateController {
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             Template template = bal.getTemplate(id, access_token);
             List<FieldDetail> fields = new ArrayList<>();
 
@@ -218,7 +219,7 @@ public class TemplateController {
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             Template template = bal.getTemplate(id, access_token);
             List<FieldDetail> fields = new ArrayList<>();
 

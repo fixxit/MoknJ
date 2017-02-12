@@ -3,7 +3,7 @@ package nl.it.fixx.moknj.bal;
 import java.util.List;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +18,9 @@ public class TemplateBal implements BusinessAccessLayer {
     private final TemplateRepository tempRep;
     private final FieldDetailRepository fieldDetailRep;
 
-    public TemplateBal(RepositoryFactory factory
-    ) {
-        this.tempRep = factory.getTemplateRep();
-        this.fieldDetailRep = factory.getFieldDetailRep();
+    public TemplateBal(RepositoryContext context) throws Exception {
+        this.tempRep = context.getRepository(TemplateRepository.class);
+        this.fieldDetailRep = context.getRepository(FieldDetailRepository.class);
     }
 
     /**

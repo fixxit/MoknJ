@@ -7,7 +7,10 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.AccessRepository;
+import nl.it.fixx.moknj.repository.AssetLinkRepository;
+import nl.it.fixx.moknj.repository.AssetRepository;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
 import static nl.it.fixx.moknj.security.OAuth2SecurityConfig.PSW_ENCODER;
@@ -29,12 +32,12 @@ public class UserBal implements BusinessAccessLayer {
     public static String ADMIN_NAME = "fixxit";
 
     private final UserRepository userRep;
-    private final RepositoryFactory factory;
+    private final RepositoryContext context;
 
-    public UserBal(RepositoryFactory factory) {
-        this.userRep = factory.getUserRep();
+    public UserBal(RepositoryContext context) throws Exception {
+        this.userRep = context.getRepository(UserRepository.class);
         this.passwordEncoder = PSW_ENCODER;
-        this.factory = factory;
+        this.context = context;
     }
 
     /**
@@ -133,21 +136,20 @@ public class UserBal implements BusinessAccessLayer {
                 throw new Exception("This user does not have " + ALL_ACCESS.toString());
             }
 
-            User resource = factory.getUserRep().findById(userId);
-            List<Asset> assets = factory.getAssetRep().getAllByResourceId(userId);
-            List<AssetLink> links = factory.getAssetLinkRep().getAllByResourceId(userId);
+            User resource = userRep.findById(userId);
+            List<Asset> assets = context.getRepository(AssetRepository.class).getAllByResourceId(userId);
+            List<AssetLink> links = context.getRepository(AssetLinkRepository.class).getAllByResourceId(userId);
 
             if (!assets.isEmpty() || !links.isEmpty()) {
                 resource.setHidden(true);
                 save(resource, token);
             } else {
                 // Delete all access rules relating to this user.
-                List<Access> accessRules = factory.getAccessRep().getAccessList(userId);
-                accessRules.stream().forEach((access) -> {
-                    factory.getAccessRep().delete(access);
-                });
-
-                factory.getUserRep().delete(resource);
+                List<Access> accessRules = context.getRepository(AccessRepository.class).getAccessList(userId);
+                for (Access access : accessRules) {
+                    context.getRepository(AccessRepository.class).delete(access);
+                }
+                userRep.delete(resource);
             }
         } catch (Exception e) {
             LOG.error("Error while deleting user [" + userId + "]", e);
@@ -205,7 +207,7 @@ public class UserBal implements BusinessAccessLayer {
                     String newUsername = payload.getUserName();
                     String dbUsername = (dbResource != null
                             && dbResource.isSystemUser())
-                                    ? dbResource.getUserName() : "";
+                            ? dbResource.getUserName() : "";
                     // this should execute for new users too
                     // as the dbUsername should then be empty string
                     if (!newUsername.equals(dbUsername)) {

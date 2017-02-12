@@ -15,7 +15,8 @@ import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.GraphRepository;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +28,10 @@ public class GraphBal implements BusinessAccessLayer {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
-    private final RepositoryFactory factory;
+    private final RepositoryContext context;
 
-    public GraphBal(RepositoryFactory factory) {
-        this.factory = factory;
+    public GraphBal(RepositoryContext factory) {
+        this.context = factory;
     }
 
     /**
@@ -48,18 +49,18 @@ public class GraphBal implements BusinessAccessLayer {
             boolean bypassExists = false;
             if (payload.getId() != null && !payload.getId().trim().isEmpty()) {
                 bypassExists = true;
-                Graph dbGraph = factory.getGraphRep().findOne(payload.getId());
+                Graph dbGraph = context.getRepository(GraphRepository.class).findOne(payload.getId());
                 payload.setCreatorId(dbGraph.getCreatorId());
             } else {
-                User user = new UserBal(factory).getUserByToken(access_token);
+                User user = new UserBal(context).getUserByToken(access_token);
                 if (user != null && user.isSystemUser()) {
                     payload.setCreatorId(user.getId());
                 }
             }
 
-            boolean exists = factory.getGraphRep().existsByName(payload.getName());
+            boolean exists = context.getRepository(GraphRepository.class).existsByName(payload.getName());
             if (!exists || bypassExists) {
-                Graph graph = factory.getGraphRep().save(payload);
+                Graph graph = context.getRepository(GraphRepository.class).save(payload);
                 return graph;
             } else {
                 throw new Exception("Graph with the name " + payload.getName() + " exists");
@@ -80,15 +81,15 @@ public class GraphBal implements BusinessAccessLayer {
      */
     public List<Graph> getAllGraphs(String access_token) throws Exception {
         try {
-            User user = new UserBal(factory).getUserByToken(access_token);
+            User user = new UserBal(context).getUserByToken(access_token);
             Set<Graph> graphs = new HashSet();
             if (user != null) {
-                List<Graph> savedGraphs = factory.getGraphRep().findAll();
+                List<Graph> savedGraphs = context.getRepository(GraphRepository.class).findAll();
                 for (Graph graph : savedGraphs) {
                     // check if user has access to view and edit this graph template
                     if (user.getId().equals(graph.getCreatorId())) {
                         if (graph.getTemplateId() != null) {
-                            Template template = new TemplateBal(factory).getTemplateById(graph.getTemplateId());
+                            Template template = new TemplateBal(context).getTemplateById(graph.getTemplateId());
                             if (template != null) {
                                 graph.setTemplate(template.getName());
                             }
@@ -97,7 +98,7 @@ public class GraphBal implements BusinessAccessLayer {
                         graph.setType(graph.getGraphType().getName());
                         graph.setView(graph.getGraphView().getDisplayName());
 
-                        Menu menu = new MenuBal(factory).getMenuById(graph.getMenuId());
+                        Menu menu = new MenuBal(context).getMenuById(graph.getMenuId());
                         if (menu != null) {
                             graph.setMenu(menu.getName());
                         }
@@ -123,10 +124,10 @@ public class GraphBal implements BusinessAccessLayer {
      */
     public GraphData getGraphData(String graphId, String token) throws Exception {
         try {
-            User user = new UserBal(factory).getUserByToken(token);
-            Graph graph = factory.getGraphRep().findOne(graphId);
+            User user = new UserBal(context).getUserByToken(token);
+            Graph graph = context.getRepository(GraphRepository.class).findOne(graphId);
             if (user.getId().equals(graph.getCreatorId())) {
-                GraphBuilder builder = new GraphBuilder(factory, token);
+                GraphBuilder builder = new GraphBuilder(context, token);
                 return builder.buildGraphData(graph);
             }
         } catch (Exception e) {
@@ -177,12 +178,12 @@ public class GraphBal implements BusinessAccessLayer {
      */
     public void deleteGraph(String id, String token) throws Exception {
         try {
-            if (factory.getGraphRep().exists(id)) {
-                Graph graph = factory.getGraphRep().findOne(id);
-                User user = new UserBal(factory).getUserByToken(token);
+            if (context.getRepository(GraphRepository.class).exists(id)) {
+                Graph graph = context.getRepository(GraphRepository.class).findOne(id);
+                User user = new UserBal(context).getUserByToken(token);
                 if (graph.getCreatorId().equals(user.getId())
                         || user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                    factory.getGraphRep().delete(id);
+                    context.getRepository(GraphRepository.class).delete(id);
                 } else {
                     throw new Exception("Delete failed. "
                             + "This user is not the creator"

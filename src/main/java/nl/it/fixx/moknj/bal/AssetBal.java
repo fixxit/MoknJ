@@ -22,7 +22,7 @@ import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.RepositoryFactory;
+import nl.it.fixx.moknj.repository.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 public class AssetBal implements RecordBal, BusinessAccessLayer {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetBal.class);
+    
     private final AssetRepository assetRep;
     private final FieldDetailRepository fieldRep;
     private final AssetLinkRepository assetLinkRep;
@@ -42,13 +43,13 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
     private final UserBal userBal;
     private final AccessBal userAccessBall;
 
-    public AssetBal(RepositoryFactory factory) {
-        this.assetRep = factory.getAssetRep();
-        this.fieldRep = factory.getFieldDetailRep();
-        this.assetLinkRep = factory.getAssetLinkRep();
-        this.menuBal = new MenuBal(factory);
-        this.userBal = new UserBal(factory);
-        this.userAccessBall = new AccessBal(factory);
+    public AssetBal(RepositoryContext context) throws Exception {
+        this.assetRep = context.getRepository(AssetRepository.class);
+        this.fieldRep = context.getRepository(FieldDetailRepository.class);
+        this.assetLinkRep = context.getRepository(AssetLinkRepository.class);
+        this.menuBal = new MenuBal(context);
+        this.userBal = new UserBal(context);
+        this.userAccessBall = new AccessBal(context);
     }
 
     /**
