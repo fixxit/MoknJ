@@ -9,7 +9,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import nl.it.fixx.moknj.util.SecurityPropertiesManager;
+import nl.it.fixx.moknj.util.SecurityPropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -28,10 +28,8 @@ import org.springframework.util.StringUtils;
 public class CustomAuthenticationEntryPoint extends AbstractOAuth2SecurityExceptionHandler implements AuthenticationEntryPoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomAuthenticationEntryPoint.class);
-
     private final String typeName = OAuth2AccessToken.BEARER_TYPE;
-
-    private final String realmName = SecurityPropertiesManager.getProperty("security.realm");
+    private final String realmName = SecurityPropertiesUtil.getProperty("security.realm");
 
     public static String getFullURL(HttpServletRequest request) {
         StringBuffer requestURL = request.getRequestURL();

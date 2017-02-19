@@ -51,7 +51,6 @@ public class DateUtil {
     }
 
     public static List<String> geMonthsForDate(DateTime date) throws Exception {
-
         String time1 = date.getYear() + "-01-01";
         String time2 = date.getYear() + "-" + date.getMonthOfYear() + "-" + date.getDayOfMonth();
         LocalDate date1 = new LocalDate(time1);

@@ -7,7 +7,7 @@ import com.mongodb.ServerAddress;
 import java.util.ArrayList;
 import java.util.List;
 import nl.it.fixx.moknj.repository.RepositoryPackage;
-import nl.it.fixx.moknj.util.DatabasePopertiesManager;
+import nl.it.fixx.moknj.util.DatabasePopertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -24,21 +24,26 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @Override
     protected String getDatabaseName() {
-        return DatabasePopertiesManager.getProperty("system.db");
+        try {
+            return DatabasePopertiesUtil.getProperty("system.db");
+        } catch (Exception ex) {
+            LOG.error("Error loading database properties", ex);
+        }
+        return null;
     }
 
     @Override
     public Mongo mongo() throws Exception {
-        final String port = DatabasePopertiesManager.getProperty("system.port");
+        final String port = DatabasePopertiesUtil.getProperty("system.port");
         if (port == null) {
             throw new Exception("No port provided for mongo db, failed connection to db!");
         }
-        final String url = DatabasePopertiesManager.getProperty("system.url");
+        final String url = DatabasePopertiesUtil.getProperty("system.url");
         if (url == null) {
             throw new Exception("No url provided for mongo db, failed connection to db!");
         }
 
-        final String environment = DatabasePopertiesManager.getProperty("system.environment");
+        final String environment = DatabasePopertiesUtil.getProperty("system.environment");
         LOG.info("environment: " + environment);
 
         if (environment != null && environment.contains("openshift")) {
@@ -65,8 +70,8 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
             }
         }
 
-        final String userName = DatabasePopertiesManager.getProperty("system.username");
-        final String password = DatabasePopertiesManager.getProperty("system.password");
+        final String userName = DatabasePopertiesUtil.getProperty("system.username");
+        final String password = DatabasePopertiesUtil.getProperty("system.password");
         if (userName != null && !userName.trim().isEmpty()
                 && password != null && !password.trim().isEmpty()) {
             List<ServerAddress> seeds = new ArrayList<>();

@@ -10,9 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import static nl.it.fixx.moknj.security.CustomAuthenticationEntryPoint.getFullURL;
-import nl.it.fixx.moknj.util.SecurityPropertiesManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import nl.it.fixx.moknj.util.SecurityPropertiesUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,11 +26,8 @@ import org.springframework.util.StringUtils;
  */
 public class CustomAccessDeniedEntryHandler extends AbstractOAuth2SecurityExceptionHandler implements AccessDeniedHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CustomAccessDeniedEntryHandler.class);
-
     private final String typeName = OAuth2AccessToken.BEARER_TYPE;
-
-    private final String realmName = SecurityPropertiesManager.getProperty("security.realm");
+    private final String realmName = SecurityPropertiesUtil.getProperty("security.realm");
 
     @Override
     protected ResponseEntity<OAuth2Exception> enhanceResponse(ResponseEntity<OAuth2Exception> response, Exception exception) {
