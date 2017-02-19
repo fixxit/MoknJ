@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MenuContoller {
 
     @Autowired
-    private RepositoryContext factory;
+    private RepositoryContext context;
 
     /**
      *
@@ -42,7 +42,7 @@ public class MenuContoller {
     MenuResponse add(@RequestBody Menu payload, @RequestParam String access_token) throws Exception {
         MenuResponse response = new MenuResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             Menu menu = bal.saveMenu(payload, access_token);
             response.setSuccess(menu != null);
             response.setMessage("Saved " + menu.getName());
@@ -68,7 +68,7 @@ public class MenuContoller {
     MenuResponse get(@PathVariable String id, @RequestParam String access_token) throws Exception {
         MenuResponse response = new MenuResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             Menu menu = bal.getMenu(id, access_token);
             response.setMenu(menu);
         } catch (Exception ex) {
@@ -90,7 +90,7 @@ public class MenuContoller {
     MenuResponse all(@RequestParam String access_token) throws Exception {
         MenuResponse response = new MenuResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             response.setMenus(bal.getUserMenus(access_token));
         } catch (Exception ex) {
             response.setSuccess(false);
@@ -112,7 +112,7 @@ public class MenuContoller {
     MenuResponse delete(@PathVariable String id, @RequestParam String access_token) throws Exception {
         MenuResponse response = new MenuResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(factory);
+            MainAccessBal bal = new MainAccessBal(context);
             bal.deleteMenu(id, access_token);
 
             response.setSuccess(true);

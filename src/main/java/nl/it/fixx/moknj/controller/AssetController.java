@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssetController {
 
     @Autowired
-    private RepositoryContext factory;
+    private RepositoryContext context;
 
     @RequestMapping(value = "/add/{menuId}/{id}", method = RequestMethod.POST)
     public AssetResponse add(@PathVariable String id,
@@ -28,7 +28,7 @@ public class AssetController {
             @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
         try {
-            AssetBal bal = new AssetBal(factory);
+            AssetBal bal = new AssetBal(context);
             if (asset == null || asset.getMenuScopeIds().isEmpty()) {
                 throw new Exception("No menu id provided for the asset record");
             }
@@ -60,7 +60,7 @@ public class AssetController {
             throws Exception {
         AssetResponse response = new AssetResponse();
         try {
-            response.setAssets(new AssetBal(factory).getAll(templateId, menuId, access_token));
+            response.setAssets(new AssetBal(context).getAll(templateId, menuId, access_token));
             return response;
         } catch (Exception ex) {
             response.setSuccess(false);
@@ -79,7 +79,7 @@ public class AssetController {
     public AssetResponse get(@PathVariable String id) {
         AssetResponse response = new AssetResponse();
         try {
-            response.setAsset(new AssetBal(factory).get(id));
+            response.setAsset(new AssetBal(context).get(id));
         } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
@@ -101,7 +101,7 @@ public class AssetController {
             @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
         try {
-            new AssetBal(factory).delete(asset, menuId, access_token, false);
+            new AssetBal(context).delete(asset, menuId, access_token, false);
             response.setSuccess(true);
             response.setMessage("Asset record was deleted successfully.");
         } catch (Exception ex) {
