@@ -48,7 +48,7 @@ public class GraphBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
     private final String token;
-    private final RepositoryContext factory;
+    private final RepositoryContext context;
 
     private DateTime endDate;
     private DateTime startDate;
@@ -58,8 +58,8 @@ public class GraphBuilder {
     private static final String MDL_ASSET_STATUS_IN = "In";
     private static final String MDL_ASSET_STATUS_OUT = "Out";
 
-    public GraphBuilder(RepositoryContext factory, String token) {
-        this.factory = factory;
+    public GraphBuilder(RepositoryContext context, String token) {
+        this.context = context;
         this.token = token;
     }
 
@@ -84,13 +84,13 @@ public class GraphBuilder {
 //                LOG.info("Graph Name : " + graphInfo.getName());
                 // Business access layer.
                 RecordBal recordBal = null;
-                Menu menu = new MainAccessBal(factory).getMenu(graphInfo.getMenuId(), token);
+                Menu menu = new MainAccessBal(context).getMenu(graphInfo.getMenuId(), token);
                 for (Template template : menu.getTemplates()) {
                     if (template.getId().equals(graphInfo.getTemplateId())) {
                         if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
-                            recordBal = new AssetBal(factory);
+                            recordBal = new AssetBal(context);
                         } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
-                            recordBal = new EmployeeBal(factory);
+                            recordBal = new EmployeeBal(context);
                         }
                         /**
                          * below is where the date logic is generated or x -
@@ -111,7 +111,7 @@ public class GraphBuilder {
                                         Asset asset = (Asset) record;
                                         // gets all the checked in/out records for asset.
                                         List<AssetLink> links
-                                                = new LinkBal(factory).
+                                                = new LinkBal(context).
                                                         getAllAssetLinksByAssetId(
                                                                 asset.getId(),
                                                                 menu.getId(),
@@ -235,7 +235,7 @@ public class GraphBuilder {
                             if (null != graphInfo.getGraphFocus()) {
                                 switch (graphInfo.getGraphFocus()) {
                                     case GBL_FOCUS_CREATED_BY:
-                                        for (User user : new UserBal(factory).getAll()) {
+                                        for (User user : new UserBal(context).getAll()) {
                                             if (user.isSystemUser()) {
                                                 yAxisLabels.add(user.getUserName());
                                             }
@@ -477,7 +477,7 @@ public class GraphBuilder {
             if (null != graphInfo.getGraphFocus()) {
                 switch (graphInfo.getGraphFocus()) {
                     case GBL_FOCUS_CREATED_BY:
-                        new UserBal(factory).getAll().stream().filter((user) -> (user.isSystemUser())).forEach((user) -> {
+                        new UserBal(context).getAll().stream().filter((user) -> (user.isSystemUser())).forEach((user) -> {
                             xAxis.add(user.getUserName());
                         });
                         break;
@@ -513,7 +513,7 @@ public class GraphBuilder {
                         }
                         break;
                     case GBL_FOCUS_DEFAULT:
-                        Menu menu = new MainAccessBal(factory).getMenu(graphInfo.getMenuId(), token);
+                        Menu menu = new MainAccessBal(context).getMenu(graphInfo.getMenuId(), token);
                         if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
                             xAxis.add(MDL_ASSET_DEFAULT);
                         } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {

@@ -29,9 +29,11 @@ public class GraphBal implements BusinessAccessLayer {
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
     private final RepositoryContext context;
+    private final GraphRepository graphRep;
 
-    public GraphBal(RepositoryContext factory) {
+    public GraphBal(RepositoryContext factory) throws Exception {
         this.context = factory;
+        this.graphRep = context.getRepository(GraphRepository.class);
     }
 
     /**
@@ -39,28 +41,28 @@ public class GraphBal implements BusinessAccessLayer {
      * correct token can access this graph.
      *
      * @param payload
-     * @param access_token
+     * @param token
      * @return
      * @throws Exception
      */
-    public Graph saveGraph(Graph payload, String access_token) throws Exception {
+    public Graph saveGraph(Graph payload, String token) throws Exception {
         try {
             // For updates if the type has a id then bypass the exists
             boolean bypassExists = false;
             if (payload.getId() != null && !payload.getId().trim().isEmpty()) {
                 bypassExists = true;
-                Graph dbGraph = context.getRepository(GraphRepository.class).findOne(payload.getId());
+                Graph dbGraph = graphRep.findOne(payload.getId());
                 payload.setCreatorId(dbGraph.getCreatorId());
             } else {
-                User user = new UserBal(context).getUserByToken(access_token);
+                User user = new UserBal(context).getUserByToken(token);
                 if (user != null && user.isSystemUser()) {
                     payload.setCreatorId(user.getId());
                 }
             }
 
-            boolean exists = context.getRepository(GraphRepository.class).existsByName(payload.getName());
+            boolean exists = graphRep.existsByName(payload.getName());
             if (!exists || bypassExists) {
-                Graph graph = context.getRepository(GraphRepository.class).save(payload);
+                Graph graph = graphRep.save(payload);
                 return graph;
             } else {
                 throw new Exception("Graph with the name " + payload.getName() + " exists");
@@ -75,16 +77,16 @@ public class GraphBal implements BusinessAccessLayer {
      * Gets all the graphs templates saved, this is used for the edit screen.
      * filtered by user access token.
      *
-     * @param access_token
+     * @param token
      * @return list of graphs
      * @throws java.lang.Exception
      */
-    public List<Graph> getAllGraphs(String access_token) throws Exception {
+    public List<Graph> getAllGraphs(String token) throws Exception {
         try {
-            User user = new UserBal(context).getUserByToken(access_token);
+            User user = new UserBal(context).getUserByToken(token);
             Set<Graph> graphs = new HashSet();
             if (user != null) {
-                List<Graph> savedGraphs = context.getRepository(GraphRepository.class).findAll();
+                List<Graph> savedGraphs = graphRep.findAll();
                 for (Graph graph : savedGraphs) {
                     // check if user has access to view and edit this graph template
                     if (user.getId().equals(graph.getCreatorId())) {
@@ -125,7 +127,7 @@ public class GraphBal implements BusinessAccessLayer {
     public GraphData getGraphData(String graphId, String token) throws Exception {
         try {
             User user = new UserBal(context).getUserByToken(token);
-            Graph graph = context.getRepository(GraphRepository.class).findOne(graphId);
+            Graph graph = graphRep.findOne(graphId);
             if (user.getId().equals(graph.getCreatorId())) {
                 GraphBuilder builder = new GraphBuilder(context, token);
                 return builder.buildGraphData(graph);
@@ -178,12 +180,12 @@ public class GraphBal implements BusinessAccessLayer {
      */
     public void deleteGraph(String id, String token) throws Exception {
         try {
-            if (context.getRepository(GraphRepository.class).exists(id)) {
-                Graph graph = context.getRepository(GraphRepository.class).findOne(id);
+            if (graphRep.exists(id)) {
+                Graph graph = graphRep.findOne(id);
                 User user = new UserBal(context).getUserByToken(token);
                 if (graph.getCreatorId().equals(user.getId())
                         || user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                    context.getRepository(GraphRepository.class).delete(id);
+                    graphRep.delete(id);
                 } else {
                     throw new Exception("Delete failed. "
                             + "This user is not the creator"

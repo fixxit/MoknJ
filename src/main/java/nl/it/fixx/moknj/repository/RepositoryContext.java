@@ -9,12 +9,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
 /**
- * The idea behind this class is single service class which is used on every
+ * The idea behind this class is a single service class which is used on every
  * controller. This removes the need to have custom service classes for each
  * controller as most of the times the service class becomes the business layer
  * which is in all accounts correct but code and logic is then repeated over
- * different services. This makes it tedious job to maintain when new features
- * are added. So I decided away with that bs and enter the Single Business Layer
+ * different services. This makes it a tedious job to maintain when new features
+ * are added. So I decided away with that bs and enter the Single Service Layer
  * which if implement right would allow you change one BAL and it will reflect
  * its changes across the all points where this BAL is implemented. Layering is
  * top to down: REST Controller -- Business Layers -- Single context service --
