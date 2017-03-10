@@ -7,9 +7,10 @@ This dragon scroll would serve for who ever takes on this project as a guide to 
 ![funny_header.gif](https://github.com/fixxit/MoknJ/blob/master/images/funny%20header.gif?raw=true)
 
 ## Mission ##
-* MoknJ started as an idea to move data from excel sheets to an customizable platform which creates an environment where it is easy for the user to build custom data templates that behave like predefined business components. 
+MoknJ started as an idea to move data from excel sheets to an customizable platform which creates an environment where it is easy for the user to build custom data templates that behave like predefined business components. 
+
 * The platform should make it easy and less of a effort for business to consolidate its spreadsheet business data. 
-* With the hope that this kind of approach where your data is consolidated/centralised will help business to save time when doing nitty-gritty administration work.
+* This kind of approach where your data is consolidated/centralised should help business to save time when doing nitty-gritty administration work.
 
 ## Technology Stack ##
 HTML5, CSS, Bootstrap, AngularJS, AngularUI, Angular Routing, Node, Express, Spring Boot, Spring Security (OAuth 2), Mongo DB, Java 8, Rest (Jersey with Jackson), Maven, Junit
