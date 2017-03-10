@@ -119,5 +119,5 @@
         </plugins>
     </build>
     <packaging>war</packaging>
-    <name>FiXXiTMoknJ</name>
+    <name>FiXXiTMoknjAPI</name>
 </project>
