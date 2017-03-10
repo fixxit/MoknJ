@@ -1,4 +1,4 @@
-# MoknJ 0.0.1b API #
+# MoknJ 0.0.1 API #
 
 
 ## Introduction ##
