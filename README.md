@@ -1,51 +1,20 @@
-# ![logo.png](https://bitbucket.org/repo/aEK7Ey/images/4055636824-logo.png) MoknJ 0.0.1b #
-
+# MoknJ 0.0.1b #
 
 
 ## Introduction ##
 This dragon scroll would serve for who ever takes on this project as a guide to unlock the unknowns and travel to far lands and slay dragons... One might ask ones self why would I be reading about dragons and I the writer would reply cause words can make a logical argument, the dragon represents the unknown(Netherlands) which you have found yourself in and mission of acquiring skills to strengthening your stats, so you too can one day ride...a...dragon...and...rain......fire...on...your...colleagues..............................
 
-![tumblr_inline_ngc8ik5Hft1t6v9pj.gif](https://bitbucket.org/repo/aEK7Ey/images/1843827414-tumblr_inline_ngc8ik5Hft1t6v9pj.gif)
-
 ## Mission ##
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform. This platform allows the user to easily build custom templates that behave like predefined business components. The platform helps the business to consolidate its spreadsheet data which results in more effective management of the data.
 
 ## MoknJ UI ##
-:arrow_right: [Bitbucket link](https://bitbucket.org/fixxitprofessionalservices/moknjui)
 
 ## Trello Board ##
-Bugs and Fixes and future expansion :arrow_right: [access the expanse](https://trello.com/b/Uw1TjVAL/asset-management-project)
+
 
 ## Live URLs ##
 :arrow_right: [GUI](http://assetmanagergui-fixxhr.rhcloud.com/)
 :arrow_right: [API](http://assetmanagerapi-fixxhr.rhcloud.com/FixxITAssetTracker/)
-
-### Login ###
-Keep in mind that all instances of this app will have full system admin to login in with.
-```
-#!xml
-Usr: fixxit
-psw: fix!2
-```
-
-## Openshift link ##
-:arrow_right: https://openshift.redhat.com/app/console/applications
-
-## Connection to Production ##
-
-Use git bash to access the ssh link.
-
-![2017-02-02_09-05-53.png](https://bitbucket.org/repo/aEK7Ey/images/1372419474-2017-02-02_09-05-53.png)
-
-To use the ssh you need add your git or SSH-2RSA certificate to openshift. Use putty keygen if don't have a key... 
-
-![2017-02-02_09-03-29.png](https://bitbucket.org/repo/aEK7Ey/images/1706954445-2017-02-02_09-03-29.png)
-
-### Production server folder locations ###
-* ssh 5834115389f5cfe0220001f4@assetmanagerapi-fixxhr.rhcloud.com
-* location of deployment wars ~/wildfly/standalone/deployments/
-* location of uploaded git (war) files  ~/app-root/repo/FixxITMoknj-0.1.0.war
-* location of logs ~/wildfly/logs/server.log
 
 ## Technology Stack ##
 HTML5, CSS, Bootstrap, AngularJS, AngularUI, Angular Routing, Node, Express, Spring Boot, Spring Security (OAuth 2), Mongo DB, Java, Rest (Jersey with Jackson), Netbeans, Tomcat, openshift, Maven, Junit, GIT, bitbucket
@@ -70,10 +39,6 @@ Templates represent components in the platform. Templates define the fields and 
 * Drop down fields are fields which have multiple values. These fields are displayed as you guessed a drop down... 
 * Templates also have behavior (Asset, Employee) assigned to them.  
 
-### See screen shot for example: ###
-
-![2017-02-01_13-13-05.jpg](https://bitbucket.org/repo/aEK7Ey/images/193534309-2017-02-01_13-13-05.jpg)
-
 ### Menu ###
 Menu item consists out a group of templates which represent a single page in the platform. The platform allows for multiple menu assigned to main modules.
 
@@ -82,30 +47,23 @@ Menu item consists out a group of templates which represent a single page in the
 * Group of templates. Templates can be order to display above one another.
 
 See screen shot for example of edit menu screen.
-![2017-02-01_13-11-14.jpg](https://bitbucket.org/repo/aEK7Ey/images/3443332288-2017-02-01_13-11-14.jpg)
 
 ### Module ###
 Modules can be seen as view and behavior of a template and menu. The module dictates the view display.  
 
 * Asset view contains a horizontal view list views.
 
-![2017-02-01_13-08-28.jpg](https://bitbucket.org/repo/aEK7Ey/images/3967650579-2017-02-01_13-08-28.jpg)
-
 * Employee view contains a horizontal user filter shown in red and tab view shown purple and list view shown in green.
-
-![2017-02-01_13-04-33.jpg](https://bitbucket.org/repo/aEK7Ey/images/4291436877-2017-02-01_13-04-33.jpg)
 
 ### User ###
 Users and employees are one of the same, a user is just an employee with user access. Employees are linked to the assets and employee templates records.
 
 Example of user view/new screen
 
-![2017-02-01_13-33-36.jpg](https://bitbucket.org/repo/aEK7Ey/images/382843295-2017-02-01_13-33-36.jpg)
 
 ### Access ###
 User access can be defined once menu and template is loaded to the platform. **The user access is stored in the access table**, note that user access is assigned to template and menu id and user id with a right (new,update,delete,view). This access is linked to user and the user is linked to token. The token is used to check if any action to rest api is allowed like view or deleting. Also keep in mind that this system has no session for the front end but token expiry date. 
 
-![2017-02-01_13-28-02.jpg](https://bitbucket.org/repo/aEK7Ey/images/1871385246-2017-02-01_13-28-02.jpg) 
 
 Screen shot info
 * MoknJ API Access rights in the red box, is used to define access to rest controller or path. Simple terms may this token access this url on the platform.
@@ -146,10 +104,5 @@ system.username =
 system.password = 
 system.environment =
 ```
-
-Oh! one design flaw... If you read to this point I have 1st improvement for you to take on. The login/token auth is done over GET request this needs to be changed to POST. Because sending passwords and usernames over open channel is lunacy!
-
 ### Who do I talk to? ###
 Riaan Schoeman (Devin Alrighty) (riaan.schoeman@fixx.it)
-
-![tumblr_mtxyuyRJZZ1s4xenlo1_400.gif](https://bitbucket.org/repo/aEK7Ey/images/1657564402-tumblr_mtxyuyRJZZ1s4xenlo1_400.gif)
