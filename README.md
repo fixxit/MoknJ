@@ -89,8 +89,6 @@ security.secret = fixx_secret
 security.token_validity_seconds = 72000
 security.refresh_token_validity_seconds = 72000
 security.resource_id = fixx_rest_api
-admin.user = fixxit
-admin.pass = test
 ```
 
 ### Database configuration ###
