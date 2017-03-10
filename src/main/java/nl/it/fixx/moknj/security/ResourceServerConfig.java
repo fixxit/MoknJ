@@ -6,10 +6,12 @@
 package nl.it.fixx.moknj.security;
 
 import javax.servlet.http.HttpServletRequest;
-import nl.it.fixx.moknj.util.SecurityPropertiesUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
@@ -24,10 +26,12 @@ import org.springframework.web.filter.CorsFilter;
  */
 @Configuration
 @EnableResourceServer
+@PropertySource("classpath:security.properties")
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
-
-    private static final String RESOURCE_ID = SecurityPropertiesUtil.getProperty("security.resource_id");
-
+    
+    @Autowired
+    private Environment properties;
+    
     public static String getFullURL(HttpServletRequest request) {
         StringBuffer requestURL = request.getRequestURL();
         String queryString = request.getQueryString();
@@ -69,7 +73,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
         resources.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                .resourceId(RESOURCE_ID)
+                .resourceId(properties.getProperty("security.resource_id"))
                 .stateless(false);
     }
 

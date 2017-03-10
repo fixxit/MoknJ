@@ -44,8 +44,9 @@ public class CustomUserService implements UserDetailsService {
                 } else {
                     LOG.info("adding full admin rights!");
                     for (UserAuthority auths : UserAuthority.values()) {
-                        if (!authorities.contains(auths)) {
-                            authorities.add(new SimpleGrantedAuthority(auths.name()));
+                        SimpleGrantedAuthority sgAuth = new SimpleGrantedAuthority(auths.name());
+                        if (!authorities.contains(sgAuth)) {
+                            authorities.add(sgAuth);
                         }
                     }
                 }
@@ -63,7 +64,7 @@ public class CustomUserService implements UserDetailsService {
                 throw new UsernameNotFoundException("User not found");
             }
             return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), getAuthorities(user));
-        } catch (Exception e) {
+        } catch (UsernameNotFoundException e) {
             throw new UsernameNotFoundException("User not found", e);
         }
     }

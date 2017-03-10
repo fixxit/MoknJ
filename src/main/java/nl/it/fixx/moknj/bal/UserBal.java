@@ -262,23 +262,22 @@ public class UserBal implements BusinessAccessLayer {
      *
      * @param token
      * @return user
-     * @throws Exception
      */
-    public User getUserByToken(String token) throws Exception {
+    public User getUserByToken(String token) {
         try {
             if (token == null || token.isEmpty()) {
                 LOG.info("No token recieved to find user");
-                throw new Exception("No user found, no token provided!");
+                throw new RuntimeException("No user found, no token provided!");
             }
             // Get user details who logged this employee using the token.
             User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(token));
             if (user == null) {
                 LOG.info("no user found for token[" + token + "]");
-                throw new Exception("No user found by this token[" + token + "]");
+                throw new RuntimeException("No user found by this token[" + token + "]");
             }
 
             return user;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             LOG.error("Error on User Bal", e);
             throw e;
         }

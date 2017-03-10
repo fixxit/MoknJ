@@ -9,9 +9,12 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import nl.it.fixx.moknj.util.SecurityPropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -25,11 +28,15 @@ import org.springframework.util.StringUtils;
  *
  * @author adriaan
  */
+@Configuration
+@PropertySource("classpath:security.properties")
 public class CustomAuthenticationEntryPoint extends AbstractOAuth2SecurityExceptionHandler implements AuthenticationEntryPoint {
+    
+    @Autowired
+    private Environment properties;
 
     private static final Logger LOG = LoggerFactory.getLogger(CustomAuthenticationEntryPoint.class);
     private final String typeName = OAuth2AccessToken.BEARER_TYPE;
-    private final String realmName = SecurityPropertiesUtil.getProperty("security.realm");
 
     public static String getFullURL(HttpServletRequest request) {
         StringBuffer requestURL = request.getRequestURL();
@@ -59,7 +66,7 @@ public class CustomAuthenticationEntryPoint extends AbstractOAuth2SecurityExcept
         }
         StringBuilder builder = new StringBuilder();
         builder.append(typeName).append(" ");
-        builder.append("realm=\"").append(realmName).append("\"");
+        builder.append("realm=\"").append(properties.getProperty("security.realm")).append("\"");
         if (existing != null) {
             builder.append(", ").append(existing);
         }

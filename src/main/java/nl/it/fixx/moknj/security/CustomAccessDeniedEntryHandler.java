@@ -10,7 +10,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import static nl.it.fixx.moknj.security.CustomAuthenticationEntryPoint.getFullURL;
-import nl.it.fixx.moknj.util.SecurityPropertiesUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,10 +27,14 @@ import org.springframework.util.StringUtils;
  *
  * @author adriaan
  */
+@Configuration
+@PropertySource("classpath:security.properties")
 public class CustomAccessDeniedEntryHandler extends AbstractOAuth2SecurityExceptionHandler implements AccessDeniedHandler {
+    
+    @Autowired
+    private Environment properties;
 
     private final String typeName = OAuth2AccessToken.BEARER_TYPE;
-    private final String realmName = SecurityPropertiesUtil.getProperty("security.realm");
 
     @Override
     protected ResponseEntity<OAuth2Exception> enhanceResponse(ResponseEntity<OAuth2Exception> response, Exception exception) {
@@ -38,7 +45,7 @@ public class CustomAccessDeniedEntryHandler extends AbstractOAuth2SecurityExcept
         }
         StringBuilder builder = new StringBuilder();
         builder.append(typeName).append(" ");
-        builder.append("realm=\"").append(realmName).append("\"");
+        builder.append("realm=\"").append(properties.getProperty("security.realm")).append("\"");
         if (existing != null) {
             builder.append(", ").append(existing);
         }

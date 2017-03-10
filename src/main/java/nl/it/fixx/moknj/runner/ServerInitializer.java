@@ -63,6 +63,7 @@ public class ServerInitializer implements ApplicationRunner {
                     + "fixxit no sysadmin is present...");
         } catch (Exception ex) {
             LOG.info("Error running system init", ex);
+            throw ex;
         }
     }
 }
