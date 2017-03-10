@@ -1,4 +1,3 @@
-
 package nl.it.fixx.moknj.repository;
 
 import nl.it.fixx.moknj.domain.core.user.User;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Repository;
  *
  * @author colin
  */
-
 @Repository
 public interface UserRepository extends MongoRepository<User, String>, UserRepositoryCustom {
 

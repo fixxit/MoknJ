@@ -24,10 +24,10 @@ import org.springframework.web.filter.CorsFilter;
 @EnableResourceServer
 @PropertySource(Security.CLASSPATH)
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
-    
+
     @Autowired
     private Environment properties;
-    
+
     public static String getFullURL(HttpServletRequest request) {
         StringBuffer requestURL = request.getRequestURL();
         String queryString = request.getQueryString();

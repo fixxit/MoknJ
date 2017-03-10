@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.controller;
 
 import nl.it.fixx.moknj.bal.EmployeeBal;
@@ -61,11 +56,10 @@ public class EmployeeController {
      * @param menuId
      * @param access_token
      * @return
-     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/get/all/{templateId}/{menuId}", method = RequestMethod.POST)
     public EmployeeResponse getAllEmployes(@PathVariable String templateId,
-            @PathVariable String menuId, @RequestParam String access_token) throws Exception {
+            @PathVariable String menuId, @RequestParam String access_token) {
         EmployeeResponse response = new EmployeeResponse();
         try {
             response.setEmployees(new EmployeeBal(context).

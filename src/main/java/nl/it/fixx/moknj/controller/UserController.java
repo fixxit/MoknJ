@@ -33,7 +33,7 @@ public class UserController {
     private SystemContext context;
 
     @RequestMapping(value = "/get/all", method = RequestMethod.POST)
-    public UserResponse all(@RequestParam String access_token) throws Exception {
+    public UserResponse all(@RequestParam String access_token) {
         UserResponse userResponse = new UserResponse();
         try {
             UserBal userBal = new UserBal(context);
@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/get/employee/all", method = RequestMethod.POST)
-    public UserResponse getAllUsersForEmployee() throws Exception {
+    public UserResponse getAllUsersForEmployee() {
         UserResponse userResponse = new UserResponse();
         try {
             UserBal userBal = new UserBal(context);
@@ -62,7 +62,7 @@ public class UserController {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public UserResponse add(@RequestBody User payload,
-            @RequestParam String access_token) throws Exception {
+            @RequestParam String access_token) {
         UserResponse userResponse = new UserResponse();
         try {
             UserBal userBal = new UserBal(context);

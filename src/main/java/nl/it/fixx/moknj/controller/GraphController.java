@@ -163,11 +163,10 @@ public class GraphController {
      *
      * @param access_token
      * @return
-     * @throws java.text.ParseException
      */
     @RequestMapping(value = "/all/saved", method = RequestMethod.POST)
     public @ResponseBody
-    GraphResponse getAllSavedGraphs(@RequestParam String access_token) throws ParseException {
+    GraphResponse getAllSavedGraphs(@RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
             GraphBal bal = new GraphBal(context);
@@ -187,11 +186,10 @@ public class GraphController {
      *
      * @param access_token
      * @return
-     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/all/data", method = RequestMethod.POST)
     public @ResponseBody
-    GraphResponse getAllGraphsData(@RequestParam String access_token) throws Exception {
+    GraphResponse getAllGraphsData(@RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
             GraphBal bal = new GraphBal(context);

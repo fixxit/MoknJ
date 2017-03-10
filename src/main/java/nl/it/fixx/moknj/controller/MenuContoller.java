@@ -35,11 +35,10 @@ public class MenuContoller {
      * @param payload
      * @param access_token
      * @return
-     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody
-    MenuResponse add(@RequestBody Menu payload, @RequestParam String access_token) throws Exception {
+    MenuResponse add(@RequestBody Menu payload, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
         try {
             MainAccessBal bal = new MainAccessBal(context);
@@ -51,7 +50,6 @@ public class MenuContoller {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
-
         return response;
     }
 
@@ -61,11 +59,10 @@ public class MenuContoller {
      * @param id
      * @param access_token
      * @return
-     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    MenuResponse get(@PathVariable String id, @RequestParam String access_token) throws Exception {
+    MenuResponse get(@PathVariable String id, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
         try {
             MainAccessBal bal = new MainAccessBal(context);
@@ -83,11 +80,10 @@ public class MenuContoller {
      *
      * @param access_token
      * @return
-     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/all", method = RequestMethod.POST)
     public @ResponseBody
-    MenuResponse all(@RequestParam String access_token) throws Exception {
+    MenuResponse all(@RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
         try {
             MainAccessBal bal = new MainAccessBal(context);
@@ -105,11 +101,10 @@ public class MenuContoller {
      * @param id
      * @param access_token
      * @return
-     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     public @ResponseBody
-    MenuResponse delete(@PathVariable String id, @RequestParam String access_token) throws Exception {
+    MenuResponse delete(@PathVariable String id, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
         try {
             MainAccessBal bal = new MainAccessBal(context);
@@ -121,7 +116,6 @@ public class MenuContoller {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
-
         return response;
     }
 

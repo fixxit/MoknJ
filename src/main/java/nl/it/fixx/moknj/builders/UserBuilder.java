@@ -4,7 +4,7 @@ import nl.it.fixx.moknj.domain.core.user.User;
 
 public class UserBuilder {
 
-    private User resource = new User();
+    private final User resource = new User();
 
     public UserBuilder firstName(String firstName) {
         this.resource.setFirstName(firstName);

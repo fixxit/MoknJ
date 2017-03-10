@@ -52,12 +52,10 @@ public class AssetController {
      * @param menuId
      * @param access_token
      * @return
-     * @throws java.lang.Exception
      */
     @RequestMapping(value = "/get/all/{templateId}/{menuId}", method = RequestMethod.POST)
     public AssetResponse getAllAssets(@PathVariable String templateId,
-            @PathVariable String menuId, @RequestParam String access_token)
-            throws Exception {
+            @PathVariable String menuId, @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
         try {
             response.setAssets(new AssetBal(context).getAll(templateId, menuId, access_token));
