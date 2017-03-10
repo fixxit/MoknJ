@@ -15,10 +15,10 @@ HTML5, CSS, Bootstrap, AngularJS, AngularUI, Angular Routing, Node, Express, Spr
 ## High level break down ##
 * MoknJ is rest API which which uses token authentication to identify the logged in user. 
 * The platform is split up in 2 applications ([GUI](https://github.com/fixxit/MoknJ-WebUI)) (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
-* As the GUI only handles rest (ajax) request and display (data manipulation) with the free API which is  tomcat/tomee/wildfly to handle db related requests and access based data manipulation.
+* As the GUI only handles rest (ajax) request and display (data manipulation) with the API which is tomcat/tomee/wildfly free to handle db related requests and data manipulation.
 * GUI is pure HTML5 and javascript which makes it easy for most developers to contribute to.
 * Moknj app consists out of templates and menu item (pages), templates and menu's are dynamic or abstract.
-* Moknj also has a high level graph stats system to setup and generate statistics on template created by the administrator.
+* Moknj also contains simple graph stats implementation to setup and generate statistics on individual templates.
 * MoknJ overs the capability to change the database structure of save records on the fly as needs of the user grow.
 
 ## Low level break down (Also high level but more detaaail hah!) ##
