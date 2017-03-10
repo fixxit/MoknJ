@@ -9,7 +9,7 @@ package nl.it.fixx.moknj.properties;
  *
  * @author Adriaan
  */
-public class admin {
+public class Admin {
 
     public static final String CLASSPATH = "classpath:admin.properties";
     public static final String USER = "admin.user";

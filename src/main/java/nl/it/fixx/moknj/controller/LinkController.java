@@ -7,7 +7,7 @@ package nl.it.fixx.moknj.controller;
 
 import nl.it.fixx.moknj.bal.LinkBal;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import nl.it.fixx.moknj.response.LinkResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class LinkController {
 
     private static final Logger LOG = LoggerFactory.getLogger(LinkController.class);
     @Autowired
-    private RepositoryContext context;
+    private SystemContext context;
 
     @RequestMapping(value = "/asset/{menuId}/{templateId}/add", method = RequestMethod.POST)
     public LinkResponse addAssetLink(@RequestBody AssetLink payload,

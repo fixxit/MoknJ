@@ -15,7 +15,7 @@ import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.template.TemplateType;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import nl.it.fixx.moknj.response.TemplateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TemplateController {
 
     @Autowired
-    private RepositoryContext context;
+    private SystemContext context;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody

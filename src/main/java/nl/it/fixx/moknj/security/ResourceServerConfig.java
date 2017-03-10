@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.security;
 
 import javax.servlet.http.HttpServletRequest;
+import nl.it.fixx.moknj.properties.Security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +22,7 @@ import org.springframework.web.filter.CorsFilter;
  */
 @Configuration
 @EnableResourceServer
-@PropertySource("classpath:security.properties")
+@PropertySource(Security.CLASSPATH)
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     
     @Autowired
@@ -73,7 +69,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
         resources.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                .resourceId(properties.getProperty("security.resource_id"))
+                .resourceId(properties.getProperty(Security.RESOURCE))
                 .stateless(false);
     }
 

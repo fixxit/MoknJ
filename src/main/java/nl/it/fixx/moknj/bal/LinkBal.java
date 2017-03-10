@@ -21,7 +21,7 @@ import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +33,13 @@ import org.slf4j.LoggerFactory;
 public class LinkBal implements BusinessAccessLayer {
 
     private static final Logger LOG = LoggerFactory.getLogger(LinkBal.class);
-    private final RepositoryContext context;
+    private final SystemContext context;
     private final UserBal userBal;
     private final AssetBal assetBal;
     private final AccessBal accessBal;
     private final EmployeeBal employeeBal;
 
-    public LinkBal(RepositoryContext context) throws Exception {
+    public LinkBal(SystemContext context) throws Exception {
         this.context = context;
         this.userBal = new UserBal(context);
         this.assetBal = new AssetBal(context);

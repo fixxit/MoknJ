@@ -2,7 +2,7 @@ package nl.it.fixx.moknj.controller;
 
 import nl.it.fixx.moknj.bal.AssetBal;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import nl.it.fixx.moknj.response.AssetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssetController {
 
     @Autowired
-    private RepositoryContext context;
+    private SystemContext context;
 
     @RequestMapping(value = "/add/{menuId}/{id}", method = RequestMethod.POST)
     public AssetResponse add(@PathVariable String id,

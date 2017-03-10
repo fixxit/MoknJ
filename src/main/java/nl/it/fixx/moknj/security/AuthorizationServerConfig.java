@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.security;
 
+import nl.it.fixx.moknj.properties.Security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +20,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
  */
 @Configuration
 @EnableAuthorizationServer
-@PropertySource("classpath:security.properties")
+@PropertySource(Security.CLASSPATH)
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
@@ -42,13 +38,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory().withClient(properties.getProperty("security.client"))
+        clients.inMemory().withClient(properties.getProperty(Security.CLIENT))
                 .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
                 .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
                 .scopes("read", "write", "trust")
-                .secret(properties.getProperty("security.secret"))
-                .accessTokenValiditySeconds(new Integer(properties.getProperty("security.token_validity_seconds")))
-                .refreshTokenValiditySeconds(new Integer(properties.getProperty("security.refresh_token_validity_seconds")));
+                .secret(properties.getProperty(Security.SECRET))
+                .accessTokenValiditySeconds(new Integer(properties.getProperty(Security.VALIDITY)))
+                .refreshTokenValiditySeconds(new Integer(properties.getProperty(Security.REFRESH_VALIDITY)));
     }
 
     @Override
@@ -60,7 +56,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-        oauthServer.realm(properties.getProperty("security.realm") + "/client");
+        oauthServer.realm(properties.getProperty(Security.REALM) + "/client");
     }
 
 }

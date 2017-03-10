@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.security;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import nl.it.fixx.moknj.properties.Security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +25,9 @@ import org.springframework.util.StringUtils;
  * @author adriaan
  */
 @Configuration
-@PropertySource("classpath:security.properties")
+@PropertySource(Security.CLASSPATH)
 public class CustomAuthenticationEntryPoint extends AbstractOAuth2SecurityExceptionHandler implements AuthenticationEntryPoint {
-    
+
     @Autowired
     private Environment properties;
 
@@ -66,7 +62,7 @@ public class CustomAuthenticationEntryPoint extends AbstractOAuth2SecurityExcept
         }
         StringBuilder builder = new StringBuilder();
         builder.append(typeName).append(" ");
-        builder.append("realm=\"").append(properties.getProperty("security.realm")).append("\"");
+        builder.append("realm=\"").append(properties.getProperty(Security.REALM)).append("\"");
         if (existing != null) {
             builder.append(", ").append(existing);
         }

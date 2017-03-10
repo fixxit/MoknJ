@@ -9,7 +9,7 @@ import nl.it.fixx.moknj.domain.core.access.AccessRight;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.core.user.UserAuthority;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import nl.it.fixx.moknj.response.UserResponse;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class UserController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
     @Autowired
-    private RepositoryContext context;
+    private SystemContext context;
 
     @RequestMapping(value = "/get/all", method = RequestMethod.POST)
     public UserResponse all(@RequestParam String access_token) throws Exception {

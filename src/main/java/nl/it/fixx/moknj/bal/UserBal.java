@@ -10,7 +10,7 @@ import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.repository.AccessRepository;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
 import static nl.it.fixx.moknj.security.OAuth2SecurityConfig.PSW_ENCODER;
@@ -29,12 +29,10 @@ public class UserBal implements BusinessAccessLayer {
     private final BCryptPasswordEncoder passwordEncoder;
     private static final Logger LOG = LoggerFactory.getLogger(UserBal.class);
 
-    public static String ADMIN_NAME = "fixxit";
-
     private final UserRepository userRep;
-    private final RepositoryContext context;
+    private final SystemContext context;
 
-    public UserBal(RepositoryContext context) throws Exception {
+    public UserBal(SystemContext context) throws Exception {
         this.userRep = context.getRepository(UserRepository.class);
         this.passwordEncoder = PSW_ENCODER;
         this.context = context;
@@ -47,12 +45,13 @@ public class UserBal implements BusinessAccessLayer {
      */
     public List<User> getAll() throws Exception {
         try {
+            LOG.info("properties.username : " + context.getProperties().username);
             List<User> users = new ArrayList<>();
             if (userRep != null) {
                 for (User user : userRep.findAll()) {
                     // if user has all access get all else only return his user
                     if (!user.isHidden()) {
-                        if (!ADMIN_NAME.equals(user.getUserName())) {
+                        if (!context.getProperties().username.equals(user.getUserName())) {
                             users.add(user);
                         }
                     }
@@ -100,7 +99,7 @@ public class UserBal implements BusinessAccessLayer {
                     if (loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
                         if (!user.isHidden()) {
                             if (isAdmin) {
-                                if (!ADMIN_NAME.equals(user.getUserName())) {
+                                if (!context.getProperties().username.equals(user.getUserName())) {
                                     users.add(user);
                                 }
                             } else {

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.bal;
 
 import java.util.ArrayList;
@@ -22,7 +17,7 @@ import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.comparator.NullSafeComparator;
@@ -45,9 +40,9 @@ public class MainAccessBal implements BusinessAccessLayer {
     private final TemplateBal tempBal;
     private final AssetBal assetBal;
     private final EmployeeBal employeeBal;
-    private final RepositoryContext context;
+    private final SystemContext context;
 
-    public MainAccessBal(RepositoryContext context) throws Exception {
+    public MainAccessBal(SystemContext context) throws Exception {
         this.menuBal = new MenuBal(context);
         this.tempBal = new TemplateBal(context);
         this.userBal = new UserBal(context);

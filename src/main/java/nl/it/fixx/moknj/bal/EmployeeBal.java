@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.bal;
 
 import java.text.SimpleDateFormat;
@@ -24,7 +19,7 @@ import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +40,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
     private final TemplateBal tempBal;
     private final AccessBal userAccessBall;
 
-    public EmployeeBal(RepositoryContext context) throws Exception {
+    public EmployeeBal(SystemContext context) throws Exception {
         this.employeeRep = context.getRepository(EmployeeRepository.class);
         this.fieldRep = context.getRepository(FieldDetailRepository.class);
         this.employeeLinkRep = context.getRepository(EmployeeLinkRepository.class);

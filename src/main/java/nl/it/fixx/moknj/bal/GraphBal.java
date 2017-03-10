@@ -16,7 +16,7 @@ import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.repository.GraphRepository;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +28,10 @@ public class GraphBal implements BusinessAccessLayer {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
-    private final RepositoryContext context;
+    private final SystemContext context;
     private final GraphRepository graphRep;
 
-    public GraphBal(RepositoryContext factory) throws Exception {
+    public GraphBal(SystemContext factory) throws Exception {
         this.context = factory;
         this.graphRep = context.getRepository(GraphRepository.class);
     }

@@ -16,7 +16,7 @@ import nl.it.fixx.moknj.domain.core.graph.GraphFocus;
 import nl.it.fixx.moknj.domain.core.graph.GraphType;
 import nl.it.fixx.moknj.domain.core.graph.GraphView;
 import nl.it.fixx.moknj.domain.core.template.Template;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import nl.it.fixx.moknj.response.GraphResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GraphController {
 
     @Autowired
-    private RepositoryContext context;
+    private SystemContext context;
 
     /**
      * Saves the graph... Sets the creator id by the token. Only a user with

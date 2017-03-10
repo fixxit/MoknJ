@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.bal;
 
 import java.util.ArrayList;
@@ -11,7 +6,7 @@ import java.util.List;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.repository.MenuRepository;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.comparator.NullSafeComparator;
@@ -25,7 +20,7 @@ public class MenuBal implements BusinessAccessLayer {
     private static final Logger LOG = LoggerFactory.getLogger(MenuBal.class);
     private final MenuRepository menuRep;
     
-    public MenuBal(RepositoryContext factory) throws Exception {
+    public MenuBal(SystemContext factory) throws Exception {
         this.menuRep = factory.getRepository(MenuRepository.class);
     }
     

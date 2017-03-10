@@ -7,8 +7,8 @@ package nl.it.fixx.moknj.runner;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.UserBal;
 import nl.it.fixx.moknj.domain.core.user.User;
+import nl.it.fixx.moknj.properties.AdminProperties;
 import nl.it.fixx.moknj.repository.UserRepository;
 import static nl.it.fixx.moknj.security.OAuth2SecurityConfig.PSW_ENCODER;
 import org.slf4j.Logger;
@@ -20,8 +20,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * This class initializes on start up and checks if sysadmin is present if not
- * it creates sysadmin user for setup.
+ * This class initializes on start up and checks if username is present if not
+ * it creates username user for setup.
  *
  * @author adriaan
  */
@@ -30,6 +30,9 @@ public class ServerInitializer implements ApplicationRunner {
 
     @Autowired
     private UserRepository resp;
+
+    @Autowired
+    private AdminProperties properties;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -40,20 +43,24 @@ public class ServerInitializer implements ApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments applicationArguments) throws Exception {
+    public void run(ApplicationArguments applicationArguments) {
         try {
             User resource = new User();
             resource.setFirstName("Fixxit");
             resource.setSurname("");
             resource.setEmail("info@fixx.it");
             resource.setSystemUser(true);
-            resource.setUserName(UserBal.ADMIN_NAME);
-            resource.setPassword(passwordEncoder.encode("fix!2"));
+
+            LOG.info("properties.username : " + properties.username);
+            LOG.info("properties.username : " + properties.password);
+
+            resource.setUserName(properties.username);
+            resource.setPassword(passwordEncoder.encode(properties.password));
             List<String> auths = new ArrayList<>();
             auths.add("Administrator rights");
             resource.setAuthorities(auths);
 
-            User indb = resp.findByUserName(UserBal.ADMIN_NAME);
+            User indb = resp.findByUserName(properties.username);
             if (indb != null && indb.getId() != null) {
                 resource.setId(indb.getId());
             }
@@ -61,7 +68,7 @@ public class ServerInitializer implements ApplicationRunner {
             User saved = resp.save(resource);
             LOG.info("Setting sysadmin [" + saved.getId() + "] user "
                     + "fixxit no sysadmin is present...");
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             LOG.info("Error running system init", ex);
             throw ex;
         }

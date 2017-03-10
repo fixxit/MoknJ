@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nl.it.fixx.moknj.bal;
 
 import java.text.SimpleDateFormat;
@@ -22,7 +17,7 @@ import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.RepositoryContext;
+import nl.it.fixx.moknj.repository.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +38,7 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
     private final UserBal userBal;
     private final AccessBal userAccessBall;
 
-    public AssetBal(RepositoryContext context) throws Exception {
+    public AssetBal(SystemContext context) throws Exception {
         this.assetRep = context.getRepository(AssetRepository.class);
         this.fieldRep = context.getRepository(FieldDetailRepository.class);
         this.assetLinkRep = context.getRepository(AssetLinkRepository.class);

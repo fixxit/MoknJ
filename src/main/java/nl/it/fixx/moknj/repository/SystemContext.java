@@ -2,6 +2,7 @@ package nl.it.fixx.moknj.repository;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import nl.it.fixx.moknj.properties.AdminProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,9 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class RepositoryContext {
+public class SystemContext {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RepositoryContext.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SystemContext.class);
     @Autowired
     private UserRepository userRep;
     @Autowired
@@ -46,6 +47,8 @@ public class RepositoryContext {
     private FieldDetailRepository fieldDetailRep;
     @Autowired
     private GraphRepository graphRep;
+    @Autowired
+    private AdminProperties properties;
 
     public enum RepositoryCall {
         USER,
@@ -75,7 +78,7 @@ public class RepositoryContext {
 
     /**
      * Searches context class for matching repository. Can only return class if
-     * the class is auto wired to RepositoryContext.
+ the class is auto wired to SystemContext.
      *
      * @param <T>
      * @param clazz
@@ -97,7 +100,7 @@ public class RepositoryContext {
             }
             throw new Exception("Could not find repository, "
                     + "repository not autowired to "
-                    + RepositoryContext.class.getName() + "!");
+                    + SystemContext.class.getName() + "!");
         } catch (Exception e) {
             LOG.error("Error on finding repository", e);
             throw e;
@@ -162,5 +165,12 @@ public class RepositoryContext {
             LOG.error("Error on finding base repository", e);
             throw e;
         }
+    }
+
+    /**
+     * @return the properties
+     */
+    public AdminProperties getProperties() {
+        return properties;
     }
 }
