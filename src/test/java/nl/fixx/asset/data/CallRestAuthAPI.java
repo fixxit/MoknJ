@@ -1,6 +1,7 @@
 package nl.fixx.asset.data;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -40,7 +41,7 @@ public class CallRestAuthAPI {
             conn.disconnect();
 
             return response;
-        } catch (Exception ex) {
+        } catch (IOException | RuntimeException ex) {
             return null;
         }
     }

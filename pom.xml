@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.fixxit</groupId>
-    <artifactId>FixxITMoknj</artifactId>
-    <version>0.1.0</version>
+    <artifactId>FiXXiTMoknJ</artifactId>
+    <version>0.0.1</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.2.RELEASE</version>
+        <version>1.5.2.RELEASE</version>
     </parent>
 
     <dependencies>
@@ -119,5 +119,5 @@
         </plugins>
     </build>
     <packaging>war</packaging>
-    <name>FixxITMoknj</name>
+    <name>FiXXiTMoknJ</name>
 </project>
