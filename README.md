@@ -2,7 +2,7 @@
 
 
 ## Introduction ##
-This dragon scroll would serve for who ever takes on this project as a guide to unlock the unknowns and travel to far lands and slay dragons... One might ask ones self why would I be reading about dragons and I the writer would reply cause words can make a logical argument, the dragon represents the unknown(Netherlands) which you have found yourself in and mission of acquiring skills to strengthening your stats, so you too can one day ride...a...dragon...and...rain......fire...on...your...colleagues..............................
+This dragon scroll would serve for who ever takes on this project as a guide to unlock the unknowns and travel to far lands and slay dragons... One might ask ones self why would I be reading about dragons and I the writer would reply cause words can make a logical argument, does it matter? (rhetorical question)
 
 ## Mission ##
 MoknJ is a simple but effective solution to move data from excel sheets to an customizable platform. This platform allows the user to easily build custom templates that behave like predefined business components. The platform helps the business to consolidate its spreadsheet data which results in more effective management of the data.
