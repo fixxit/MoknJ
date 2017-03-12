@@ -16,7 +16,7 @@ import nl.it.fixx.moknj.domain.core.graph.GraphFocus;
 import nl.it.fixx.moknj.domain.core.graph.GraphType;
 import nl.it.fixx.moknj.domain.core.graph.GraphView;
 import nl.it.fixx.moknj.domain.core.template.Template;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import nl.it.fixx.moknj.response.GraphResponse;
 import org.springframework.beans.factory.annotation.Autowired;

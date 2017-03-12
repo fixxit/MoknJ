@@ -24,7 +24,7 @@ import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;

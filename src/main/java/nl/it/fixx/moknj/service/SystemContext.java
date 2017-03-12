@@ -1,8 +1,18 @@
-package nl.it.fixx.moknj.repository;
+package nl.it.fixx.moknj.service;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import nl.it.fixx.moknj.properties.AdminProperties;
+import nl.it.fixx.moknj.repository.AccessRepository;
+import nl.it.fixx.moknj.repository.AssetLinkRepository;
+import nl.it.fixx.moknj.repository.AssetRepository;
+import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
+import nl.it.fixx.moknj.repository.EmployeeRepository;
+import nl.it.fixx.moknj.repository.FieldDetailRepository;
+import nl.it.fixx.moknj.repository.GraphRepository;
+import nl.it.fixx.moknj.repository.MenuRepository;
+import nl.it.fixx.moknj.repository.TemplateRepository;
+import nl.it.fixx.moknj.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

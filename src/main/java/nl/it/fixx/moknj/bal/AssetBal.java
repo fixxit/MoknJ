@@ -17,7 +17,7 @@ import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

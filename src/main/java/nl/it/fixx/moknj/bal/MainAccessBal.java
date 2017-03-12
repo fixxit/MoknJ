@@ -17,7 +17,7 @@ import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.comparator.NullSafeComparator;

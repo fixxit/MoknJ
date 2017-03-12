@@ -21,7 +21,7 @@ import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

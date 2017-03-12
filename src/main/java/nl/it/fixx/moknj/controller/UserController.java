@@ -9,7 +9,7 @@ import nl.it.fixx.moknj.domain.core.access.AccessRight;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.core.user.UserAuthority;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import nl.it.fixx.moknj.response.UserResponse;
 import org.slf4j.Logger;

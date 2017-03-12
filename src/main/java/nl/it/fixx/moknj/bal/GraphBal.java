@@ -16,7 +16,7 @@ import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.repository.GraphRepository;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

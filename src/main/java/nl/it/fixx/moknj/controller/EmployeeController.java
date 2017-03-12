@@ -2,7 +2,7 @@ package nl.it.fixx.moknj.controller;
 
 import nl.it.fixx.moknj.bal.EmployeeBal;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.response.EmployeeResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;

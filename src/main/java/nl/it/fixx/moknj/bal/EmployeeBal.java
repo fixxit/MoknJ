@@ -19,7 +19,7 @@ import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

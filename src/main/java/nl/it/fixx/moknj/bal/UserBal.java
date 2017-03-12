@@ -10,7 +10,7 @@ import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.repository.AccessRepository;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
 import static nl.it.fixx.moknj.security.OAuth2SecurityConfig.PSW_ENCODER;

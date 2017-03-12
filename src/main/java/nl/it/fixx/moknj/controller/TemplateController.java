@@ -10,7 +10,7 @@ import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.template.TemplateType;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import nl.it.fixx.moknj.response.TemplateResponse;
 import org.springframework.beans.factory.annotation.Autowired;

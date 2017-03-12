@@ -3,7 +3,7 @@ package nl.it.fixx.moknj.bal;
 import java.util.List;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

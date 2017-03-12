@@ -6,7 +6,7 @@ import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.repository.AccessRepository;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

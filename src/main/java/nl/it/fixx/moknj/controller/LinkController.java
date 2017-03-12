@@ -2,7 +2,7 @@ package nl.it.fixx.moknj.controller;
 
 import nl.it.fixx.moknj.bal.LinkBal;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.repository.SystemContext;
+import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.response.LinkResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
