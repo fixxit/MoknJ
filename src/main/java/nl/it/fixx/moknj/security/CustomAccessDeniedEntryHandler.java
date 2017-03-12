@@ -4,7 +4,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import nl.it.fixx.moknj.properties.Security;
+import nl.it.fixx.moknj.properties.enums.Security;
 import static nl.it.fixx.moknj.security.CustomAuthenticationEntryPoint.getFullURL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

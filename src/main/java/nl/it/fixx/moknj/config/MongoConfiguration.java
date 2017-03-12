@@ -6,7 +6,7 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.properties.Database;
+import nl.it.fixx.moknj.properties.enums.Database;
 import nl.it.fixx.moknj.repository.RepositoryPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

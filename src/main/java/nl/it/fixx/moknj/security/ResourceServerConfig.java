@@ -1,7 +1,7 @@
 package nl.it.fixx.moknj.security;
 
 import javax.servlet.http.HttpServletRequest;
-import nl.it.fixx.moknj.properties.Security;
+import nl.it.fixx.moknj.properties.enums.Security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

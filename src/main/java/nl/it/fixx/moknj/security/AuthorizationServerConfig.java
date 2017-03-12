@@ -1,6 +1,6 @@
 package nl.it.fixx.moknj.security;
 
-import nl.it.fixx.moknj.properties.Security;
+import nl.it.fixx.moknj.properties.enums.Security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
