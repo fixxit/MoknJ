@@ -15,6 +15,17 @@ MoknJ started as an idea to move data from excel sheets to an customizable platf
 ## Technology Stack ##
 HTML5, CSS, Bootstrap, AngularJS, AngularUI, Angular Routing, Node, Express, Spring Boot, Spring Security (OAuth 2), Mongo DB, Java 8, Rest (Jersey with Jackson), Maven, Junit
 
+### Running API ###
+When this app starts for the 1st time you will see your username and password printed in the logs (this is your admin user). To start using the app you need to create template 1st with your respected fields mapped out then just add that template to menu (create menu) item and you are set. Repeat that few times with few unique templates and menu mappings and you've got yourself a web app (WHUTTT!!!!?)
+
+```
+2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : ########Remove me in production########
+2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : Admin : user
+2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : Password : user!2
+2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : #######################################
+
+```
+
 ## High level break down ##
 * MoknJ is rest API which which uses token authentication to identify the logged in user. 
 * The platform is split up in 2 applications ([GUI](https://github.com/fixxit/MoknJ-WebUI)) (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
@@ -36,17 +47,6 @@ Templates represent components in the platform. Templates define the fields and 
 * Templates also have behavior (Asset, Employee) assigned to them.  
 
 ![template](https://github.com/fixxit/MoknJ/blob/master/images/template.jpg?raw=true)
-
-### Running API ###
-When this app starts for the 1st time you will see your username and password printed in the logs (this is your admin user). To start using the app you need to create template 1st with your respected fields mapped out then just add that template to menu (create menu) item and you are set. Repeat that few times with few unique templates and menu mappings and you've got yourself a web app (WHUTTT!!!!?)
-
-```
-2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : ########Remove me in production########
-2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : Admin : user
-2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : Password : user!2
-2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : #######################################
-
-```
 
 ### Menu ###
 Menu item consists out a group of templates which represent a single page in the platform. The platform allows for multiple menu assigned to main modules.
