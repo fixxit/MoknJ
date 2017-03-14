@@ -37,6 +37,17 @@ Templates represent components in the platform. Templates define the fields and 
 
 ![template](https://github.com/fixxit/MoknJ/blob/master/images/template.jpg?raw=true)
 
+### Running API ###
+When this app starts for the 1st time you will see your username and password printed in the logs (this is your admin user). To start using the app you need to create template 1st with your respected fields mapped out then just add that template to menu (create menu) item and you are set. Repeat that few times with few unique templates and menu mappings and you've got yourself a web app (WHUTTT!!!!?)
+
+```
+2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : ########Remove me in production########
+2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : Admin : user
+2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : Password : user!2
+2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : #######################################
+
+```
+
 ### Menu ###
 Menu item consists out a group of templates which represent a single page in the platform. The platform allows for multiple menu assigned to main modules.
 
