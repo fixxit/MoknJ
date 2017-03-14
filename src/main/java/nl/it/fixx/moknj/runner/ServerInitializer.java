@@ -45,9 +45,11 @@ public class ServerInitializer implements ApplicationRunner {
             resource.setSurname("");
             resource.setEmail("info@fixx.it");
             resource.setSystemUser(true);
-
-            LOG.info("properties.username : " + properties.username);
-            LOG.info("properties.username : " + properties.password);
+            
+            LOG.info("########Remove me in production########");
+            LOG.info("Admin : " + properties.username);
+            LOG.info("Password : " + properties.password);
+            LOG.info("#######################################");
 
             resource.setUserName(properties.username);
             resource.setPassword(passwordEncoder.encode(properties.password));
