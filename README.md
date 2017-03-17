@@ -87,31 +87,31 @@ Screen shot info
 * Mongo 
 * Mongo chef core (Mongo db editor)
 
-
 ### Configuration ###
-This is to be added to the security.properties file the main Moknj package.
+MoknJ/src/main/java/application.yml
+```
+environment: 
+system:
+    db: moknj
+    url: localhost
+    port: 27017
+    username: 
+    password: 
+admin:
+    user: fixxit
+    pass: fix!2
+security:
+    realm: FIXX_OAUTH_REALM
+    client: fixx-trusted-client
+    secret: fixx_secret
+    tokenValiditySeconds: 72000
+    refreshTokenValiditySeconds: 72000
+    resourceId: fixx_rest_api
+```
+* System settings contains the db settings.
+* Admin is for you system administrator (All access, used for installation/mapping of system)
+* Security settings contains all OAuth settings.
 
-```
-#!xml
-security.realm = FIXX_OAUTH_REALM
-security.client = fixx-trusted-client
-security.secret = fixx_secret
-security.token_validity_seconds = 72000
-security.refresh_token_validity_seconds = 72000
-security.resource_id = fixx_rest_api
-```
-
-### Database configuration ###
-This is to be added to the system.properties file the main Moknj package.
-```
-#!xml
-system.db = moknj
-system.url = localhost
-system.port = 27017
-system.username = 
-system.password = 
-system.environment =
-```
 ### Who do I talk to? ###
 Riaan Schoeman (Devin Alrighty) (riaan.schoeman@fixx.it)
 
