@@ -6,6 +6,7 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import java.util.ArrayList;
 import java.util.List;
+import nl.it.fixx.moknj.properties.ApplicationProperties;
 import nl.it.fixx.moknj.properties.enums.Database;
 import nl.it.fixx.moknj.repository.RepositoryPackage;
 import org.slf4j.Logger;
@@ -13,26 +14,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
 @EnableMongoRepositories(basePackageClasses = RepositoryPackage.class)
-@PropertySource(Database.CLASSPATH)
 public class MongoConfiguration extends AbstractMongoConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoConfiguration.class);
-
+    
     @Autowired
-    private Environment porperties;
-
+    private ApplicationProperties porperties;
+    
+    
     @Override
     protected String getDatabaseName() {
         try {
-            return porperties.getProperty(Database.DATABASE);
+            return porperties.getSystem().getDb();
         } catch (Exception ex) {
             LOG.error("Error loading database properties", ex);
         }
@@ -41,16 +40,16 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @Override
     public Mongo mongo() {
-        final String port = porperties.getProperty(Database.PORT);
+        final String port = porperties.getSystem().getPort();
         if (port == null) {
             throw new RuntimeException("No port provided for mongo db, failed connection to db!");
         }
-        final String url = porperties.getProperty(Database.URL);
+        final String url = porperties.getSystem().getUrl();
         if (url == null) {
             throw new RuntimeException("No url provided for mongo db, failed connection to db!");
         }
 
-        final String environment = porperties.getProperty(Database.ENVIRONMENT);
+        final String environment = porperties.getEnvironment();
         LOG.info("Starting up on environment: " + environment);
         if (environment != null
                 && environment.contains(Database.ENVIRONMENT_OPENSHIFT)) {
@@ -77,8 +76,8 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
             }
         }
 
-        final String userName = porperties.getProperty(Database.USERNAME);
-        final String password = porperties.getProperty(Database.PASSWORD);
+        final String userName = porperties.getSystem().getUsername();
+        final String password = porperties.getSystem().getPassword();
         if (userName != null && !userName.trim().isEmpty()
                 && password != null && !password.trim().isEmpty()) {
             List<ServerAddress> seeds = new ArrayList<>();

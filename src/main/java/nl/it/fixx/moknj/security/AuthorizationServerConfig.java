@@ -1,11 +1,9 @@
 package nl.it.fixx.moknj.security;
 
-import nl.it.fixx.moknj.properties.enums.Security;
+import nl.it.fixx.moknj.properties.ApplicationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -20,11 +18,10 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
  */
 @Configuration
 @EnableAuthorizationServer
-@PropertySource(Security.CLASSPATH)
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
-    private Environment properties;
+    private ApplicationProperties properties;
 
     @Autowired
     private TokenStore tokenStore;
@@ -38,13 +35,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory().withClient(properties.getProperty(Security.CLIENT))
+        clients.inMemory().withClient(properties.getSecurity().getClient())
                 .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
                 .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
                 .scopes("read", "write", "trust")
-                .secret(properties.getProperty(Security.SECRET))
-                .accessTokenValiditySeconds(new Integer(properties.getProperty(Security.VALIDITY)))
-                .refreshTokenValiditySeconds(new Integer(properties.getProperty(Security.REFRESH_VALIDITY)));
+                .secret(properties.getSecurity().getSecret())
+                .accessTokenValiditySeconds(new Integer(properties.getSecurity().getTokenValiditySeconds()))
+                .refreshTokenValiditySeconds(new Integer(properties.getSecurity().getRefreshTokenValiditySeconds()));
     }
 
     @Override
@@ -56,7 +53,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-        oauthServer.realm(properties.getProperty(Security.REALM) + "/client");
+        oauthServer.realm(properties.getSecurity().getRealm() + "/client");
     }
 
 }

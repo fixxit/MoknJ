@@ -45,13 +45,13 @@ public class UserBal implements BusinessAccessLayer {
      */
     public List<User> getAll() throws Exception {
         try {
-            LOG.info("properties.username : " + context.getProperties().username);
+            LOG.info("properties.username : " + context.getProperties().getAdmin().getUser());
             List<User> users = new ArrayList<>();
             if (userRep != null) {
                 for (User user : userRep.findAll()) {
                     // if user has all access get all else only return his user
                     if (!user.isHidden()) {
-                        if (!context.getProperties().username.equals(user.getUserName())) {
+                        if (!context.getProperties().getAdmin().getUser().equals(user.getUserName())) {
                             users.add(user);
                         }
                     }
@@ -99,7 +99,7 @@ public class UserBal implements BusinessAccessLayer {
                     if (loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
                         if (!user.isHidden()) {
                             if (isAdmin) {
-                                if (!context.getProperties().username.equals(user.getUserName())) {
+                                if (!context.getProperties().getAdmin().getUser().equals(user.getUserName())) {
                                     users.add(user);
                                 }
                             } else {

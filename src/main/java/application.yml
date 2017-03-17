@@ -1,0 +1,19 @@
+environment: 
+system:
+    db: moknj
+    url: localhost
+    port: 27017
+    username: 
+    password: 
+admin:
+    user: fixxit
+    pass: fix!2
+security:
+    realm: FIXX_OAUTH_REALM
+    client: fixx-trusted-client
+    secret: fixx_secret
+    tokenValiditySeconds: 72000
+    refreshTokenValiditySeconds: 72000
+    resourceId: fixx_rest_api
+    
+

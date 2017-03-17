@@ -3,7 +3,7 @@ package nl.it.fixx.moknj.runner;
 import java.util.ArrayList;
 import java.util.List;
 import nl.it.fixx.moknj.domain.core.user.User;
-import nl.it.fixx.moknj.properties.AdminProperties;
+import nl.it.fixx.moknj.properties.ApplicationProperties;
 import nl.it.fixx.moknj.repository.UserRepository;
 import static nl.it.fixx.moknj.security.OAuth2SecurityConfig.PSW_ENCODER;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class ServerInitializer implements ApplicationRunner {
     private UserRepository resp;
 
     @Autowired
-    private AdminProperties properties;
+    private ApplicationProperties properties;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -45,19 +45,19 @@ public class ServerInitializer implements ApplicationRunner {
             resource.setSurname("");
             resource.setEmail("info@fixx.it");
             resource.setSystemUser(true);
-            
+
             LOG.info("########Remove me in production########");
-            LOG.info("Admin : " + properties.username);
-            LOG.info("Password : " + properties.password);
+            LOG.info("Admin : " + properties.getAdmin().getUser());
+            LOG.info("Password : " + properties.getAdmin().getPass());
             LOG.info("#######################################");
 
-            resource.setUserName(properties.username);
-            resource.setPassword(passwordEncoder.encode(properties.password));
+            resource.setUserName(properties.getAdmin().getUser());
+            resource.setPassword(passwordEncoder.encode(properties.getAdmin().getPass()));
             List<String> auths = new ArrayList<>();
             auths.add("Administrator rights");
             resource.setAuthorities(auths);
 
-            User indb = resp.findByUserName(properties.username);
+            User indb = resp.findByUserName(properties.getAdmin().getUser());
             if (indb != null && indb.getId() != null) {
                 resource.setId(indb.getId());
             }

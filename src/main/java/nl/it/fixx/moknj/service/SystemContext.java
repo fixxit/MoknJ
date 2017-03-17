@@ -2,7 +2,7 @@ package nl.it.fixx.moknj.service;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import nl.it.fixx.moknj.properties.AdminProperties;
+import nl.it.fixx.moknj.properties.ApplicationProperties;
 import nl.it.fixx.moknj.repository.AccessRepository;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
@@ -58,7 +58,7 @@ public class SystemContext {
     @Autowired
     private GraphRepository graphRep;
     @Autowired
-    private AdminProperties properties;
+    private ApplicationProperties properties;
 
     public enum RepositoryCall {
         USER,
@@ -88,7 +88,7 @@ public class SystemContext {
 
     /**
      * Searches context class for matching repository. Can only return class if
- the class is auto wired to SystemContext.
+     * the class is auto wired to SystemContext.
      *
      * @param <T>
      * @param clazz
@@ -180,7 +180,7 @@ public class SystemContext {
     /**
      * @return the properties
      */
-    public AdminProperties getProperties() {
+    public ApplicationProperties getProperties() {
         return properties;
     }
 }
