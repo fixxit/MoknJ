@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import nl.it.fixx.moknj.properties.ApplicationProperties;
 import static nl.it.fixx.moknj.security.CustomAuthenticationEntryPoint.getFullURL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +25,8 @@ import org.springframework.util.StringUtils;
  */
 @Configuration
 public class CustomAccessDeniedEntryHandler extends AbstractOAuth2SecurityExceptionHandler implements AccessDeniedHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CustomAccessDeniedEntryHandler.class);
 
     @Autowired
     private ApplicationProperties properties;
@@ -61,7 +65,7 @@ public class CustomAccessDeniedEntryHandler extends AbstractOAuth2SecurityExcept
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         String uri = getFullURL(request);
-        System.out.println("access denied redirect:" + uri);
+        LOG.debug("access denied redirect:" + uri);
         response.addHeader("Access-Control-Allow-Origin", "*");
         doHandle(request, response, accessDeniedException);
     }

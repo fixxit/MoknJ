@@ -1,13 +1,13 @@
 package nl.fixx.asset.data;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 
 public class CallRestAuthAPI {
+
     public static String doCall(String username, String password) {
         try {
             StringBuilder sb = new StringBuilder("http://localhost:8080/oauth/token?grant_type=password&username=");
@@ -25,7 +25,7 @@ public class CallRestAuthAPI {
             conn.addRequestProperty("Authorization", basicAuth);
 
             if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode() + " " + conn.getResponseMessage());
+                throw new Exception("Failed : HTTP error code : " + conn.getResponseCode() + " " + conn.getResponseMessage());
             }
 
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
@@ -41,7 +41,7 @@ public class CallRestAuthAPI {
             conn.disconnect();
 
             return response;
-        } catch (IOException | RuntimeException ex) {
+        } catch (Exception ex) {
             return null;
         }
     }

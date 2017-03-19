@@ -28,7 +28,7 @@ public class AccessBal {
     private final TemplateBal templateBal;
     private final MenuBal menuBal;
 
-    public AccessBal(SystemContext factory) throws Exception {
+    public AccessBal(SystemContext factory) {
         this.accessRep = factory.getRepository(AccessRepository.class);
         this.userBal = new UserBal(factory);
         this.menuBal = new MenuBal(factory);
@@ -36,7 +36,7 @@ public class AccessBal {
     }
 
     public AccessBal(SystemContext factory, UserBal userBal,
-            TemplateBal templateBal, MenuBal menuBal) throws Exception {
+            TemplateBal templateBal, MenuBal menuBal) {
         this.accessRep = factory.getRepository(AccessRepository.class);
         this.userBal = userBal;
         this.templateBal = templateBal;
@@ -72,7 +72,7 @@ public class AccessBal {
             }
 
         } catch (Exception e) {
-            LOG.info("Error while trying to insert user access rules");
+            LOG.error("Error while trying to insert user access rules");
             throw e;
         }
     }
@@ -91,14 +91,14 @@ public class AccessBal {
                 throw new Exception("This user does not have " + ALL_ACCESS.toString());
             }
 
-            LOG.info("Adding access for user "
+            LOG.debug("Adding access for user "
                     + "[" + userBal.getFullName(access.getUserId()) + "] on "
                     + "menu [" + menuBal.getDispayName(access.getMenuId()) + "] "
                     + "template [" + templateBal.getDispayName(access.getTemplateId()) + "]"
                     + "access [" + access.getRights() + "]");
             accessRep.save(access);
         } else {
-            LOG.info("Access for user "
+            LOG.debug("Access for user "
                     + "[" + userBal.getFullName(access.getUserId()) + "] on "
                     + "menu [" + menuBal.getDispayName(access.getMenuId()) + "] "
                     + "template [" + templateBal.getDispayName(access.getTemplateId()) + "] "
@@ -123,7 +123,7 @@ public class AccessBal {
 
         Access access = accessRep.findOne(id);
         if (access != null) {
-            LOG.info("removing access for user "
+            LOG.debug("removing access for user "
                     + "[" + userBal.getFullName(access.getUserId()) + "] on "
                     + "menu [" + menuBal.getDispayName(access.getMenuId()) + "] "
                     + "template [" + templateBal.getDispayName(access.getTemplateId()) + "]");
@@ -148,7 +148,7 @@ public class AccessBal {
             }
 
             if (access == null || access.getId() == null || access.getId().isEmpty()) {
-                LOG.info("No access id provided to update access rules with");
+                LOG.debug("No access id provided to update access rules with");
                 throw new Exception("Invalid access [unknown] provided for "
                         + "access rule update!");
             }
@@ -156,7 +156,7 @@ public class AccessBal {
             Access dbAcces = accessRep.findOne(access.getId());
 
             if (dbAcces == null) {
-                LOG.info("Access rule not found in db");
+                LOG.debug("Access rule not found in db");
                 throw new Exception("Invalid access [" + access.getId() + "]s provided, this "
                         + "access does not exist in the db!");
             }
@@ -252,7 +252,7 @@ public class AccessBal {
     public List<Access> getAccessList(String userId) throws Exception {
         List<Access> accessList = accessRep.getAccessList(userId);
         if (accessList == null || accessList.isEmpty()) {
-            LOG.info("This user[" + userBal.getFullName(userId) + "] seems to "
+            LOG.debug("This user[" + userBal.getFullName(userId) + "] seems to "
                     + "have no access rules assigned to him...");
         }
         return accessList;

@@ -42,7 +42,7 @@ public class MainAccessBal implements BusinessAccessLayer {
     private final EmployeeBal employeeBal;
     private final SystemContext context;
 
-    public MainAccessBal(SystemContext context) throws Exception {
+    public MainAccessBal(SystemContext context) {
         this.menuBal = new MenuBal(context);
         this.tempBal = new TemplateBal(context);
         this.userBal = new UserBal(context);
@@ -103,25 +103,24 @@ public class MainAccessBal implements BusinessAccessLayer {
      * @throws Exception
      */
     private List<Template> getMenuTemplates(Menu menu, User user, boolean bypassHidden) throws Exception {
-//        LOG.info("========================================");
-//        LOG.info("Menu [" + menu.getName() + "] ");
+        LOG.debug("========================================");
+        LOG.debug("Menu [" + menu.getName() + "] ");
         List<Template> templates = new ArrayList<>();
         for (Template temp : menu.getTemplates()) {
-//            LOG.info("Temp [" + temp.getName() + "] ");
+            LOG.debug("Temp [" + temp.getName() + "] ");
             if (tempBal.exists(temp.getId())) {
                 Template globalTemplate = tempBal.getTemplateById(temp.getId());
                 if (globalTemplate != null) {
                     // sets teh template menu rules down to template passed back
                     globalTemplate.setAllowScopeChallenge(temp.isAllowScopeChallenge());
                     // check if template is hidden or has access
-
                     boolean access = userAccessBal.hasAccess(user,
                             menu.getId(), globalTemplate.getId(), GlobalAccessRights.VIEW);
 
-//                    LOG.info("User [" + user.getUserName() + "] has access : " + access);
+                    LOG.debug("User [" + user.getUserName() + "] has access : " + access);
                     // check if template is hidden
                     if ((!bypassHidden && globalTemplate.isHidden()) || !access) {
-//                        LOG.info("skipping template [" + globalTemplate.getName() + "] for menu [" + menu.getName() + "]");
+                        LOG.debug("skipping template [" + globalTemplate.getName() + "] for menu [" + menu.getName() + "]");
                     } else {
                         // update template with db version
                         templates.add(Template.copy(globalTemplate));
@@ -318,7 +317,7 @@ public class MainAccessBal implements BusinessAccessLayer {
                     throw new Exception("This user does not have access to this template.");
                 }
             }
-            LOG.info("This template[" + templateId + "] seems to be deleted");
+            LOG.debug("This template[" + templateId + "] seems to be deleted");
             return null;
         } catch (Exception e) {
             LOG.error("Error while all templates for user token[" + token + "]");

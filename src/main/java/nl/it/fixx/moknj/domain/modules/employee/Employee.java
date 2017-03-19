@@ -2,10 +2,8 @@ package nl.it.fixx.moknj.domain.modules.employee;
 
 import java.util.List;
 import java.util.Objects;
-import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.record.Record;
-import nl.it.fixx.moknj.repository.FieldDetailRepository;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
@@ -218,30 +216,6 @@ public class Employee implements Record {
     @Override
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public String toAuditString(FieldDetailRepository fieldRep) {
-        String str = "";
-
-        str += menu + ", " + employee;
-
-        if (details != null && !details.isEmpty()) {
-            String fields = "";
-            for (FieldValue field : details) {
-                FieldDetail dbField = fieldRep.findOne(field.getId());
-                String fieldName = dbField.getName();
-                String fieldValue = field.getValue();
-                fields += fieldName + "=" + fieldValue + ",";
-            }
-            if (fields.endsWith(",")) {
-                fields = fields.substring(0, fields.length() - 1);
-            }
-            str += ", value={" + fields + "}";
-        }
-
-        str += ", createdDate=" + createdDate
-                + ", createdBy=" + createdBy;
-        return str;
     }
 
     @Override

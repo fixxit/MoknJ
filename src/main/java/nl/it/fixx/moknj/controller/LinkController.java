@@ -36,10 +36,6 @@ public class LinkController {
         LinkResponse response = new LinkResponse();
         try {
             LinkBal bal = new LinkBal(context);
-
-            LOG.info("templateId : " + templateId);
-            LOG.info("menuId : " + menuId);
-
             AssetLink link = bal.linkAssetToUser(menuId, templateId,
                     payload, access_token);
             response.setLink(link);

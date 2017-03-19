@@ -7,7 +7,7 @@ package nl.it.fixx.moknj.exception;
  *
  * @author Adriaan
  */
-public class BalException extends RuntimeException {
+public class BalException extends Exception {
 
     public BalException(String s) {
         super(s);

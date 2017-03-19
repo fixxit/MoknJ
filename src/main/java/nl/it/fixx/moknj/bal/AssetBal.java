@@ -13,10 +13,7 @@ import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.repository.FieldDetailRepository;
 import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,24 +24,39 @@ import org.slf4j.LoggerFactory;
  * @author adriaan
  */
 public class AssetBal implements RecordBal, BusinessAccessLayer {
-
+    
     private static final Logger LOG = LoggerFactory.getLogger(AssetBal.class);
     
     private final AssetRepository assetRep;
-    private final FieldDetailRepository fieldRep;
-    private final AssetLinkRepository assetLinkRep;
-
+    
     private final MenuBal menuBal;
     private final UserBal userBal;
     private final AccessBal userAccessBall;
-
-    public AssetBal(SystemContext context) throws Exception {
+    private final FieldBal fieldBal;
+    private final LinkBal linkBal;
+    
+    public AssetBal(SystemContext context) {
         this.assetRep = context.getRepository(AssetRepository.class);
-        this.fieldRep = context.getRepository(FieldDetailRepository.class);
-        this.assetLinkRep = context.getRepository(AssetLinkRepository.class);
         this.menuBal = new MenuBal(context);
         this.userBal = new UserBal(context);
         this.userAccessBall = new AccessBal(context);
+        this.fieldBal = new FieldBal(context);
+        this.linkBal = new LinkBal(context, userBal, this);
+    }
+
+    /**
+     * Stops stack overflow error on link bal constructor
+     *
+     * @param context
+     * @param linkBal
+     */
+    public AssetBal(SystemContext context, LinkBal linkBal) {
+        this.assetRep = context.getRepository(AssetRepository.class);
+        this.menuBal = new MenuBal(context);
+        this.userBal = new UserBal(context);
+        this.userAccessBall = new AccessBal(context);
+        this.fieldBal = new FieldBal(context);
+        this.linkBal = linkBal;
     }
 
     /**
@@ -61,7 +73,7 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
             if (!(record instanceof Asset)) {
                 throw new Exception("Not of asset class!");
             }
-
+            
             if (templateId != null) {
                 Asset saveAsset = (Asset) record;
                 saveAsset.setTypeId(templateId);
@@ -77,7 +89,7 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
                         throw new Exception("This user does not have sufficient "
                                 + "access rights to update this asset!");
                     }
-
+                    
                     Asset dbAsset = assetRep.findOne(saveAsset.getId());
                     if (saveAsset.equals(dbAsset)) {
                         flag = "no_changes";
@@ -105,9 +117,13 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
                 // Get all the unique field ids
                 List<FieldValue> newAssetFields = saveAsset.getDetails();
                 newAssetFields.stream().forEach((field) -> {
-                    FieldDetail detail = fieldRep.findOne(field.getId());
-                    if (detail != null && detail.isUnique()) {
-                        uniqueFields.put(field.getId(), detail.getName());
+                    try {
+                        FieldDetail detail = fieldBal.getField(field.getId());
+                        if (detail != null && detail.isUnique()) {
+                            uniqueFields.put(field.getId(), detail.getName());
+                        }
+                    } catch (Exception ex) {
+                        LOG.error("Error getting field detail", ex);
                     }
                 });
 
@@ -145,7 +161,7 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
                     if (message.endsWith(",")) {
                         message = message.substring(0, message.length() - 1);
                     }
-
+                    
                     message += unifieldIndicator.size() > 1
                             ? "]. Please check values"
                             : ". Please input new value";
@@ -171,7 +187,7 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
                     saveAsset.setCreatedBy(dbAsset.getCreatedBy());
                     saveAsset.setCreatedDate(dbAsset.getCreatedDate());
                 }
-
+                
                 return assetRep.save(saveAsset);
             } else {
                 throw new Exception("No asset type id provided.");
@@ -270,23 +286,23 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
                         throw new Exception("This user does not have sufficient "
                                 + "access rights to delete this asset!");
                     }
-
-                    List<AssetLink> links = assetLinkRep.getAllByAssetId(result.getId());
+                    
                     if (cascade) {
                         // delete links
-                        links.stream().forEach((link) -> {
-                            assetLinkRep.delete(link);
-                        });
+                        linkBal.getAllAssetLinksByAssetId(result.getId(),
+                                token).stream().forEach((link) -> {
+                                    linkBal.deleteAssetLink(link);
+                                });
                         // delete asset from the asset list.
                         assetRep.delete(result);
                     } else {
                         // hide asset by updating hidden field=
                         result.setHidden(true);
-                        LOG.info("This asset[" + result.getId() + "] is now "
+                        LOG.debug("This asset[" + result.getId() + "] is now "
                                 + "hidden as audit links was detected");
                         assetRep.save(result);
                     }
-
+                    
                 } else {
                     throw new Exception("Could not remove asset "
                             + "[" + asset.getId() + "] not found in db");
@@ -297,5 +313,5 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
             throw e;
         }
     }
-
+    
 }

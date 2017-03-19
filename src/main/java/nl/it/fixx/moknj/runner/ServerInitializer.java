@@ -65,7 +65,7 @@ public class ServerInitializer implements ApplicationRunner {
             User saved = resp.save(resource);
             LOG.info("Setting sysadmin [" + saved.getId() + "] user "
                     + "fixxit no sysadmin is present...");
-        } catch (RuntimeException ex) {
+        } catch (Exception ex) {
             LOG.info("Error running system init", ex);
             throw ex;
         }

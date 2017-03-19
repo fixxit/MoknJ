@@ -3,11 +3,14 @@ package nl.it.fixx.moknj.controller;
 import java.util.ArrayList;
 import java.util.List;
 import nl.it.fixx.moknj.bal.MainAccessBal;
+import nl.it.fixx.moknj.bal.MenuBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalMenuType;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.menu.MenuType;
 import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.response.MenuResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/menu")
 public class MenuContoller {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MenuContoller.class);
     @Autowired
     private SystemContext context;
 

@@ -80,39 +80,43 @@ public class SystemContext {
      * @param <T>
      * @param clazz
      * @return Object
-     * @throws Exception
      */
-    public <T extends Object> T getRepository(Class<T> clazz) throws Exception {
-        return getRepositoryFromAutoWiredClazz(clazz);
-    }
-
-    /**
-     * Searches context class for matching repository. Can only return class if
-     * the class is auto wired to SystemContext.
-     *
-     * @param <T>
-     * @param clazz
-     * @return Object
-     * @throws Exception
-     */
-    private <T extends Object> T getRepositoryFromAutoWiredClazz(Class<T> clazz) throws Exception {
+    public <T extends Object> T getRepository(Class<T> clazz) {
         try {
-            Field[] fields = this.getClass().getDeclaredFields();
-            for (Field field : fields) {
-                int mods = field.getModifiers();
-                if (!Modifier.isFinal(mods)
-                        && !Modifier.isStatic(mods)) {
-                    field.setAccessible(true);
-                    if (field.getType().equals(clazz)) {
-                        return (T) field.get(this);
-                    }
+            if (clazz != null) {
+                T rep = null;
+                if (UserRepository.class.equals(clazz)) {
+                    rep = (T) userRep;
+                } else if (AssetRepository.class.equals(clazz)) {
+                    rep = (T) assetRep;
+                } else if (EmployeeRepository.class.equals(clazz)) {
+                    rep = (T) employeeRep;
+                } else if (AssetLinkRepository.class.equals(clazz)) {
+                    rep = (T) assetLinkRep;
+                } else if (EmployeeLinkRepository.class.equals(clazz)) {
+                    rep = (T) employeeLinkRep;
+                } else if (AccessRepository.class.equals(clazz)) {
+                    rep = (T) accessRep;
+                } else if (MenuRepository.class.equals(clazz)) {
+                    rep = (T) menuRep;
+                } else if (TemplateRepository.class.equals(clazz)) {
+                    rep = (T) templateRep;
+                } else if (FieldDetailRepository.class.equals(clazz)) {
+                    rep = (T) fieldDetailRep;
+                } else if (GraphRepository.class.equals(clazz)) {
+                    rep = (T) graphRep;
                 }
+
+                if (rep != null) {
+                    return rep;
+                } else {
+                    throw new RuntimeException("Error trying to get repository for call " + clazz);
+                }
+            } else {
+                throw new RuntimeException("No call provide factory unable to get repository");
             }
-            throw new Exception("Could not find repository, "
-                    + "repository not autowired to "
-                    + SystemContext.class.getName() + "!");
-        } catch (Exception e) {
-            LOG.error("Error on finding repository", e);
+        } catch (RuntimeException e) {
+            LOG.error("Error on finding base repository", e);
             throw e;
         }
     }

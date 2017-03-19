@@ -24,7 +24,7 @@ import org.springframework.util.StringUtils;
  */
 @Configuration
 public class CustomAuthenticationEntryPoint extends AbstractOAuth2SecurityExceptionHandler implements AuthenticationEntryPoint {
-
+    
     @Autowired
     private ApplicationProperties properties;
 

@@ -32,7 +32,7 @@ public class UserBal implements BusinessAccessLayer {
     private final UserRepository userRep;
     private final SystemContext context;
 
-    public UserBal(SystemContext context) throws Exception {
+    public UserBal(SystemContext context) {
         this.userRep = context.getRepository(UserRepository.class);
         this.passwordEncoder = PSW_ENCODER;
         this.context = context;
@@ -45,7 +45,6 @@ public class UserBal implements BusinessAccessLayer {
      */
     public List<User> getAll() throws Exception {
         try {
-            LOG.info("properties.username : " + context.getProperties().getAdmin().getUser());
             List<User> users = new ArrayList<>();
             if (userRep != null) {
                 for (User user : userRep.findAll()) {
@@ -145,9 +144,9 @@ public class UserBal implements BusinessAccessLayer {
             } else {
                 // Delete all access rules relating to this user.
                 List<Access> accessRules = context.getRepository(AccessRepository.class).getAccessList(userId);
-                for (Access access : accessRules) {
+                accessRules.forEach((access) -> {
                     context.getRepository(AccessRepository.class).delete(access);
-                }
+                });
                 userRep.delete(resource);
             }
         } catch (Exception e) {
@@ -240,13 +239,13 @@ public class UserBal implements BusinessAccessLayer {
     public User getUserById(String id) throws Exception {
         try {
             if (id == null || id.isEmpty()) {
-                LOG.info("No user id recieved to find user");
+                LOG.debug("No user id recieved to find user");
                 throw new Exception("No user found, no user id provided!");
             }
 
             User user = userRep.findOne(id);
             if (user == null) {
-                LOG.info("no user found for id[" + id + "]");
+                LOG.debug("no user found for id[" + id + "]");
                 throw new Exception("No user found by this id[" + id + "]");
             }
             return user;
@@ -261,22 +260,23 @@ public class UserBal implements BusinessAccessLayer {
      *
      * @param token
      * @return user
+     * @throws java.lang.Exception
      */
-    public User getUserByToken(String token) {
+    public User getUserByToken(String token) throws Exception {
         try {
             if (token == null || token.isEmpty()) {
-                LOG.info("No token recieved to find user");
-                throw new RuntimeException("No user found, no token provided!");
+                LOG.debug("No token recieved to find user");
+                throw new Exception("No user found, no token provided!");
             }
             // Get user details who logged this employee using the token.
             User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(token));
             if (user == null) {
-                LOG.info("no user found for token[" + token + "]");
-                throw new RuntimeException("No user found by this token[" + token + "]");
+                LOG.debug("no user found for token[" + token + "]");
+                throw new Exception("No user found by this token[" + token + "]");
             }
 
             return user;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             LOG.error("Error on User Bal", e);
             throw e;
         }

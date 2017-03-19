@@ -37,7 +37,7 @@ public class CustomUserService implements UserDetailsService {
                         authorities.add(new SimpleGrantedAuthority(resAuth.name()));
                     }
                 } else {
-                    LOG.info("adding full admin rights!");
+                    LOG.debug("adding full admin rights!");
                     for (UserAuthority auths : UserAuthority.values()) {
                         SimpleGrantedAuthority sgAuth = new SimpleGrantedAuthority(auths.name());
                         if (!authorities.contains(sgAuth)) {
@@ -47,7 +47,7 @@ public class CustomUserService implements UserDetailsService {
                 }
             });
         }
-        LOG.info("authorities " + authorities);
+        LOG.debug("authorities " + authorities);
         return authorities;
     }
 

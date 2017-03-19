@@ -39,12 +39,69 @@ public class LinkBal implements BusinessAccessLayer {
     private final AccessBal accessBal;
     private final EmployeeBal employeeBal;
 
-    public LinkBal(SystemContext context) throws Exception {
+    public LinkBal(SystemContext context) {
         this.context = context;
         this.userBal = new UserBal(context);
-        this.assetBal = new AssetBal(context);
         this.accessBal = new AccessBal(context);
-        this.employeeBal = new EmployeeBal(context);
+        this.assetBal = new AssetBal(context, this);
+        this.employeeBal = new EmployeeBal(context, this);
+    }
+
+    /**
+     * Stops stack overflow error on Employee bal constructor
+     *
+     * @param context
+     * @param userBal
+     * @param employeeBal
+     */
+    public LinkBal(SystemContext context, UserBal userBal, EmployeeBal employeeBal) {
+        this.context = context;
+        this.userBal = userBal;
+        this.employeeBal = employeeBal;
+        this.accessBal = new AccessBal(context);
+        this.assetBal = new AssetBal(context, this);
+    }
+
+    /**
+     * Stops stack overflow error on Asset bal constructor
+     *
+     * @param context
+     * @param userBal
+     * @param assetBal
+     */
+    public LinkBal(SystemContext context, UserBal userBal, AssetBal assetBal) {
+        this.context = context;
+        this.assetBal = assetBal;
+        this.userBal = userBal;
+        this.accessBal = new AccessBal(context);
+        this.employeeBal = new EmployeeBal(context, this);
+    }
+
+    /**
+     * Todo add comments and access checks
+     *
+     * @param link
+     */
+    public void deleteAssetLink(AssetLink link) {
+        context.getRepository(AssetLinkRepository.class).delete(link);
+    }
+
+    /**
+     * Todo add comments and access checks
+     *
+     * @param link
+     */
+    public void deleteEmployeeLink(EmployeeLink link) {
+        context.getRepository(EmployeeLinkRepository.class).delete(link);
+    }
+
+    /**
+     * Todo add comments and access checks
+     *
+     * @param audit
+     */
+    public void saveEmployeeLink(EmployeeLink audit) {
+        context.getRepository(EmployeeLinkRepository.class).save(audit);
     }
 
     /**
@@ -297,7 +354,7 @@ public class LinkBal implements BusinessAccessLayer {
         try {
             Set<AssetLink> results = new HashSet<>();
             for (Menu menu : new MainAccessBal(context).getUserMenus(token)) {
-                if (menu.getMenuType().equals(GBL_MT_ASSET)) {
+                if (GBL_MT_ASSET.equals(menu.getMenuType())) {
                     for (Template temp : menu.getTemplates()) {
                         List<Asset> assets = assetBal.getAll(temp.getId(), menu.getId(), token);
                         for (Asset asset : assets) {

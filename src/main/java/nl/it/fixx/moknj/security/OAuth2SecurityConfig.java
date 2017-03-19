@@ -103,8 +103,10 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
         return store;
     }
 
-    public static String getUserForToken(String token) {
-        return IN_MEM_TOKEN_STORE.readAuthentication(token).getName();
+    public static String getUserForToken(String token) throws Exception {
+        return IN_MEM_TOKEN_STORE.readAuthentication(token) != null
+                ? IN_MEM_TOKEN_STORE.readAuthentication(token).getName()
+                : null;
     }
 
     @Override

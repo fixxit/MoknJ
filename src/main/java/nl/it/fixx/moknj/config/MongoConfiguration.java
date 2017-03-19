@@ -23,11 +23,10 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 public class MongoConfiguration extends AbstractMongoConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoConfiguration.class);
-    
+
     @Autowired
     private ApplicationProperties porperties;
-    
-    
+
     @Override
     protected String getDatabaseName() {
         try {
@@ -39,18 +38,18 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
     }
 
     @Override
-    public Mongo mongo() {
+    public Mongo mongo() throws Exception {
         final String port = porperties.getSystem().getPort();
         if (port == null) {
-            throw new RuntimeException("No port provided for mongo db, failed connection to db!");
+            throw new Exception("No port provided for mongo db, failed connection to db!");
         }
         final String url = porperties.getSystem().getUrl();
         if (url == null) {
-            throw new RuntimeException("No url provided for mongo db, failed connection to db!");
+            throw new Exception("No url provided for mongo db, failed connection to db!");
         }
 
         final String environment = porperties.getEnvironment();
-        LOG.info("Starting up on environment: " + environment);
+        LOG.debug("Starting up on environment: " + environment);
         if (environment != null
                 && environment.contains(Database.ENVIRONMENT_OPENSHIFT)) {
             String openIp = System.getenv(Database.OPENSHIFT_MONGODB_DB_HOST);
@@ -69,9 +68,9 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
                                 openPassword.toCharArray()
                         )
                 );
-                LOG.info("####################################");
-                LOG.info("returning open shift db connection!");
-                LOG.info("####################################");
+                LOG.debug("####################################");
+                LOG.debug("returning open shift db connection!");
+                LOG.debug("####################################");
                 return new MongoClient(address, credentials);
             }
         }
@@ -103,7 +102,7 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @Bean
     @Override
-    public MongoTemplate mongoTemplate() {
+    public MongoTemplate mongoTemplate() throws Exception {
         return new MongoTemplate(mongo(), getDatabaseName());
     }
 

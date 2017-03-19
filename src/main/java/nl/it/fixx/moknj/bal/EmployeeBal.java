@@ -16,9 +16,7 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeAction;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
-import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.repository.FieldDetailRepository;
 import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,23 +30,38 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeBal.class);
     private final EmployeeRepository employeeRep;
-    private final FieldDetailRepository fieldRep;
-    private final EmployeeLinkRepository employeeLinkRep;
 
     private final MenuBal menuBal;
     private final UserBal userBal;
     private final TemplateBal tempBal;
     private final AccessBal userAccessBall;
+    private final FieldBal fieldBal;
+    private final LinkBal linkBal;
 
-    public EmployeeBal(SystemContext context) throws Exception {
+    public EmployeeBal(SystemContext context) {
         this.employeeRep = context.getRepository(EmployeeRepository.class);
-        this.fieldRep = context.getRepository(FieldDetailRepository.class);
-        this.employeeLinkRep = context.getRepository(EmployeeLinkRepository.class);
-
         this.userBal = new UserBal(context);
         this.menuBal = new MenuBal(context);
         this.tempBal = new TemplateBal(context);
         this.userAccessBall = new AccessBal(context);
+        this.fieldBal = new FieldBal(context);
+        this.linkBal = new LinkBal(context, userBal, this);
+    }
+
+    /**
+     * Stops stack overflow error on link bal constructor
+     *
+     * @param context
+     * @param linkBal
+     */
+    public EmployeeBal(SystemContext context, LinkBal linkBal) {
+        this.employeeRep = context.getRepository(EmployeeRepository.class);
+        this.userBal = new UserBal(context);
+        this.menuBal = new MenuBal(context);
+        this.tempBal = new TemplateBal(context);
+        this.userAccessBall = new AccessBal(context);
+        this.fieldBal = new FieldBal(context);
+        this.linkBal = linkBal;
     }
 
     /**
@@ -102,7 +115,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
 
     @Override
     public Employee save(String templateId, String menuId, Object record, String token) throws Exception {
-        EmployeeLink audit = new EmployeeLink();
+
         try {
             if (templateId != null) {
                 Employee passedEmployee = (Employee) record;
@@ -147,9 +160,13 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                 // Get all the unique field ids
                 List<FieldValue> newEmployeeFields = passedEmployee.getDetails();
                 newEmployeeFields.stream().forEach((field) -> {
-                    FieldDetail detail = fieldRep.findOne(field.getId());
-                    if (detail != null && detail.isUnique()) {
-                        uniqueFields.put(field.getId(), detail.getName());
+                    try {
+                        FieldDetail detail = fieldBal.getField(field.getId());
+                        if (detail != null && detail.isUnique()) {
+                            uniqueFields.put(field.getId(), detail.getName());
+                        }
+                    } catch (Exception ex) {
+                        LOG.error("Error getting field detail", ex);
                     }
                 });
 
@@ -218,6 +235,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                     passedEmployee.setCreatedDate(dbEmployee.getCreatedDate());
                 }
 
+                EmployeeLink audit = new EmployeeLink();
                 // Set audit logs
                 audit.setCreatedDate(createdDate);
                 audit.setCreatedBy(passedEmployee.getLastModifiedBy());
@@ -242,7 +260,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                                 if (dbFieldValue.getId().equals(newFieldValue.getId())) {
                                     if (!dbFieldValue.getValue().equals(newFieldValue.getValue())) {
                                         // get field details
-                                        FieldDetail detail = fieldRep.findOne(dbFieldValue.getId());
+                                        FieldDetail detail = fieldBal.getField(dbFieldValue.getId());
                                         String change = detail.getName() + " value [";
                                         change += dbFieldValue.getValue() + "] ";
                                         change += "changed to [" + newFieldValue.getValue() + "], ";
@@ -276,7 +294,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                         }
                     }
 
-                    audit.setChanges(passedEmployee.toAuditString(fieldRep));
+                    audit.setChanges(toAuditString(passedEmployee));
                 }
 
                 // Set action
@@ -299,7 +317,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                 // make sure action is added to audit.
                 if (audit.getAction() != null) {
                     if (!"NO_CHANGE".equals(audit.getChanges())) {
-                        employeeLinkRep.save(audit);
+                        linkBal.saveEmployeeLink(audit);
                     }
                 }
 
@@ -344,18 +362,18 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                                 + "access rights to delete this employee!");
                     }
 
-                    List<EmployeeLink> links = employeeLinkRep.getAllByEmployeeId(result.getId());
                     if (cascade) {
                         // delete links
-                        links.stream().forEach((link) -> {
-                            employeeLinkRep.delete(link);
+                        linkBal.getAllEmployeeLinksForEmployee(
+                                result.getId(), token).stream().forEach((link) -> {
+                            linkBal.deleteEmployeeLink(link);
                         });
                         employeeRep.delete(result);
                     } else {
                         // hide asset by updating hidden field=
                         result.setHidden(true);
                         employeeRep.save(result);
-                        LOG.info("This employee[" + result.getId() + "] is now "
+                        LOG.debug("This employee[" + result.getId() + "] is now "
                                 + "hidden as audit links was detected");
                     }
                 } else {
@@ -367,6 +385,32 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
             LOG.error("Error on trying to retieve employee for id [" + record + "]", e);
             throw e;
         }
+    }
+
+    public String toAuditString(Employee emp) throws Exception {
+        String str = "";
+
+        str += emp.getMenu() + ", " + emp.getEmployee();
+
+        if (emp.getDetails() != null && !emp.getDetails().isEmpty()) {
+            String fields = "";
+
+            for (FieldValue field : emp.getDetails()) {
+                FieldDetail dbField = fieldBal.getField(field.getId());
+                String fieldName = dbField.getName();
+                String fieldValue = field.getValue();
+                fields += fieldName + "=" + fieldValue + ",";
+            }
+
+            if (fields.endsWith(",")) {
+                fields = fields.substring(0, fields.length() - 1);
+            }
+            str += ", value={" + fields + "}";
+        }
+
+        str += ", createdDate=" + emp.getCreatedDate()
+                + ", createdBy=" + emp.getCreatedBy();
+        return str;
     }
 
 }

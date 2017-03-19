@@ -31,7 +31,7 @@ public class GraphBal implements BusinessAccessLayer {
     private final SystemContext context;
     private final GraphRepository graphRep;
 
-    public GraphBal(SystemContext factory) throws Exception {
+    public GraphBal(SystemContext factory) {
         this.context = factory;
         this.graphRep = context.getRepository(GraphRepository.class);
     }

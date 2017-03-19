@@ -2,7 +2,6 @@ package nl.it.fixx.moknj.bal;
 
 import java.util.List;
 import nl.it.fixx.moknj.domain.core.template.Template;
-import nl.it.fixx.moknj.repository.FieldDetailRepository;
 import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import org.slf4j.Logger;
@@ -16,11 +15,11 @@ public class TemplateBal implements BusinessAccessLayer {
 
     private static final Logger LOG = LoggerFactory.getLogger(TemplateBal.class);
     private final TemplateRepository tempRep;
-    private final FieldDetailRepository fieldDetailRep;
+    private final FieldBal fieldBal;
 
-    public TemplateBal(SystemContext context) throws Exception {
+    public TemplateBal(SystemContext context) {
         this.tempRep = context.getRepository(TemplateRepository.class);
-        this.fieldDetailRep = context.getRepository(FieldDetailRepository.class);
+        this.fieldBal = new FieldBal(context);
     }
 
     /**
@@ -45,17 +44,14 @@ public class TemplateBal implements BusinessAccessLayer {
 
             boolean exists = tempRep.existsByName(payload.getName());
             if (!exists || bypassExists) {
-                payload.getDetails().stream().forEach((detail) -> {
-                    this.fieldDetailRep.save(detail);
-                });
-
+                fieldBal.saveFields(payload.getDetails());
                 Template template = this.tempRep.save(payload);
                 return template;
             } else {
                 throw new Exception("Template by name " + payload.getName() + " exists");
             }
         } catch (Exception e) {
-            LOG.error("Error getting template by id", e);
+            LOG.error("Error saving template[" + payload + "]", e);
             throw e;
         }
     }
@@ -70,13 +66,13 @@ public class TemplateBal implements BusinessAccessLayer {
     public Template getTemplateById(String id) throws Exception {
         try {
             if (id == null || id.isEmpty()) {
-                LOG.info("No template id recieved to find template");
+                LOG.debug("No template id recieved to find template");
                 throw new Exception("No template found, no template id provided!");
             }
 
             Template template = tempRep.findOne(id);
             if (template == null) {
-                LOG.info("no template found for id[" + id + "]");
+                LOG.debug("no template found for id[" + id + "]");
                 throw new Exception("No template found by this id[" + id + "]");
             }
             return template;
@@ -147,11 +143,11 @@ public class TemplateBal implements BusinessAccessLayer {
         try {
             Template template = getTemplateById(id);
             if (!cascade) {
-                LOG.info("hiding template[" + template.getName() + "]");
+                LOG.debug("hiding template[" + template.getName() + "]");
                 template.setHidden(true);
                 this.saveTemplate(template);
             } else {
-                LOG.info("deleting template[" + template.getName() + "]");
+                LOG.debug("deleting template[" + template.getName() + "]");
                 this.tempRep.delete(id);
             }
         } catch (Exception e) {
