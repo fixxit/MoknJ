@@ -13,6 +13,7 @@ import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
+import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
@@ -23,20 +24,18 @@ import org.slf4j.LoggerFactory;
  *
  * @author adriaan
  */
-public class AssetBal implements RecordBal, BusinessAccessLayer {
-    
+public class AssetBal extends RepositoryChain<AssetRepository> implements RecordBal<Asset> {
+
     private static final Logger LOG = LoggerFactory.getLogger(AssetBal.class);
-    
-    private final AssetRepository assetRep;
-    
+
     private final MenuBal menuBal;
     private final UserBal userBal;
     private final AccessBal userAccessBall;
     private final FieldBal fieldBal;
     private final LinkBal linkBal;
-    
+
     public AssetBal(SystemContext context) {
-        this.assetRep = context.getRepository(AssetRepository.class);
+        super(context.getRepository(AssetRepository.class));
         this.menuBal = new MenuBal(context);
         this.userBal = new UserBal(context);
         this.userAccessBall = new AccessBal(context);
@@ -51,7 +50,7 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
      * @param linkBal
      */
     public AssetBal(SystemContext context, LinkBal linkBal) {
-        this.assetRep = context.getRepository(AssetRepository.class);
+        super(context.getRepository(AssetRepository.class));
         this.menuBal = new MenuBal(context);
         this.userBal = new UserBal(context);
         this.userAccessBall = new AccessBal(context);
@@ -65,33 +64,27 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
      * @param templateId template id
      * @param token
      * @return the saved asset for id
-     * @throws Exception
      */
     @Override
-    public Asset save(String templateId, String menuId, Object record, String token) throws Exception {
+    public Asset save(String templateId, String menuId, Asset record, String token) throws BalException {
         try {
-            if (!(record instanceof Asset)) {
-                throw new Exception("Not of asset class!");
-            }
-            
             if (templateId != null) {
-                Asset saveAsset = (Asset) record;
-                saveAsset.setTypeId(templateId);
+                record.setTypeId(templateId);
                 // checks if the original object differs from new saved object
                 // stop the unique filter form check for duplicates on asset
                 // which has not changed from the db version...
                 String flag = null;
-                if (saveAsset.getId() != null) {
+                if (record.getId() != null) {
                     // check if user has acess for edit record
                     User user = userBal.getUserByToken(token);
                     if (!userAccessBall.hasAccess(user, menuId, templateId,
                             GlobalAccessRights.EDIT)) {
-                        throw new Exception("This user does not have sufficient "
+                        throw new BalException("This user does not have sufficient "
                                 + "access rights to update this asset!");
                     }
-                    
-                    Asset dbAsset = assetRep.findOne(saveAsset.getId());
-                    if (saveAsset.equals(dbAsset)) {
+
+                    Asset dbAsset = repository.findOne(record.getId());
+                    if (record.equals(dbAsset)) {
                         flag = "no_changes";
                     } else {
                         flag = "has_changes";
@@ -101,7 +94,7 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
                     User user = userBal.getUserByToken(token);
                     if (!userAccessBall.hasAccess(user, menuId, templateId,
                             GlobalAccessRights.NEW)) {
-                        throw new Exception("This user does not have sufficient "
+                        throw new BalException("This user does not have sufficient "
                                 + "access rights to save this asset!");
                     }
                 }
@@ -115,7 +108,7 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
                 Map<String, List<String>> uniqueValues = new HashMap<>();
 
                 // Get all the unique field ids
-                List<FieldValue> newAssetFields = saveAsset.getDetails();
+                List<FieldValue> newAssetFields = record.getDetails();
                 newAssetFields.stream().forEach((field) -> {
                     try {
                         FieldDetail detail = fieldBal.getField(field.getId());
@@ -128,10 +121,10 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
                 });
 
                 // Create a list of all the values for the unique assets
-                for (Asset asset : assetRep.getAllByTypeId(templateId)) {
+                for (Asset asset : repository.getAllByTypeId(templateId)) {
                     // if statement below checks that if update asset does not check
                     // it self to flag for duplication
-                    if (!asset.getId().equals(saveAsset.getId())
+                    if (!asset.getId().equals(record.getId())
                             && !"no_changes".equals(flag)) {
                         List<FieldValue> details = asset.getDetails();
                         details.stream().filter((field) -> (uniqueFields.keySet().contains(field.getId()))).map((field) -> {
@@ -161,40 +154,39 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
                     if (message.endsWith(",")) {
                         message = message.substring(0, message.length() - 1);
                     }
-                    
+
                     message += unifieldIndicator.size() > 1
                             ? "]. Please check values"
                             : ". Please input new value";
-                    throw new Exception(message);
+                    throw new BalException(message);
                 }
 
                 // Get user details who logged this asset using the token.
                 User user = userBal.getUserByToken(token);
                 if (user != null && user.isSystemUser()) {
-                    saveAsset.setLastModifiedBy(user.getUserName());
+                    record.setLastModifiedBy(user.getUserName());
                 } else {
-                    throw new Exception("Asset save error, could not find system"
+                    throw new BalException("Asset save error, could not find system"
                             + " user for this token");
                 }
                 // Save asset
                 String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
-                saveAsset.setLastModifiedDate(date);
-                if (saveAsset.getId() == null) {
-                    saveAsset.setCreatedBy(user.getUserName());
-                    saveAsset.setCreatedDate(date);
+                record.setLastModifiedDate(date);
+                if (record.getId() == null) {
+                    record.setCreatedBy(user.getUserName());
+                    record.setCreatedDate(date);
                 } else {
-                    Asset dbAsset = assetRep.findOne(saveAsset.getId());
-                    saveAsset.setCreatedBy(dbAsset.getCreatedBy());
-                    saveAsset.setCreatedDate(dbAsset.getCreatedDate());
+                    Asset dbAsset = repository.findOne(record.getId());
+                    record.setCreatedBy(dbAsset.getCreatedBy());
+                    record.setCreatedDate(dbAsset.getCreatedDate());
                 }
-                
-                return assetRep.save(saveAsset);
+
+                return repository.save(record);
             } else {
-                throw new Exception("No asset type id provided.");
+                throw new BalException("No asset type id provided.");
             }
         } catch (Exception e) {
-            LOG.error("Could not save asset due to internal error", e);
-            throw e;
+            throw new BalException("Could not save asset due to internal error", e);
         }
     }
 
@@ -207,12 +199,12 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
      * @return
      */
     @Override
-    public List<Asset> getAll(String templateId, String menuId, String token) throws Exception {
+    public List<Asset> getAll(String templateId, String menuId, String token) throws BalException {
         try {
             List<Asset> assets = new ArrayList<>();
             User user = userBal.getUserByToken(token);
             if (userAccessBall.hasAccess(user, menuId, templateId, GlobalAccessRights.VIEW)) {
-                List<Asset> records = assetRep.getAllByTypeId(templateId);
+                List<Asset> records = repository.getAllByTypeId(templateId);
                 // Gets custom template settings saved to menu.
                 Menu menu = menuBal.getMenuById(menuId);
                 menu.getTemplates().stream().filter((template)
@@ -238,9 +230,8 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
             }
             return assets;
         } catch (Exception e) {
-            LOG.error("Could not find all assets for template "
+            throw new BalException("Could not find all assets for template "
                     + "[" + templateId + "] and menu [" + menuId + "]", e);
-            throw e;
         }
     }
 
@@ -253,12 +244,12 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
     @Override
     public Asset get(String id) throws Exception {
         try {
-            Asset asset = assetRep.findOne(id);
+            Asset asset = repository.findOne(id);
             if (asset != null) {
                 return asset;
             }
-            throw new Exception("Could not find asset for id [" + id + "]");
-        } catch (Exception e) {
+            throw new BalException("Could not find asset for id [" + id + "]");
+        } catch (BalException e) {
             LOG.error("Error on trying to retieve asset for id [" + id + "]", e);
             throw e;
         }
@@ -270,48 +261,44 @@ public class AssetBal implements RecordBal, BusinessAccessLayer {
      * @param menuId
      * @param token
      * @param cascade
-     * @throws Exception
      */
     @Override
-    public void delete(Object record, String menuId, String token, boolean cascade) throws Exception {
+    public void delete(Asset record, String menuId, String token, boolean cascade) throws BalException {
         try {
-            if (record instanceof Asset) {
-                Asset asset = (Asset) record;
-                Asset result = assetRep.findOne(asset.getId());
-                if (result != null) {
-                    String templateId = result.getTypeId();
-                    User user = userBal.getUserByToken(token);
-                    if (!userAccessBall.hasAccess(user, menuId, templateId,
-                            GlobalAccessRights.DELETE)) {
-                        throw new Exception("This user does not have sufficient "
-                                + "access rights to delete this asset!");
-                    }
-                    
-                    if (cascade) {
-                        // delete links
-                        linkBal.getAllAssetLinksByAssetId(result.getId(),
-                                token).stream().forEach((link) -> {
-                                    linkBal.deleteAssetLink(link);
-                                });
-                        // delete asset from the asset list.
-                        assetRep.delete(result);
-                    } else {
-                        // hide asset by updating hidden field=
-                        result.setHidden(true);
-                        LOG.debug("This asset[" + result.getId() + "] is now "
-                                + "hidden as audit links was detected");
-                        assetRep.save(result);
-                    }
-                    
-                } else {
-                    throw new Exception("Could not remove asset "
-                            + "[" + asset.getId() + "] not found in db");
+            Asset result = repository.findOne(record.getId());
+            if (result != null) {
+                String templateId = result.getTypeId();
+                User user = userBal.getUserByToken(token);
+                if (!userAccessBall.hasAccess(user, menuId, templateId,
+                        GlobalAccessRights.DELETE)) {
+                    throw new BalException("This user does not have sufficient "
+                            + "access rights to delete this asset!");
                 }
+
+                if (cascade) {
+                    // delete links
+                    linkBal.getAllAssetLinksByAssetId(result.getId(),
+                            token).stream().forEach((link) -> {
+                                linkBal.deleteAssetLink(link);
+                            });
+                    // delete asset from the asset list.
+                    repository.delete(result);
+                } else {
+                    // hide asset by updating hidden field=
+                    result.setHidden(true);
+                    LOG.debug("This asset[" + result.getId() + "] is now "
+                            + "hidden as audit links was detected");
+                    repository.save(result);
+                }
+
+            } else {
+                throw new BalException("Could not remove asset "
+                        + "[" + record.getId() + "] not found in db");
             }
+
         } catch (Exception e) {
-            LOG.error("Error on trying to to delete asset [" + record + "]", e);
-            throw e;
+            throw new BalException("Error on trying to to delete asset [" + record + "]", e);
         }
     }
-    
+
 }

@@ -15,6 +15,7 @@ import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
+import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.GraphRepository;
 import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
@@ -24,16 +25,15 @@ import org.slf4j.LoggerFactory;
  *
  * @author adriaan
  */
-public class GraphBal implements BusinessAccessLayer {
+public class GraphBal extends RepositoryChain<GraphRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
     private final SystemContext context;
-    private final GraphRepository graphRep;
 
-    public GraphBal(SystemContext factory) {
-        this.context = factory;
-        this.graphRep = context.getRepository(GraphRepository.class);
+    public GraphBal(SystemContext context) {
+        super(context.getRepository(GraphRepository.class));
+        this.context = context;
     }
 
     /**
@@ -51,7 +51,7 @@ public class GraphBal implements BusinessAccessLayer {
             boolean bypassExists = false;
             if (payload.getId() != null && !payload.getId().trim().isEmpty()) {
                 bypassExists = true;
-                Graph dbGraph = graphRep.findOne(payload.getId());
+                Graph dbGraph = repository.findOne(payload.getId());
                 payload.setCreatorId(dbGraph.getCreatorId());
             } else {
                 User user = new UserBal(context).getUserByToken(token);
@@ -60,12 +60,12 @@ public class GraphBal implements BusinessAccessLayer {
                 }
             }
 
-            boolean exists = graphRep.existsByName(payload.getName());
+            boolean exists = repository.existsByName(payload.getName());
             if (!exists || bypassExists) {
-                Graph graph = graphRep.save(payload);
+                Graph graph = repository.save(payload);
                 return graph;
             } else {
-                throw new Exception("Graph with the name " + payload.getName() + " exists");
+                throw new BalException("Graph with the name " + payload.getName() + " exists");
             }
         } catch (Exception e) {
             LOG.error("Could not save the graph setup", e);
@@ -86,7 +86,7 @@ public class GraphBal implements BusinessAccessLayer {
             User user = new UserBal(context).getUserByToken(token);
             Set<Graph> graphs = new HashSet();
             if (user != null) {
-                List<Graph> savedGraphs = graphRep.findAll();
+                List<Graph> savedGraphs = repository.findAll();
                 for (Graph graph : savedGraphs) {
                     // check if user has access to view and edit this graph template
                     if (user.getId().equals(graph.getCreatorId())) {
@@ -127,7 +127,7 @@ public class GraphBal implements BusinessAccessLayer {
     public GraphData getGraphData(String graphId, String token) throws Exception {
         try {
             User user = new UserBal(context).getUserByToken(token);
-            Graph graph = graphRep.findOne(graphId);
+            Graph graph = repository.findOne(graphId);
             if (user.getId().equals(graph.getCreatorId())) {
                 GraphBuilder builder = new GraphBuilder(context, token);
                 return builder.buildGraphData(graph);
@@ -180,19 +180,19 @@ public class GraphBal implements BusinessAccessLayer {
      */
     public void deleteGraph(String id, String token) throws Exception {
         try {
-            if (graphRep.exists(id)) {
-                Graph graph = graphRep.findOne(id);
+            if (repository.exists(id)) {
+                Graph graph = repository.findOne(id);
                 User user = new UserBal(context).getUserByToken(token);
                 if (graph.getCreatorId().equals(user.getId())
                         || user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                    graphRep.delete(id);
+                    repository.delete(id);
                 } else {
-                    throw new Exception("Delete failed. "
+                    throw new BalException("Delete failed. "
                             + "This user is not the creator"
                             + " of this graph template.");
                 }
             } else {
-                throw new Exception("No graph by id[" + id + "] exists");
+                throw new BalException("No graph by id[" + id + "] exists");
             }
         } catch (Exception e) {
             LOG.error("Could not delete this graph[" + id + "]", e);

@@ -15,6 +15,7 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
+import nl.it.fixx.moknj.exception.AccessException;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
 import nl.it.fixx.moknj.service.SystemContext;
@@ -66,7 +67,7 @@ public class MainAccessBal implements BusinessAccessLayer {
             if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
                 return menuBal.saveMenu(payload);
             }
-            throw new Exception("This user does not have " + ALL_ACCESS.toString());
+            throw new AccessException("This user does not have " + ALL_ACCESS.toString());
         } catch (Exception e) {
             LOG.error("Error on saving menu", e);
             throw e;
@@ -87,7 +88,7 @@ public class MainAccessBal implements BusinessAccessLayer {
             if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
                 return tempBal.saveTemplate(payload);
             }
-            throw new Exception("This user does not have " + ALL_ACCESS.toString());
+            throw new AccessException("This user does not have " + ALL_ACCESS.toString());
         } catch (Exception e) {
             LOG.error("Error on saving template", e);
             throw e;
@@ -194,7 +195,7 @@ public class MainAccessBal implements BusinessAccessLayer {
                 menu.setTemplates(getMenuTemplates(menu, user, false));
                 return menu;
             } else {
-                throw new Exception("Menu not found");
+                throw new AccessException("Menu not found");
             }
         } catch (Exception e) {
             LOG.error("Error while get menu[" + menuId + "] for user token");
@@ -248,7 +249,7 @@ public class MainAccessBal implements BusinessAccessLayer {
             if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
                 menuBal.deleteMenu(id);
             }
-            throw new Exception("Unable to delete. "
+            throw new AccessException("Unable to delete. "
                     + "This user does not have " + ALL_ACCESS.toString());
         } catch (Exception e) {
             LOG.error("Error while get all menus for user token");
@@ -314,7 +315,7 @@ public class MainAccessBal implements BusinessAccessLayer {
                 }
 
                 if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                    throw new Exception("This user does not have access to this template.");
+                    throw new AccessException("This user does not have access to this template.");
                 }
             }
             LOG.debug("This template[" + templateId + "] seems to be deleted");
@@ -338,7 +339,7 @@ public class MainAccessBal implements BusinessAccessLayer {
         try {
             User user = userBal.getUserByToken(token);
             if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                throw new Exception("Unable to delete template. "
+                throw new AccessException("Unable to delete template. "
                         + "This user does not have " + ALL_ACCESS.toString());
             }
 

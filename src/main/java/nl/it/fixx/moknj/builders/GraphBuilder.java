@@ -95,11 +95,9 @@ public class GraphBuilder {
                         // X-AXIS Label Logic
                         if (recordBal != null) {
                             List records = recordBal.getAll(template.getId(), menu.getId(), token);
-
                             // duplicate records for all entries which have the same id.
                             // Basically a left join...
                             if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
-
                                 List<Asset> inOutAssetJoinList = new ArrayList<>();
                                 for (Object record : records) {
                                     if (record instanceof Asset) {

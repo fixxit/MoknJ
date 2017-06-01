@@ -37,28 +37,44 @@ import org.springframework.stereotype.Service;
 public class SystemContext {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemContext.class);
+
+    private final UserRepository userRep;
+    private final AssetRepository assetRep;
+    private final EmployeeRepository employeeRep;
+    private final AssetLinkRepository assetLinkRep;
+    private final EmployeeLinkRepository employeeLinkRep;
+    private final AccessRepository accessRep;
+    private final MenuRepository menuRep;
+    private final TemplateRepository templateRep;
+    private final FieldDetailRepository fieldDetailRep;
+    private final GraphRepository graphRep;
+    private final ApplicationProperties properties;
+
     @Autowired
-    private UserRepository userRep;
-    @Autowired
-    private AssetRepository assetRep;
-    @Autowired
-    private EmployeeRepository employeeRep;
-    @Autowired
-    private AssetLinkRepository assetLinkRep;
-    @Autowired
-    private EmployeeLinkRepository employeeLinkRep;
-    @Autowired
-    private AccessRepository accessRep;
-    @Autowired
-    private MenuRepository menuRep;
-    @Autowired
-    private TemplateRepository templateRep;
-    @Autowired
-    private FieldDetailRepository fieldDetailRep;
-    @Autowired
-    private GraphRepository graphRep;
-    @Autowired
-    private ApplicationProperties properties;
+    public SystemContext(
+            UserRepository userRep,
+            AssetRepository assetRep,
+            EmployeeRepository employeeRep,
+            AssetLinkRepository assetLinkRep,
+            EmployeeLinkRepository employeeLinkRep,
+            AccessRepository accessRep,
+            MenuRepository menuRep,
+            TemplateRepository templateRep,
+            FieldDetailRepository fieldDetailRep,
+            GraphRepository graphRep,
+            ApplicationProperties properties) {
+        this.userRep = userRep;
+        this.assetRep = assetRep;
+        this.employeeRep = employeeRep;
+        this.assetLinkRep = assetLinkRep;
+        this.employeeLinkRep = employeeLinkRep;
+        this.accessRep = accessRep;
+        this.menuRep = menuRep;
+        this.templateRep = templateRep;
+        this.fieldDetailRep = fieldDetailRep;
+        this.graphRep = graphRep;
+        this.properties = properties;
+    }
 
     public enum RepositoryCall {
         USER,
@@ -81,7 +97,7 @@ public class SystemContext {
      * @param clazz
      * @return Object
      */
-    public <T extends Object> T getRepository(Class<T> clazz) {
+    public <T> T getRepository(Class<T> clazz) {
         try {
             if (clazz != null) {
                 T rep = null;
@@ -116,66 +132,6 @@ public class SystemContext {
                 throw new RuntimeException("No call provide factory unable to get repository");
             }
         } catch (RuntimeException e) {
-            LOG.error("Error on finding base repository", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Gets the Repository for a RepositoryCall, keep in mind this returns basic
-     * Mongo Repository and its full contracted repository.
-     *
-     * @param call
-     * @return
-     * @throws Exception
-     */
-    public MongoRepository getBaseRepository(RepositoryCall call) throws Exception {
-        try {
-            if (call != null) {
-                MongoRepository rep = null;
-                switch (call) {
-                    case USER:
-                        rep = userRep;
-                        break;
-                    case ASSET:
-                        rep = assetRep;
-                        break;
-                    case EMPLOYEE:
-                        rep = employeeRep;
-                        break;
-                    case ASSET_LINK:
-                        rep = assetLinkRep;
-                        break;
-                    case EMPLOYEE_LINK:
-                        rep = employeeLinkRep;
-                        break;
-                    case ACCESS:
-                        rep = accessRep;
-                        break;
-                    case MENU:
-                        rep = menuRep;
-                        break;
-                    case TEMPLATE:
-                        rep = templateRep;
-                        break;
-                    case FIELD:
-                        rep = fieldDetailRep;
-                        break;
-                    case GRAPH:
-                        rep = graphRep;
-                        break;
-                    default:
-                        break;
-                }
-                if (rep != null) {
-                    return rep;
-                } else {
-                    throw new Exception("Error trying to get repository for call " + call.name());
-                }
-            } else {
-                throw new Exception("No call provide factory unable to get repository");
-            }
-        } catch (Exception e) {
             LOG.error("Error on finding base repository", e);
             throw e;
         }

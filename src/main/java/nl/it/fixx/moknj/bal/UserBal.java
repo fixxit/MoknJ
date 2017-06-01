@@ -7,6 +7,7 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
+import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.AccessRepository;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
@@ -24,16 +25,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  *
  * @author adriaan
  */
-public class UserBal implements BusinessAccessLayer {
+public class UserBal extends RepositoryChain<UserRepository> {
 
     private final BCryptPasswordEncoder passwordEncoder;
     private static final Logger LOG = LoggerFactory.getLogger(UserBal.class);
 
-    private final UserRepository userRep;
     private final SystemContext context;
 
     public UserBal(SystemContext context) {
-        this.userRep = context.getRepository(UserRepository.class);
+        super(context.getRepository(UserRepository.class));
         this.passwordEncoder = PSW_ENCODER;
         this.context = context;
     }
@@ -46,8 +46,8 @@ public class UserBal implements BusinessAccessLayer {
     public List<User> getAll() throws Exception {
         try {
             List<User> users = new ArrayList<>();
-            if (userRep != null) {
-                for (User user : userRep.findAll()) {
+            if (repository != null) {
+                for (User user : repository.findAll()) {
                     // if user has all access get all else only return his user
                     if (!user.isHidden()) {
                         if (!context.getProperties().getAdmin().getUser().equals(user.getUserName())) {
@@ -56,10 +56,10 @@ public class UserBal implements BusinessAccessLayer {
                     }
                 }
             } else {
-                throw new Exception("UserRepository is null");
+                throw new BalException("UserRepository is null");
             }
             return users;
-        } catch (Exception ex) {
+        } catch (BalException ex) {
             LOG.error("Error while getting all users", ex);
             throw ex;
         }
@@ -92,8 +92,8 @@ public class UserBal implements BusinessAccessLayer {
         try {
             User loginUser = getUserByToken(token);
             List<User> users = new ArrayList<>();
-            if (userRep != null) {
-                for (User user : userRep.findAll()) {
+            if (repository != null) {
+                for (User user : repository.findAll()) {
                     // if user has all access get all else only return his user
                     if (loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
                         if (!user.isHidden()) {
@@ -111,7 +111,7 @@ public class UserBal implements BusinessAccessLayer {
                     }
                 }
             } else {
-                throw new Exception("UserRepository is null");
+                throw new BalException("UserRepository is null");
             }
             return users;
         } catch (Exception ex) {
@@ -131,10 +131,10 @@ public class UserBal implements BusinessAccessLayer {
         try {
             User loginUser = getUserByToken(token);
             if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
-                throw new Exception("This user does not have " + ALL_ACCESS.toString());
+                throw new BalException("This user does not have " + ALL_ACCESS.toString());
             }
 
-            User resource = userRep.findById(userId);
+            User resource = repository.findById(userId);
             List<Asset> assets = context.getRepository(AssetRepository.class).getAllByResourceId(userId);
             List<AssetLink> links = context.getRepository(AssetLinkRepository.class).getAllByResourceId(userId);
 
@@ -147,7 +147,7 @@ public class UserBal implements BusinessAccessLayer {
                 accessRules.forEach((access) -> {
                     context.getRepository(AccessRepository.class).delete(access);
                 });
-                userRep.delete(resource);
+                repository.delete(resource);
             }
         } catch (Exception e) {
             LOG.error("Error while deleting user [" + userId + "]", e);
@@ -166,15 +166,15 @@ public class UserBal implements BusinessAccessLayer {
         try {
             User loginUser = getUserByToken(token);
             if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
-                throw new Exception("This user does not have " + ALL_ACCESS.toString());
+                throw new BalException("This user does not have " + ALL_ACCESS.toString());
             }
 
             User dbResource = null;
             if (payload.getId() != null) {
-                dbResource = userRep.findById(payload.getId());
+                dbResource = repository.findById(payload.getId());
             }
 
-            List<User> results = userRep.findByFullname(
+            List<User> results = repository.findByFullname(
                     payload.getFirstName(), payload.getSurname());
 
             boolean exists = results.size() > 0;
@@ -209,17 +209,17 @@ public class UserBal implements BusinessAccessLayer {
                     // this should execute for new users too
                     // as the dbUsername should then be empty string
                     if (!newUsername.equals(dbUsername)) {
-                        User indb = userRep.findByUserName(newUsername);
+                        User indb = repository.findByUserName(newUsername);
                         if (indb != null && indb.getId() != null) {
-                            throw new Exception("Employee with a user name "
+                            throw new BalException("Employee with a user name "
                                     + "" + newUsername + " already exists");
                         }
                     }
                 }
 
-                return userRep.save(payload);
+                return repository.save(payload);
             } else {
-                throw new Exception("Employee by name "
+                throw new BalException("Employee by name "
                         + "" + payload.getFirstName() + " "
                         + "" + payload.getSurname() + " exists");
             }
@@ -240,16 +240,16 @@ public class UserBal implements BusinessAccessLayer {
         try {
             if (id == null || id.isEmpty()) {
                 LOG.debug("No user id recieved to find user");
-                throw new Exception("No user found, no user id provided!");
+                throw new BalException("No user found, no user id provided!");
             }
 
-            User user = userRep.findOne(id);
+            User user = repository.findOne(id);
             if (user == null) {
                 LOG.debug("no user found for id[" + id + "]");
-                throw new Exception("No user found by this id[" + id + "]");
+                throw new BalException("No user found by this id[" + id + "]");
             }
             return user;
-        } catch (Exception e) {
+        } catch (BalException e) {
             LOG.error("Error on User Bal", e);
             throw e;
         }
@@ -266,13 +266,13 @@ public class UserBal implements BusinessAccessLayer {
         try {
             if (token == null || token.isEmpty()) {
                 LOG.debug("No token recieved to find user");
-                throw new Exception("No user found, no token provided!");
+                throw new BalException("No user found, no token provided!");
             }
             // Get user details who logged this employee using the token.
-            User user = userRep.findByUserName(OAuth2SecurityConfig.getUserForToken(token));
+            User user = repository.findByUserName(OAuth2SecurityConfig.getUserForToken(token));
             if (user == null) {
                 LOG.debug("no user found for token[" + token + "]");
-                throw new Exception("No user found by this token[" + token + "]");
+                throw new BalException("No user found by this token[" + token + "]");
             }
 
             return user;
@@ -290,7 +290,7 @@ public class UserBal implements BusinessAccessLayer {
      */
     public String getFullName(User user) throws Exception {
         if (user == null) {
-            throw new Exception("No user object provided");
+            throw new BalException("No user object provided");
         }
 
         String fullname = "";

@@ -17,6 +17,7 @@ import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
+import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
@@ -129,7 +130,7 @@ public class LinkBal implements BusinessAccessLayer {
                     LOG.info("user : " + user.getAuthorities());
 
                     if (!accessBal.hasAccess(user, menuId, templateId, GlobalAccessRights.EDIT)) {
-                        throw new Exception("Unable to check out/in this asset. "
+                        throw new BalException("Unable to check out/in this asset. "
                                 + "This user does not have "
                                 + "" + GlobalAccessRights.EDIT.toString()
                                 + " rights");

@@ -5,6 +5,7 @@ import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
+import nl.it.fixx.moknj.exception.AccessException;
 import nl.it.fixx.moknj.repository.AccessRepository;
 import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
@@ -88,7 +89,7 @@ public class AccessBal {
         if (!accessRep.hasAccess(access.getUserId(), access.getMenuId(), access.getTemplateId())) {
             User loginUser = userBal.getUserByToken(token);
             if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
-                throw new Exception("This user does not have " + ALL_ACCESS.toString());
+                throw new AccessException("This user does not have " + ALL_ACCESS.toString());
             }
 
             LOG.debug("Adding access for user "
@@ -118,7 +119,7 @@ public class AccessBal {
     public void deleteAccess(String id, String token) throws Exception {
         User loginUser = userBal.getUserByToken(token);
         if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
-            throw new Exception("This user does not have " + ALL_ACCESS.toString());
+            throw new AccessException("This user does not have " + ALL_ACCESS.toString());
         }
 
         Access access = accessRep.findOne(id);
@@ -144,12 +145,12 @@ public class AccessBal {
         try {
             User loginUser = userBal.getUserByToken(token);
             if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
-                throw new Exception("This user does not have " + ALL_ACCESS.toString());
+                throw new AccessException("This user does not have " + ALL_ACCESS.toString());
             }
 
             if (access == null || access.getId() == null || access.getId().isEmpty()) {
                 LOG.debug("No access id provided to update access rules with");
-                throw new Exception("Invalid access [unknown] provided for "
+                throw new AccessException("Invalid access [unknown] provided for "
                         + "access rule update!");
             }
 
@@ -157,7 +158,7 @@ public class AccessBal {
 
             if (dbAcces == null) {
                 LOG.debug("Access rule not found in db");
-                throw new Exception("Invalid access [" + access.getId() + "]s provided, this "
+                throw new AccessException("Invalid access [" + access.getId() + "]s provided, this "
                         + "access does not exist in the db!");
             }
 
@@ -185,9 +186,9 @@ public class AccessBal {
         if (!accessRep.hasAccess(userId, menuId, templateId)) {
             User user = userBal.getUserById(userId);
             if (user != null) {
-                throw new Exception("Unknown user access denied!");
+                throw new AccessException("Unknown user access denied!");
             } else {
-                throw new Exception(userBal.getFullName(user) + " access denied!");
+                throw new AccessException(userBal.getFullName(user) + " access denied!");
             }
         }
     }

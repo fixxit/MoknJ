@@ -1,14 +1,16 @@
 package nl.it.fixx.moknj.bal;
 
 import java.util.List;
+import nl.it.fixx.moknj.exception.BalException;
 
 /**
  * Main Record BAL interface. All common Record REST Controllers logic needs to
  * be consolidated on this layer.
  *
  * @author adriaan
+ * @param <T>
  */
-public interface RecordBal {
+public interface RecordBal<T> {
 
     /**
      * Gets a specific record by its UUID.
@@ -26,9 +28,9 @@ public interface RecordBal {
      * @param menuId
      * @param access_token
      * @return List of Beans
-     * @throws java.lang.Exception
+     * @throws nl.it.fixx.moknj.exception.BalException
      */
-    public List getAll(String templateId, String menuId, String access_token) throws Exception;
+    public List<T> getAll(String templateId, String menuId, String access_token) throws BalException;
 
     /**
      * Save the record.
@@ -38,9 +40,9 @@ public interface RecordBal {
      * @param record
      * @param access_token
      * @return
-     * @throws Exception
+     * @throws nl.it.fixx.moknj.exception.BalException
      */
-    public Object save(String templateId, String menuId, Object record, String access_token) throws Exception;
+    public T save(String templateId, String menuId, T record, String access_token) throws BalException;
 
     /**
      * Delete a record.
@@ -49,7 +51,7 @@ public interface RecordBal {
      * @param menuId
      * @param access_token
      * @param cascade delete asset/employee link data
-     * @throws java.lang.Exception
+     * @throws nl.it.fixx.moknj.exception.BalException
      */
-    public void delete(Object record, String menuId, String access_token, boolean cascade) throws Exception;
+    public void delete(T record, String menuId, String access_token, boolean cascade) throws BalException;
 }

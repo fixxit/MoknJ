@@ -16,6 +16,7 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeAction;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
+import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
 import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
@@ -26,10 +27,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author adriaan
  */
-public class EmployeeBal implements RecordBal, BusinessAccessLayer {
+public class EmployeeBal extends RepositoryChain<EmployeeRepository> implements RecordBal<Employee> {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeBal.class);
-    private final EmployeeRepository employeeRep;
 
     private final MenuBal menuBal;
     private final UserBal userBal;
@@ -39,7 +39,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
     private final LinkBal linkBal;
 
     public EmployeeBal(SystemContext context) {
-        this.employeeRep = context.getRepository(EmployeeRepository.class);
+        super(context.getRepository(EmployeeRepository.class));
         this.userBal = new UserBal(context);
         this.menuBal = new MenuBal(context);
         this.tempBal = new TemplateBal(context);
@@ -55,7 +55,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
      * @param linkBal
      */
     public EmployeeBal(SystemContext context, LinkBal linkBal) {
-        this.employeeRep = context.getRepository(EmployeeRepository.class);
+        super(context.getRepository(EmployeeRepository.class));
         this.userBal = new UserBal(context);
         this.menuBal = new MenuBal(context);
         this.tempBal = new TemplateBal(context);
@@ -73,12 +73,12 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
      * @return
      */
     @Override
-    public List<Employee> getAll(String templateId, String menuId, String token) throws Exception {
+    public List<Employee> getAll(String templateId, String menuId, String token) throws BalException {
         try {
             List<Employee> employees = new ArrayList<>();
             User user = userBal.getUserByToken(token);
             if (userAccessBall.hasAccess(user, menuId, templateId, GlobalAccessRights.VIEW)) {
-                List<Employee> records = employeeRep.getAllByTypeId(templateId);
+                List<Employee> records = repository.getAllByTypeId(templateId);
                 // Gets custom template settings saved to menu.
                 Menu menu = menuBal.getMenuById(menuId);
                 menu.getTemplates().stream().filter((template)
@@ -107,34 +107,31 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
             }
             return employees;
         } catch (Exception e) {
-            LOG.error("Could not find all employees for template "
+            throw new BalException("Could not find all employees for template "
                     + "[" + templateId + "] and menu [" + menuId + "]", e);
-            throw e;
         }
     }
 
     @Override
-    public Employee save(String templateId, String menuId, Object record, String token) throws Exception {
-
+    public Employee save(String templateId, String menuId, Employee record, String token) throws BalException {
         try {
             if (templateId != null) {
-                Employee passedEmployee = (Employee) record;
-                passedEmployee.setTypeId(templateId);
+                record.setTypeId(templateId);
                 // checks if the original object differs from new saved object
                 // stop the unique filter form check for duplicates on employee
                 // which has not changed from the db version...
                 String flag = null;
-                if (passedEmployee.getId() != null) {
+                if (record.getId() != null) {
                     // check if user has acess for edit record
                     User user = userBal.getUserByToken(token);
                     if (!userAccessBall.hasAccess(user, menuId, templateId,
                             GlobalAccessRights.EDIT)) {
-                        throw new Exception("This user does not have sufficient "
+                        throw new BalException("This user does not have sufficient "
                                 + "access rights to update this employee!");
                     }
 
-                    Employee dbEmployee = employeeRep.findOne(passedEmployee.getId());
-                    if (passedEmployee.equals(dbEmployee)) {
+                    Employee dbEmployee = repository.findOne(record.getId());
+                    if (record.equals(dbEmployee)) {
                         flag = "no_changes";
                     } else {
                         flag = "has_changes";
@@ -144,7 +141,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                     User user = userBal.getUserByToken(token);
                     if (!userAccessBall.hasAccess(user, menuId, templateId,
                             GlobalAccessRights.NEW)) {
-                        throw new Exception("This user does not have sufficient "
+                        throw new BalException("This user does not have sufficient "
                                 + "access rights to create this employee!");
                     }
                 }
@@ -158,7 +155,7 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                 Map<String, List<String>> uniqueValues = new HashMap<>();
 
                 // Get all the unique field ids
-                List<FieldValue> newEmployeeFields = passedEmployee.getDetails();
+                List<FieldValue> newEmployeeFields = record.getDetails();
                 newEmployeeFields.stream().forEach((field) -> {
                     try {
                         FieldDetail detail = fieldBal.getField(field.getId());
@@ -171,10 +168,10 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                 });
 
                 // Create a list of all the values for the unique employees
-                for (Employee employee : employeeRep.getAllByTypeId(templateId)) {
+                for (Employee employee : repository.getAllByTypeId(templateId)) {
                     // if statement below checks that if update employee does not check
                     // it self to flag for duplication
-                    if (!employee.getId().equals(passedEmployee.getId())
+                    if (!employee.getId().equals(record.getId())
                             && !"no_changes".equals(flag)) {
                         List<FieldValue> details = employee.getDetails();
                         details.stream().filter((field) -> (uniqueFields.keySet().contains(field.getId()))).map((field) -> {
@@ -209,15 +206,15 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                             ? "]. Please check values"
                             : ". Please input new value";
 
-                    throw new Exception(message);
+                    throw new BalException(message);
                 }
 
                 // Get user details who logged this employee using the token.
                 User user = userBal.getUserByToken(token);
                 if (user != null && user.isSystemUser()) {
-                    passedEmployee.setLastModifiedBy(user.getUserName());
+                    record.setLastModifiedBy(user.getUserName());
                 } else {
-                    throw new Exception("Employee save error, could not find system"
+                    throw new BalException("Employee save error, could not find system"
                             + " user for this token");
                 }
 
@@ -225,38 +222,38 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
 
                 // Save employee
                 String date = createdDate;
-                passedEmployee.setLastModifiedDate(date);
-                if (passedEmployee.getId() == null) {
-                    passedEmployee.setCreatedBy(user.getUserName());
-                    passedEmployee.setCreatedDate(date);
+                record.setLastModifiedDate(date);
+                if (record.getId() == null) {
+                    record.setCreatedBy(user.getUserName());
+                    record.setCreatedDate(date);
                 } else {
-                    Employee dbEmployee = employeeRep.findOne(passedEmployee.getId());
-                    passedEmployee.setCreatedBy(dbEmployee.getCreatedBy());
-                    passedEmployee.setCreatedDate(dbEmployee.getCreatedDate());
+                    Employee dbEmployee = repository.findOne(record.getId());
+                    record.setCreatedBy(dbEmployee.getCreatedBy());
+                    record.setCreatedDate(dbEmployee.getCreatedDate());
                 }
 
                 EmployeeLink audit = new EmployeeLink();
                 // Set audit logs
                 audit.setCreatedDate(createdDate);
-                audit.setCreatedBy(passedEmployee.getLastModifiedBy());
+                audit.setCreatedBy(record.getLastModifiedBy());
 
-                if (passedEmployee.getTypeId() != null) {
-                    Template template = tempBal.getTemplateById(passedEmployee.getTypeId());
+                if (record.getTypeId() != null) {
+                    Template template = tempBal.getTemplateById(record.getTypeId());
                     if (template != null) {
                         audit.setTemplate(template.getName());
                     }
                 }
 
-                if (passedEmployee.getId() != null) {
+                if (record.getId() != null) {
                     // get the field changes. This code scans fields for any
                     // changes then adds its to the string builder and saves
                     // it to the audit trail.
-                    Employee dbEmployee = employeeRep.findOne(passedEmployee.getId());
+                    Employee dbEmployee = repository.findOne(record.getId());
                     StringBuilder changes = new StringBuilder();
 
-                    if (!Objects.equals(dbEmployee.getDetails(), passedEmployee.getDetails())) {
+                    if (!Objects.equals(dbEmployee.getDetails(), record.getDetails())) {
                         for (FieldValue dbFieldValue : dbEmployee.getDetails()) {
-                            for (FieldValue newFieldValue : passedEmployee.getDetails()) {
+                            for (FieldValue newFieldValue : record.getDetails()) {
                                 if (dbFieldValue.getId().equals(newFieldValue.getId())) {
                                     if (!dbFieldValue.getValue().equals(newFieldValue.getValue())) {
                                         // get field details
@@ -282,36 +279,36 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                         audit.setChanges("NO_CHANGE");
                     }
                 } else {
-                    User emp = userBal.getUserById(passedEmployee.getResourceId());
+                    User emp = userBal.getUserById(record.getResourceId());
                     if (emp != null) {
-                        passedEmployee.setEmployee(emp.getFirstName() + " " + emp.getSurname());
+                        record.setEmployee(emp.getFirstName() + " " + emp.getSurname());
                     }
 
                     if (menuId != null && !menuId.trim().isEmpty()) {
                         Menu menu = menuBal.getMenuById(menuId);
                         if (menu != null) {
-                            passedEmployee.setMenu(menu.getName());
+                            record.setMenu(menu.getName());
                         }
                     }
 
-                    audit.setChanges(toAuditString(passedEmployee));
+                    audit.setChanges(toAuditString(record));
                 }
 
                 // Set action
-                if (passedEmployee.getId() != null) {
+                if (record.getId() != null) {
                     audit.setAction(EmployeeAction.EMP_ACTION_EDIT);
                 } else {
                     audit.setAction(EmployeeAction.EMP_ACTION_NEW);
                 }
 
                 // gets the user edited the record.
-                if (passedEmployee.getResourceId() != null) {
-                    User linkedUser = userBal.getUserById(passedEmployee.getResourceId());
+                if (record.getResourceId() != null) {
+                    User linkedUser = userBal.getUserById(record.getResourceId());
                     String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
                     audit.setUser(fullname);
                 }
 
-                Employee savedEmployee = employeeRep.save(passedEmployee);
+                Employee savedEmployee = repository.save(record);
                 audit.setEmployeeId(savedEmployee.getId());
 
                 // make sure action is added to audit.
@@ -323,67 +320,62 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
 
                 return savedEmployee;
             } else {
-                throw new Exception("No employee type id provided.");
+                throw new BalException("No employee type id provided.");
             }
         } catch (Exception e) {
-            LOG.error("Could not save employee due to internal error", e);
-            throw e;
+            throw new BalException("Could not save employee due to internal error", e);
         }
     }
 
     @Override
     public Employee get(String id) throws Exception {
         try {
-            Employee employee = employeeRep.findOne(id);
+            Employee employee = repository.findOne(id);
             if (employee != null) {
                 return employee;
             }
 
-            throw new Exception("Could not find employee for id [" + id + "]");
-        } catch (Exception e) {
+            throw new BalException("Could not find employee for id [" + id + "]");
+        } catch (BalException e) {
             LOG.error("Error on trying to retieve employee for id [" + id + "]", e);
             throw e;
         }
     }
 
     @Override
-    public void delete(Object record, String menuId, String token, boolean cascade) throws Exception {
+    public void delete(Employee record, String menuId, String token, boolean cascade) throws BalException {
         try {
-            if (record instanceof Employee) {
-                Employee employee = (Employee) record;
-                Employee result = employeeRep.findOne(employee.getId());
-                if (result != null) {
-                    String templateId = employee.getTypeId();
+            Employee result = repository.findOne(record.getId());
+            if (result != null) {
+                String templateId = record.getTypeId();
 
-                    User user = userBal.getUserByToken(token);
-                    if (!userAccessBall.hasAccess(user, menuId, templateId,
-                            GlobalAccessRights.DELETE)) {
-                        throw new Exception("This user does not have sufficient "
-                                + "access rights to delete this employee!");
-                    }
-
-                    if (cascade) {
-                        // delete links
-                        linkBal.getAllEmployeeLinksForEmployee(
-                                result.getId(), token).stream().forEach((link) -> {
-                            linkBal.deleteEmployeeLink(link);
-                        });
-                        employeeRep.delete(result);
-                    } else {
-                        // hide asset by updating hidden field=
-                        result.setHidden(true);
-                        employeeRep.save(result);
-                        LOG.debug("This employee[" + result.getId() + "] is now "
-                                + "hidden as audit links was detected");
-                    }
-                } else {
-                    throw new Exception("Could not remove employee "
-                            + "[" + employee.getId() + "] not found in db");
+                User user = userBal.getUserByToken(token);
+                if (!userAccessBall.hasAccess(user, menuId, templateId,
+                        GlobalAccessRights.DELETE)) {
+                    throw new BalException("This user does not have sufficient "
+                            + "access rights to delete this employee!");
                 }
+
+                if (cascade) {
+                    // delete links
+                    linkBal.getAllEmployeeLinksForEmployee(
+                            result.getId(), token).stream().forEach((link) -> {
+                        linkBal.deleteEmployeeLink(link);
+                    });
+                    repository.delete(result);
+                } else {
+                    // hide asset by updating hidden field=
+                    result.setHidden(true);
+                    repository.save(result);
+                    LOG.debug("This employee[" + result.getId() + "] is now "
+                            + "hidden as audit links was detected");
+                }
+            } else {
+                throw new BalException("Could not remove employee "
+                        + "[" + record.getId() + "] not found in db");
             }
         } catch (Exception e) {
-            LOG.error("Error on trying to retieve employee for id [" + record + "]", e);
-            throw e;
+            throw new BalException("Error on trying to retieve employee for id [" + record + "]", e);
         }
     }
 
@@ -412,5 +404,4 @@ public class EmployeeBal implements RecordBal, BusinessAccessLayer {
                 + ", createdBy=" + emp.getCreatedBy();
         return str;
     }
-
 }

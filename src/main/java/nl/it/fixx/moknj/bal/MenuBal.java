@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
+import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.MenuRepository;
 import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
@@ -15,24 +16,23 @@ import org.springframework.util.comparator.NullSafeComparator;
  *
  * @author adriaan
  */
-public class MenuBal implements BusinessAccessLayer {
+public class MenuBal extends RepositoryChain<MenuRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MenuBal.class);
-    private final MenuRepository menuRep;
 
-    public MenuBal(SystemContext factory) {
-        this.menuRep = factory.getRepository(MenuRepository.class);
+    public MenuBal(SystemContext context) {
+        super(context.getRepository(MenuRepository.class));
     }
 
     public Menu saveMenu(Menu payload) throws Exception {
         try {
             if (payload == null) {
-                throw new Exception("No menu recieved to update/insert");
+                throw new BalException("No menu recieved to update/insert");
             }
 
             if (payload.getTemplates() == null
                     && payload.getTemplates().isEmpty()) {
-                throw new Exception("No templates recieved to save. Aborting insert "
+                throw new BalException("No templates recieved to save. Aborting insert "
                         + "due to empty template list!");
             }
 
@@ -42,14 +42,14 @@ public class MenuBal implements BusinessAccessLayer {
                 bypassExists = true;
             }
 
-            boolean exists = menuRep.existsByName(payload.getName());
+            boolean exists = repository.existsByName(payload.getName());
             if (!exists || bypassExists) {
-                Menu menu = menuRep.save(payload);
+                Menu menu = repository.save(payload);
                 return menu;
             } else {
-                throw new Exception("Menu by name " + payload.getName() + " exists");
+                throw new BalException("Menu by name " + payload.getName() + " exists");
             }
-        } catch (Exception e) {
+        } catch (BalException e) {
             LOG.error("Error on saving menu", e);
             throw e;
         }
@@ -66,16 +66,16 @@ public class MenuBal implements BusinessAccessLayer {
         try {
             if (id == null || id.isEmpty()) {
                 LOG.debug("No menu id recieved to find menu");
-                throw new Exception("No menu found, no menu id provided!");
+                throw new BalException("No menu found, no menu id provided!");
             }
 
-            Menu menu = menuRep.findOne(id);
+            Menu menu = repository.findOne(id);
             if (menu == null) {
                 LOG.debug("no menu found for id[" + id + "]");
-                throw new Exception("No menu found by this id[" + id + "]");
+                throw new BalException("No menu found by this id[" + id + "]");
             }
             return menu;
-        } catch (Exception e) {
+        } catch (BalException e) {
             LOG.error("Error on Menu Bal", e);
             throw e;
         }
@@ -89,7 +89,7 @@ public class MenuBal implements BusinessAccessLayer {
      */
     public List<Menu> getAllMenus() throws Exception {
         try {
-            return menuRep.findAll();
+            return repository.findAll();
         } catch (Exception e) {
             LOG.error("error getting all menus", e);
             throw e;
@@ -145,7 +145,7 @@ public class MenuBal implements BusinessAccessLayer {
      */
     public String getDispayName(Menu menu) throws Exception {
         if (menu == null) {
-            throw new Exception("No menu object provided");
+            throw new BalException("No menu object provided");
         }
 
         return menu.getName();
@@ -172,9 +172,9 @@ public class MenuBal implements BusinessAccessLayer {
         try {
             Menu menu = getMenuById(id);
             if (menu == null) {
-                throw new Exception("Menu does not exists in the db");
+                throw new BalException("Menu does not exists in the db");
             }
-            menuRep.delete(menu);
+            repository.delete(menu);
         } catch (Exception e) {
             LOG.error("error deleting menu[" + id + "]", e);
             throw e;
