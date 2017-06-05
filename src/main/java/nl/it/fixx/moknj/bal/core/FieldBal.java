@@ -1,23 +1,28 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
+import nl.it.fixx.moknj.bal.record.RepositoryChain;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.service.SystemContext;
+import nl.it.fixx.moknj.bal.record.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Field Detail Business Access Layer
  *
  * @author adriaan
  */
+@Service
 public class FieldBal extends RepositoryChain<FieldDetailRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldBal.class);
-
-    public FieldBal(SystemContext context) {
+    
+    @Autowired
+    public FieldBal(RepositoryContext context) {
         super(context.getRepository(FieldDetailRepository.class));
     }
 

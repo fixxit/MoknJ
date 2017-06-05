@@ -1,7 +1,5 @@
-package nl.it.fixx.moknj.service;
+package nl.it.fixx.moknj.bal.record;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import nl.it.fixx.moknj.properties.ApplicationProperties;
 import nl.it.fixx.moknj.repository.AccessRepository;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
@@ -16,7 +14,6 @@ import nl.it.fixx.moknj.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,9 +31,9 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class SystemContext {
+public class RepositoryContext {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SystemContext.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RepositoryContext.class);
 
     private final UserRepository userRep;
     private final AssetRepository assetRep;
@@ -51,7 +48,7 @@ public class SystemContext {
     private final ApplicationProperties properties;
 
     @Autowired
-    public SystemContext(
+    public RepositoryContext(
             UserRepository userRep,
             AssetRepository assetRep,
             EmployeeRepository employeeRep,

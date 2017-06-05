@@ -1,4 +1,7 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.record;
+
+import nl.it.fixx.moknj.bal.BusinessAccessLayer;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**
  * Main Business Access Layer interface. All common REST Controllers logic needs
@@ -13,7 +16,7 @@ package nl.it.fixx.moknj.bal;
  * @author adriaan
  * @param <T>
  */
-public abstract class RepositoryChain<T> implements BusinessAccessLayer {
+public abstract class RepositoryChain<T extends MongoRepository> implements BusinessAccessLayer {
 
     protected final T repository;
 

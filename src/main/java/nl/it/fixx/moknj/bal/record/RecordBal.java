@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.record;
 
 import java.util.List;
 import nl.it.fixx.moknj.exception.BalException;
@@ -12,6 +12,8 @@ import nl.it.fixx.moknj.exception.BalException;
  */
 public interface RecordBal<T> {
 
+    public boolean exists(String id);
+
     /**
      * Gets a specific record by its UUID.
      *
@@ -19,7 +21,7 @@ public interface RecordBal<T> {
      * @return List of Beans
      * @throws java.lang.Exception
      */
-    public Object get(String id) throws Exception;
+    public T get(String id) throws Exception;
 
     /**
      * Gets all the records for entity record.

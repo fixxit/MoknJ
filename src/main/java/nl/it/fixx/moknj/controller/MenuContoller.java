@@ -2,15 +2,11 @@ package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.MainAccessBal;
-import nl.it.fixx.moknj.bal.MenuBal;
+import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalMenuType;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.menu.MenuType;
-import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.response.MenuResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,18 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- *
- * @author adriaan
- */
 @CrossOrigin // added for cors, allow access from another web server
 @RestController
 @RequestMapping(value = "/menu")
 public class MenuContoller {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MenuContoller.class);
     @Autowired
-    private SystemContext context;
+    private MainAccessBal mainAccessBal;
 
     /**
      *
@@ -45,8 +36,7 @@ public class MenuContoller {
     MenuResponse add(@RequestBody Menu payload, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            Menu menu = bal.saveMenu(payload, access_token);
+            Menu menu = mainAccessBal.saveMenu(payload, access_token);
             response.setSuccess(menu != null);
             response.setMessage("Saved " + menu.getName());
             response.setMenu(menu);
@@ -69,8 +59,7 @@ public class MenuContoller {
     MenuResponse get(@PathVariable String id, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            Menu menu = bal.getMenu(id, access_token);
+            Menu menu = mainAccessBal.getMenu(id, access_token);
             response.setMenu(menu);
         } catch (Exception ex) {
             response.setSuccess(false);
@@ -90,8 +79,7 @@ public class MenuContoller {
     MenuResponse all(@RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            response.setMenus(bal.getUserMenus(access_token));
+            response.setMenus(mainAccessBal.getUserMenus(access_token));
         } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
@@ -111,9 +99,7 @@ public class MenuContoller {
     MenuResponse delete(@PathVariable String id, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            bal.deleteMenu(id, access_token);
-
+            mainAccessBal.deleteMenu(id, access_token);
             response.setSuccess(true);
             response.setMessage("Menu deleted from active menu list");
         } catch (Exception ex) {

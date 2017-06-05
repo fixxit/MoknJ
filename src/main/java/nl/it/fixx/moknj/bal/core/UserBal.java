@@ -1,7 +1,8 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import nl.it.fixx.moknj.bal.record.RepositoryChain;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
@@ -11,13 +12,15 @@ import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.AccessRepository;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.service.SystemContext;
+import nl.it.fixx.moknj.bal.record.RepositoryContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
 import static nl.it.fixx.moknj.security.OAuth2SecurityConfig.PSW_ENCODER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 /**
  * This class should handle all logic which is related to business. Most of
@@ -25,14 +28,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  *
  * @author adriaan
  */
+@Service
 public class UserBal extends RepositoryChain<UserRepository> {
 
     private final BCryptPasswordEncoder passwordEncoder;
     private static final Logger LOG = LoggerFactory.getLogger(UserBal.class);
 
-    private final SystemContext context;
+    private final RepositoryContext context;
 
-    public UserBal(SystemContext context) {
+    @Autowired
+    public UserBal(RepositoryContext context) {
         super(context.getRepository(UserRepository.class));
         this.passwordEncoder = PSW_ENCODER;
         this.context = context;

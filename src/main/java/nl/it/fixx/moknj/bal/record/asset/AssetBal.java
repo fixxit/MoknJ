@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.record.asset;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -6,6 +6,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import nl.it.fixx.moknj.bal.core.access.AccessBal;
+import nl.it.fixx.moknj.bal.core.FieldBal;
+import nl.it.fixx.moknj.bal.core.LinkBal;
+import nl.it.fixx.moknj.bal.core.MenuBal;
+import nl.it.fixx.moknj.bal.record.RecordBal;
+import nl.it.fixx.moknj.bal.record.RepositoryChain;
+import nl.it.fixx.moknj.bal.core.UserBal;
+import nl.it.fixx.moknj.bal.record.RepositoryContext;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
@@ -15,46 +23,35 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Asset Business Access Layer
  *
  * @author adriaan
  */
+@Service
 public class AssetBal extends RepositoryChain<AssetRepository> implements RecordBal<Asset> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetBal.class);
 
     private final MenuBal menuBal;
     private final UserBal userBal;
-    private final AccessBal userAccessBall;
+    private final AccessBal accessBal;
     private final FieldBal fieldBal;
     private final LinkBal linkBal;
 
-    public AssetBal(SystemContext context) {
+    @Autowired
+    public AssetBal(MenuBal menuBal, UserBal userBal, AccessBal accessBal,
+            FieldBal fieldBal, LinkBal linkBal, RepositoryContext context) {
         super(context.getRepository(AssetRepository.class));
-        this.menuBal = new MenuBal(context);
-        this.userBal = new UserBal(context);
-        this.userAccessBall = new AccessBal(context);
-        this.fieldBal = new FieldBal(context);
-        this.linkBal = new LinkBal(context, userBal, this);
-    }
-
-    /**
-     * Stops stack overflow error on link bal constructor
-     *
-     * @param context
-     * @param linkBal
-     */
-    public AssetBal(SystemContext context, LinkBal linkBal) {
-        super(context.getRepository(AssetRepository.class));
-        this.menuBal = new MenuBal(context);
-        this.userBal = new UserBal(context);
-        this.userAccessBall = new AccessBal(context);
-        this.fieldBal = new FieldBal(context);
+        this.menuBal = menuBal;
+        this.userBal = userBal;
+        this.accessBal = accessBal;
+        this.fieldBal = fieldBal;
         this.linkBal = linkBal;
     }
 
@@ -73,31 +70,8 @@ public class AssetBal extends RepositoryChain<AssetRepository> implements Record
                 // checks if the original object differs from new saved object
                 // stop the unique filter form check for duplicates on asset
                 // which has not changed from the db version...
-                String flag = null;
-                if (record.getId() != null) {
-                    // check if user has acess for edit record
-                    User user = userBal.getUserByToken(token);
-                    if (!userAccessBall.hasAccess(user, menuId, templateId,
-                            GlobalAccessRights.EDIT)) {
-                        throw new BalException("This user does not have sufficient "
-                                + "access rights to update this asset!");
-                    }
-
-                    Asset dbAsset = repository.findOne(record.getId());
-                    if (record.equals(dbAsset)) {
-                        flag = "no_changes";
-                    } else {
-                        flag = "has_changes";
-                    }
-                } else {
-                    // check if user has acess for new record
-                    User user = userBal.getUserByToken(token);
-                    if (!userAccessBall.hasAccess(user, menuId, templateId,
-                            GlobalAccessRights.NEW)) {
-                        throw new BalException("This user does not have sufficient "
-                                + "access rights to save this asset!");
-                    }
-                }
+                String flag = new AssetChange(repository, userBal, accessBal).
+                        hasChange(record, templateId, menuId, token);
 
                 /**
                  * Find unique fields for asset and check if the current list of
@@ -108,8 +82,8 @@ public class AssetBal extends RepositoryChain<AssetRepository> implements Record
                 Map<String, List<String>> uniqueValues = new HashMap<>();
 
                 // Get all the unique field ids
-                List<FieldValue> newAssetFields = record.getDetails();
-                newAssetFields.stream().forEach((field) -> {
+                List<FieldValue> assetFields = record.getDetails();
+                assetFields.stream().forEach((field) -> {
                     try {
                         FieldDetail detail = fieldBal.getField(field.getId());
                         if (detail != null && detail.isUnique()) {
@@ -140,7 +114,7 @@ public class AssetBal extends RepositoryChain<AssetRepository> implements Record
 
                 // check if fields to be saved for asset has duplicates
                 if (!uniqueValues.isEmpty()) {
-                    newAssetFields.stream().filter((field) -> (uniqueValues.containsKey(field.getId()))).filter((field) -> (uniqueValues.get(field.getId()).contains(field.getValue()))).forEach((field) -> {
+                    assetFields.stream().filter((field) -> (uniqueValues.containsKey(field.getId()))).filter((field) -> (uniqueValues.get(field.getId()).contains(field.getValue()))).forEach((field) -> {
                         unifieldIndicator.put(field.getId(), true);
                     });
                 }
@@ -203,7 +177,7 @@ public class AssetBal extends RepositoryChain<AssetRepository> implements Record
         try {
             List<Asset> assets = new ArrayList<>();
             User user = userBal.getUserByToken(token);
-            if (userAccessBall.hasAccess(user, menuId, templateId, GlobalAccessRights.VIEW)) {
+            if (accessBal.hasAccess(user, menuId, templateId, GlobalAccessRights.VIEW)) {
                 List<Asset> records = repository.getAllByTypeId(templateId);
                 // Gets custom template settings saved to menu.
                 Menu menu = menuBal.getMenuById(menuId);
@@ -269,7 +243,7 @@ public class AssetBal extends RepositoryChain<AssetRepository> implements Record
             if (result != null) {
                 String templateId = result.getTypeId();
                 User user = userBal.getUserByToken(token);
-                if (!userAccessBall.hasAccess(user, menuId, templateId,
+                if (!accessBal.hasAccess(user, menuId, templateId,
                         GlobalAccessRights.DELETE)) {
                     throw new BalException("This user does not have sufficient "
                             + "access rights to delete this asset!");
@@ -299,6 +273,11 @@ public class AssetBal extends RepositoryChain<AssetRepository> implements Record
         } catch (Exception e) {
             throw new BalException("Error on trying to to delete asset [" + record + "]", e);
         }
+    }
+
+    @Override
+    public boolean exists(String id) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

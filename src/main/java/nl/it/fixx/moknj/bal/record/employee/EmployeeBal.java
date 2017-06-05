@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.record.employee;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,6 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import nl.it.fixx.moknj.bal.core.access.AccessBal;
+import nl.it.fixx.moknj.bal.core.FieldBal;
+import nl.it.fixx.moknj.bal.core.MenuBal;
+import nl.it.fixx.moknj.bal.record.RecordBal;
+import nl.it.fixx.moknj.bal.record.RepositoryChain;
+import nl.it.fixx.moknj.bal.core.TemplateBal;
+import nl.it.fixx.moknj.bal.core.UserBal;
+import nl.it.fixx.moknj.bal.record.RepositoryContext;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
@@ -18,15 +26,17 @@ import nl.it.fixx.moknj.domain.modules.employee.EmployeeAction;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Employee Business Access Layer
  *
  * @author adriaan
  */
+@Service
 public class EmployeeBal extends RepositoryChain<EmployeeRepository> implements RecordBal<Employee> {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeBal.class);
@@ -34,34 +44,20 @@ public class EmployeeBal extends RepositoryChain<EmployeeRepository> implements 
     private final MenuBal menuBal;
     private final UserBal userBal;
     private final TemplateBal tempBal;
-    private final AccessBal userAccessBall;
+    private final AccessBal accessBal;
     private final FieldBal fieldBal;
-    private final LinkBal linkBal;
+    private final EmployeeLinkBal linkBal;
 
-    public EmployeeBal(SystemContext context) {
+    @Autowired
+    public EmployeeBal(MenuBal menuBal, UserBal userBal, TemplateBal tempBal,
+            AccessBal accessBal, FieldBal fieldBal, RepositoryContext context) {
         super(context.getRepository(EmployeeRepository.class));
-        this.userBal = new UserBal(context);
-        this.menuBal = new MenuBal(context);
-        this.tempBal = new TemplateBal(context);
-        this.userAccessBall = new AccessBal(context);
-        this.fieldBal = new FieldBal(context);
-        this.linkBal = new LinkBal(context, userBal, this);
-    }
-
-    /**
-     * Stops stack overflow error on link bal constructor
-     *
-     * @param context
-     * @param linkBal
-     */
-    public EmployeeBal(SystemContext context, LinkBal linkBal) {
-        super(context.getRepository(EmployeeRepository.class));
-        this.userBal = new UserBal(context);
-        this.menuBal = new MenuBal(context);
-        this.tempBal = new TemplateBal(context);
-        this.userAccessBall = new AccessBal(context);
-        this.fieldBal = new FieldBal(context);
-        this.linkBal = linkBal;
+        this.menuBal = menuBal;
+        this.userBal = userBal;
+        this.tempBal = tempBal;
+        this.accessBal = accessBal;
+        this.fieldBal = fieldBal;
+        this.linkBal = new EmployeeLinkBal(context, mainAccessBal, userBal, this, empLinkAccess);
     }
 
     /**
@@ -77,7 +73,7 @@ public class EmployeeBal extends RepositoryChain<EmployeeRepository> implements 
         try {
             List<Employee> employees = new ArrayList<>();
             User user = userBal.getUserByToken(token);
-            if (userAccessBall.hasAccess(user, menuId, templateId, GlobalAccessRights.VIEW)) {
+            if (accessBal.hasAccess(user, menuId, templateId, GlobalAccessRights.VIEW)) {
                 List<Employee> records = repository.getAllByTypeId(templateId);
                 // Gets custom template settings saved to menu.
                 Menu menu = menuBal.getMenuById(menuId);
@@ -120,32 +116,8 @@ public class EmployeeBal extends RepositoryChain<EmployeeRepository> implements 
                 // checks if the original object differs from new saved object
                 // stop the unique filter form check for duplicates on employee
                 // which has not changed from the db version...
-                String flag = null;
-                if (record.getId() != null) {
-                    // check if user has acess for edit record
-                    User user = userBal.getUserByToken(token);
-                    if (!userAccessBall.hasAccess(user, menuId, templateId,
-                            GlobalAccessRights.EDIT)) {
-                        throw new BalException("This user does not have sufficient "
-                                + "access rights to update this employee!");
-                    }
-
-                    Employee dbEmployee = repository.findOne(record.getId());
-                    if (record.equals(dbEmployee)) {
-                        flag = "no_changes";
-                    } else {
-                        flag = "has_changes";
-                    }
-                } else {
-                    // check if user has acess for new record
-                    User user = userBal.getUserByToken(token);
-                    if (!userAccessBall.hasAccess(user, menuId, templateId,
-                            GlobalAccessRights.NEW)) {
-                        throw new BalException("This user does not have sufficient "
-                                + "access rights to create this employee!");
-                    }
-                }
-
+                String flag = new EmployeeChange(repository, userBal, accessBal).
+                        hasChange(record, templateId, menuId, token);
                 /**
                  * Find unique fields for employee and check if the current list
                  * of employees is unique for the field...
@@ -314,7 +286,7 @@ public class EmployeeBal extends RepositoryChain<EmployeeRepository> implements 
                 // make sure action is added to audit.
                 if (audit.getAction() != null) {
                     if (!"NO_CHANGE".equals(audit.getChanges())) {
-                        linkBal.saveEmployeeLink(audit);
+//                        linkBal.saveEmployeeLink(audit);
                     }
                 }
 
@@ -350,7 +322,7 @@ public class EmployeeBal extends RepositoryChain<EmployeeRepository> implements 
                 String templateId = record.getTypeId();
 
                 User user = userBal.getUserByToken(token);
-                if (!userAccessBall.hasAccess(user, menuId, templateId,
+                if (!accessBal.hasAccess(user, menuId, templateId,
                         GlobalAccessRights.DELETE)) {
                     throw new BalException("This user does not have sufficient "
                             + "access rights to delete this employee!");
@@ -358,10 +330,11 @@ public class EmployeeBal extends RepositoryChain<EmployeeRepository> implements 
 
                 if (cascade) {
                     // delete links
-                    linkBal.getAllEmployeeLinksForEmployee(
-                            result.getId(), token).stream().forEach((link) -> {
-                        linkBal.deleteEmployeeLink(link);
-                    });
+                      
+//                    linkBal.getAllEmployeeLinksForEmployee(
+//                            result.getId(), token).stream().forEach((link) -> {
+//                        linkBal.deleteEmployeeLink(link);
+//                    });
                     repository.delete(result);
                 } else {
                     // hide asset by updating hidden field=
@@ -404,4 +377,10 @@ public class EmployeeBal extends RepositoryChain<EmployeeRepository> implements 
                 + ", createdBy=" + emp.getCreatedBy();
         return str;
     }
+
+    @Override
+    public boolean exists(String id) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

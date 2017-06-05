@@ -1,13 +1,14 @@
 package nl.it.fixx.moknj.domain.modules.employee;
 
 import java.util.Objects;
+import nl.it.fixx.moknj.domain.core.link.Link;
 import org.springframework.data.annotation.Id;
 
 /**
  *
  * @author adriaan
  */
-public class EmployeeLink {
+public class EmployeeLink implements Link {
 
     @Id
     private String id;
@@ -205,6 +206,16 @@ public class EmployeeLink {
             return false;
         }
         return this.action == other.action;
+    }
+
+    @Override
+    public String getLinkId() {
+        return getId();
+    }
+
+    @Override
+    public String getRecordId() {
+        return getEmployeeId();
     }
 
 }

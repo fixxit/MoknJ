@@ -1,16 +1,14 @@
-package nl.it.fixx.moknj.builders;
+package nl.it.fixx.moknj.bal.core;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import nl.it.fixx.moknj.bal.AssetBal;
-import nl.it.fixx.moknj.bal.EmployeeBal;
-import nl.it.fixx.moknj.bal.LinkBal;
-import nl.it.fixx.moknj.bal.MainAccessBal;
-import nl.it.fixx.moknj.bal.RecordBal;
-import nl.it.fixx.moknj.bal.UserBal;
+import nl.it.fixx.moknj.bal.record.asset.AssetBal;
+import nl.it.fixx.moknj.bal.record.employee.EmployeeBal;
+import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
+import nl.it.fixx.moknj.bal.record.RecordBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
@@ -24,7 +22,6 @@ import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -32,18 +29,18 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * This class is used to group the graph data for display in the UI
  *
  * @author adriaan
  */
+@Service
 public class GraphBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
-
-    private final String token;
-    private final SystemContext context;
 
     private DateTime endDate;
     private DateTime startDate;
@@ -53,9 +50,20 @@ public class GraphBuilder {
     private static final String MDL_ASSET_STATUS_IN = "In";
     private static final String MDL_ASSET_STATUS_OUT = "Out";
 
-    public GraphBuilder(SystemContext context, String token) {
-        this.context = context;
-        this.token = token;
+    private final MainAccessBal mainAccessBal;
+    private final AssetBal assetBal;
+    private final EmployeeBal employeeBal;
+    private final LinkBal linkBal;
+    private final UserBal userBal;
+
+    @Autowired
+    public GraphBuilder(MainAccessBal mainAccessBal, AssetBal assetBal,
+            EmployeeBal employeeBal, LinkBal linkBal, UserBal userBal) {
+        this.mainAccessBal = mainAccessBal;
+        this.assetBal = assetBal;
+        this.employeeBal = employeeBal;
+        this.linkBal = linkBal;
+        this.userBal = userBal;
     }
 
     private final String FMT_CREATED_DATE = "yyyy-MM-dd HH:mm";
@@ -67,10 +75,11 @@ public class GraphBuilder {
      * Generates the graph data!
      *
      * @param graphInfo
+     * @param token
      * @return
      * @throws Exception
      */
-    public GraphData buildGraphData(Graph graphInfo) throws Exception {
+    public GraphData buildGraphData(Graph graphInfo, String token) throws Exception {
         try {
             GraphData data = new GraphData();
             // get all records for template.
@@ -79,13 +88,13 @@ public class GraphBuilder {
 //                LOG.info("Graph Name : " + graphInfo.getName());
                 // Business access layer.
                 RecordBal recordBal = null;
-                Menu menu = new MainAccessBal(context).getMenu(graphInfo.getMenuId(), token);
+                Menu menu = mainAccessBal.getMenu(graphInfo.getMenuId(), token);
                 for (Template template : menu.getTemplates()) {
                     if (template.getId().equals(graphInfo.getTemplateId())) {
                         if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
-                            recordBal = new AssetBal(context);
+                            recordBal = assetBal;
                         } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {
-                            recordBal = new EmployeeBal(context);
+                            recordBal = employeeBal;
                         }
                         /**
                          * below is where the date logic is generated or x -
@@ -104,12 +113,11 @@ public class GraphBuilder {
                                         Asset asset = (Asset) record;
                                         // gets all the checked in/out records for asset.
                                         List<AssetLink> links
-                                                = new LinkBal(context).
-                                                        getAllAssetLinksByAssetId(
-                                                                asset.getId(),
-                                                                menu.getId(),
-                                                                template.getId(),
-                                                                token);
+                                                = linkBal.getAllAssetLinksByAssetId(
+                                                        asset.getId(),
+                                                        menu.getId(),
+                                                        template.getId(),
+                                                        token);
 
                                         links.forEach((link) -> {
                                             // create new instance of asset... prototype pattern would be nice here...
@@ -188,20 +196,20 @@ public class GraphBuilder {
                                         startDate = today;
                                         break;
                                     case GBL_SMTEOM: {
-                                        getXAxisLabels(xAxisLabels, graphInfo, template);
+                                        getXAxisLabels(xAxisLabels, graphInfo, template, token);
                                         xAxisSwapped = true;
                                         initialiseMonthDates();
                                     }
                                     break;
                                     case GBL_SYTEOY: {
-                                        getXAxisLabels(xAxisLabels, graphInfo, template);
+                                        getXAxisLabels(xAxisLabels, graphInfo, template, token);
                                         xAxisSwapped = true;
                                         initialiseYearDates();
                                     }
                                     break;
                                     case GBL_SYTD: {
                                         // SWOPS THE data set for x axis labels
-                                        getXAxisLabels(xAxisLabels, graphInfo, template);
+                                        getXAxisLabels(xAxisLabels, graphInfo, template, token);
                                         xAxisSwapped = true;
 
                                         String startDateStr = endDate.getYear() + "-01-01";
@@ -228,7 +236,7 @@ public class GraphBuilder {
                             if (null != graphInfo.getGraphFocus()) {
                                 switch (graphInfo.getGraphFocus()) {
                                     case GBL_FOCUS_CREATED_BY:
-                                        for (User user : new UserBal(context).getAll()) {
+                                        for (User user : userBal.getAll()) {
                                             if (user.isSystemUser()) {
                                                 yAxisLabels.add(user.getUserName());
                                             }
@@ -465,12 +473,12 @@ public class GraphBuilder {
         }
     }
 
-    private void getXAxisLabels(List<String> xAxis, Graph graphInfo, Template temp) throws Exception {
+    private void getXAxisLabels(List<String> xAxis, Graph graphInfo, Template temp, String token) throws Exception {
         try {
             if (null != graphInfo.getGraphFocus()) {
                 switch (graphInfo.getGraphFocus()) {
                     case GBL_FOCUS_CREATED_BY:
-                        new UserBal(context).getAll().stream().filter((user) -> (user.isSystemUser())).forEach((user) -> {
+                        userBal.getAll().stream().filter((user) -> (user.isSystemUser())).forEach((user) -> {
                             xAxis.add(user.getUserName());
                         });
                         break;
@@ -506,7 +514,7 @@ public class GraphBuilder {
                         }
                         break;
                     case GBL_FOCUS_DEFAULT:
-                        Menu menu = new MainAccessBal(context).getMenu(graphInfo.getMenuId(), token);
+                        Menu menu = mainAccessBal.getMenu(graphInfo.getMenuId(), token);
                         if (GlobalMenuType.GBL_MT_ASSET.equals(menu.getMenuType())) {
                             xAxis.add(MDL_ASSET_DEFAULT);
                         } else if (GlobalMenuType.GBL_MT_EMPLOYEE.equals(menu.getMenuType())) {

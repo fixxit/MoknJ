@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.builders.GraphBuilder;
+import nl.it.fixx.moknj.bal.record.RepositoryChain;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
@@ -17,22 +17,28 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.GraphRepository;
-import nl.it.fixx.moknj.service.SystemContext;
+import nl.it.fixx.moknj.bal.record.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author adriaan
  */
+@Service
 public class GraphBal extends RepositoryChain<GraphRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
-    private final SystemContext context;
+    private final RepositoryContext context;
+    private final GraphBuilder graphBuilder;
 
-    public GraphBal(SystemContext context) {
+    @Autowired
+    public GraphBal(RepositoryContext context, GraphBuilder graphBuilder) {
         super(context.getRepository(GraphRepository.class));
+        this.graphBuilder = graphBuilder;
         this.context = context;
     }
 
@@ -129,8 +135,7 @@ public class GraphBal extends RepositoryChain<GraphRepository> {
             User user = new UserBal(context).getUserByToken(token);
             Graph graph = repository.findOne(graphId);
             if (user.getId().equals(graph.getCreatorId())) {
-                GraphBuilder builder = new GraphBuilder(context, token);
-                return builder.buildGraphData(graph);
+                return graphBuilder.buildGraphData(graph, token);
             }
         } catch (Exception e) {
             LOG.error("Could no get graph data", e);

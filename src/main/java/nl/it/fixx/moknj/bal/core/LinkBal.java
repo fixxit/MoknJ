@@ -1,11 +1,16 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.core;
 
+import nl.it.fixx.moknj.bal.core.access.AccessBal;
+import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
+import nl.it.fixx.moknj.bal.record.asset.AssetBal;
+import nl.it.fixx.moknj.bal.record.employee.EmployeeBal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import nl.it.fixx.moknj.bal.BusinessAccessLayer;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_ASSET;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_EMPLOYEE;
@@ -22,60 +27,37 @@ import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.service.SystemContext;
+import nl.it.fixx.moknj.bal.record.RepositoryContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author adriaan
  */
+@Service
 public class LinkBal implements BusinessAccessLayer {
 
     private static final Logger LOG = LoggerFactory.getLogger(LinkBal.class);
-    private final SystemContext context;
+    private final RepositoryContext context;
     private final UserBal userBal;
     private final AssetBal assetBal;
     private final AccessBal accessBal;
+    private final MainAccessBal mainAccessBal;
     private final EmployeeBal employeeBal;
 
-    public LinkBal(SystemContext context) {
-        this.context = context;
-        this.userBal = new UserBal(context);
-        this.accessBal = new AccessBal(context);
-        this.assetBal = new AssetBal(context, this);
-        this.employeeBal = new EmployeeBal(context, this);
-    }
-
-    /**
-     * Stops stack overflow error on Employee bal constructor
-     *
-     * @param context
-     * @param userBal
-     * @param employeeBal
-     */
-    public LinkBal(SystemContext context, UserBal userBal, EmployeeBal employeeBal) {
+    @Autowired
+    public LinkBal(RepositoryContext context, UserBal userBal, AssetBal assetBal,
+            AccessBal accessBal, EmployeeBal employeeBal, MainAccessBal mainAccessBal) {
         this.context = context;
         this.userBal = userBal;
-        this.employeeBal = employeeBal;
-        this.accessBal = new AccessBal(context);
-        this.assetBal = new AssetBal(context, this);
-    }
-
-    /**
-     * Stops stack overflow error on Asset bal constructor
-     *
-     * @param context
-     * @param userBal
-     * @param assetBal
-     */
-    public LinkBal(SystemContext context, UserBal userBal, AssetBal assetBal) {
-        this.context = context;
         this.assetBal = assetBal;
-        this.userBal = userBal;
-        this.accessBal = new AccessBal(context);
-        this.employeeBal = new EmployeeBal(context, this);
+        this.accessBal = accessBal;
+        this.mainAccessBal = mainAccessBal;
+        this.employeeBal = employeeBal;
     }
 
     /**
@@ -167,7 +149,7 @@ public class LinkBal implements BusinessAccessLayer {
     public List<EmployeeLink> getAllEmployeeLinksForEmployee(String employeeId, String token) throws Exception {
         try {
             Set<EmployeeLink> results = new HashSet<>();
-            for (Menu menu : new MainAccessBal(context).getUserMenus(token)) {
+            for (Menu menu : mainAccessBal.getUserMenus(token)) {
                 if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
                     for (Template temp : menu.getTemplates()) {
                         results.addAll(checkEmployeeRecordAccess(
@@ -186,7 +168,7 @@ public class LinkBal implements BusinessAccessLayer {
     }
 
     private void setEmployeelinkDetails(String employeeId, EmployeeLink link) throws Exception {
-        Employee employee = employeeBal.get(employeeId);
+        Employee employee = context.getRepository(EmployeeRepository.class).findOne(employeeId);
         User linkedUser = context.getRepository(UserRepository.class).findById(employee.getResourceId());
         String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
         link.setUser(fullname);
@@ -323,7 +305,7 @@ public class LinkBal implements BusinessAccessLayer {
     public List<EmployeeLink> getAllEmployeeLinks(String token) throws Exception {
         try {
             Set<EmployeeLink> results = new HashSet<>();
-            for (Menu menu : new MainAccessBal(context).getUserMenus(token)) {
+            for (Menu menu : mainAccessBal.getUserMenus(token)) {
                 if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
                     for (Template temp : menu.getTemplates()) {
                         List<Employee> employees = employeeBal.getAll(temp.getId(), menu.getId(), token);
@@ -354,7 +336,7 @@ public class LinkBal implements BusinessAccessLayer {
     public List<AssetLink> getAllAssetLinks(String token) throws Exception {
         try {
             Set<AssetLink> results = new HashSet<>();
-            for (Menu menu : new MainAccessBal(context).getUserMenus(token)) {
+            for (Menu menu : mainAccessBal.getUserMenus(token)) {
                 if (GBL_MT_ASSET.equals(menu.getMenuType())) {
                     for (Template temp : menu.getTemplates()) {
                         List<Asset> assets = assetBal.getAll(temp.getId(), menu.getId(), token);
@@ -390,7 +372,7 @@ public class LinkBal implements BusinessAccessLayer {
     public List<AssetLink> getAllAssetLinksByAssetId(String assetId, String token) throws Exception {
         try {
             Set<AssetLink> results = new HashSet<>();
-            for (Menu menu : new MainAccessBal(context).getUserMenus(token)) {
+            for (Menu menu : mainAccessBal.getUserMenus(token)) {
                 if (menu.getMenuType().equals(GBL_MT_ASSET)) {
                     for (Template temp : menu.getTemplates()) {
                         results.addAll(checkAssetRecordAccess(
@@ -443,7 +425,7 @@ public class LinkBal implements BusinessAccessLayer {
     public List<AssetLink> getAllAssetLinksByResourceId(String userId, String token) throws Exception {
         try {
             Set<AssetLink> results = new HashSet<>();
-            for (Menu menu : new MainAccessBal(context).getUserMenus(token)) {
+            for (Menu menu : mainAccessBal.getUserMenus(token)) {
                 if (menu.getMenuType().equals(GBL_MT_ASSET)) {
                     for (Template temp : menu.getTemplates()) {
                         results.addAll(checkAssetRecordAccess(
