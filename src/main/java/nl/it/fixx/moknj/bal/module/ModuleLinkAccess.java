@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nl.it.fixx.moknj.bal.record;
+package nl.it.fixx.moknj.bal.module;
 
 import java.util.HashSet;
 import java.util.List;
@@ -14,21 +14,20 @@ import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.core.access.AccessBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.link.Link;
-import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.exception.BalException;
 
-public abstract class RecordLinkAccess<T extends Link> {
+public abstract class ModuleLinkAccess<T extends Link> {
 
     protected final MenuBal menuBal;
     protected final AccessBal accessBal;
-    protected final RecordBal recordBal;
+    protected final ModuleBal recordBal;
     protected final UserBal userBal;
 
-    public RecordLinkAccess(MenuBal menuBal, AccessBal accessBal,
-            RecordBal recordBal, UserBal userBal) {
+    public ModuleLinkAccess(MenuBal menuBal, AccessBal accessBal,
+            ModuleBal recordBal, UserBal userBal) {
         this.menuBal = menuBal;
         this.accessBal = accessBal;
         this.recordBal = recordBal;
@@ -42,7 +41,7 @@ public abstract class RecordLinkAccess<T extends Link> {
                 if (recordBal.exists(link.getRecordId())) {
                     if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
                         // Get template from menu item
-                        Template template = getMenuTemplate(menuId, templateId);
+                        Template template = menuBal.getMenuTemplate(menuId, templateId);
                         if (template == null) {
                             continue;
                         }
@@ -73,26 +72,5 @@ public abstract class RecordLinkAccess<T extends Link> {
     }
 
     public abstract void setRecordViewValues(String recordId, T link) throws BalException;
-
-    /**
-     * Gets Template for the menu and template id, this is to get the saved
-     * settings to the template as menu template can differ to plain template as
-     * it has scope settings included.
-     *
-     * @param menuId
-     * @param templateId
-     * @return
-     * @throws Exception
-     */
-    private Template getMenuTemplate(String menuId, String templateId) throws Exception {
-        Menu menu = menuBal.getMenuById(menuId);
-        List<Template> menuTemplates = menu.getTemplates();
-        for (Template menuTemplate : menuTemplates) {
-            if (templateId.equals(menuTemplate.getId())) {
-                return menuTemplate;
-            }
-        }
-        return null;
-    }
 
 }

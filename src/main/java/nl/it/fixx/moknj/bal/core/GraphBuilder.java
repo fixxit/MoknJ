@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import nl.it.fixx.moknj.bal.record.asset.AssetBal;
-import nl.it.fixx.moknj.bal.record.employee.EmployeeBal;
+import nl.it.fixx.moknj.bal.module.asset.AssetBal;
+import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
 import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
-import nl.it.fixx.moknj.bal.record.RecordBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
@@ -31,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import nl.it.fixx.moknj.bal.module.ModuleBal;
+import nl.it.fixx.moknj.bal.module.asset.AssetLinkBal;
 
 /**
  * This class is used to group the graph data for display in the UI
@@ -53,12 +54,12 @@ public class GraphBuilder {
     private final MainAccessBal mainAccessBal;
     private final AssetBal assetBal;
     private final EmployeeBal employeeBal;
-    private final LinkBal linkBal;
+    private final AssetLinkBal linkBal;
     private final UserBal userBal;
 
     @Autowired
     public GraphBuilder(MainAccessBal mainAccessBal, AssetBal assetBal,
-            EmployeeBal employeeBal, LinkBal linkBal, UserBal userBal) {
+            EmployeeBal employeeBal, AssetLinkBal linkBal, UserBal userBal) {
         this.mainAccessBal = mainAccessBal;
         this.assetBal = assetBal;
         this.employeeBal = employeeBal;
@@ -87,7 +88,7 @@ public class GraphBuilder {
 //                LOG.info("======================================================");
 //                LOG.info("Graph Name : " + graphInfo.getName());
                 // Business access layer.
-                RecordBal recordBal = null;
+                ModuleBal recordBal = null;
                 Menu menu = mainAccessBal.getMenu(graphInfo.getMenuId(), token);
                 for (Template template : menu.getTemplates()) {
                     if (template.getId().equals(graphInfo.getTemplateId())) {

@@ -1,14 +1,18 @@
-package nl.it.fixx.moknj.bal.record;
+package nl.it.fixx.moknj.bal.module;
 
 import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.exception.BalException;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public abstract class RecordChangeBal<T extends MongoRepository, I extends Record> {
-
+public abstract class ModuleChangeBal<T extends MongoRepository, I extends Record> {
+    
+    public static String NO_CHANGES = "no_changes";
+    public static String HAS_CHANGES = "has_changes";
+    
+    
     protected final T repository;
 
-    public RecordChangeBal(T repository) {
+    public ModuleChangeBal(T repository) {
         this.repository = repository;
     }
 

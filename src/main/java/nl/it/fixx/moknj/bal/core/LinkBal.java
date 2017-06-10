@@ -2,8 +2,8 @@ package nl.it.fixx.moknj.bal.core;
 
 import nl.it.fixx.moknj.bal.core.access.AccessBal;
 import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
-import nl.it.fixx.moknj.bal.record.asset.AssetBal;
-import nl.it.fixx.moknj.bal.record.employee.EmployeeBal;
+import nl.it.fixx.moknj.bal.module.asset.AssetBal;
+import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,7 +27,7 @@ import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.bal.record.RepositoryContext;
+import nl.it.fixx.moknj.bal.RepositoryContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
  *
  * @author adriaan
  */
+@Deprecated
 @Service
 public class LinkBal implements BusinessAccessLayer {
 

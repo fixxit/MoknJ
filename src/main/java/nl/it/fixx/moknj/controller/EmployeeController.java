@@ -1,6 +1,6 @@
 package nl.it.fixx.moknj.controller;
 
-import nl.it.fixx.moknj.bal.record.employee.EmployeeBal;
+import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.response.EmployeeResponse;

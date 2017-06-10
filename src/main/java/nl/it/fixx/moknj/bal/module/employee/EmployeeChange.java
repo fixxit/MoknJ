@@ -1,44 +1,43 @@
-package nl.it.fixx.moknj.bal.record.asset;
+package nl.it.fixx.moknj.bal.module.employee;
 
 import nl.it.fixx.moknj.bal.core.access.AccessBal;
-import nl.it.fixx.moknj.bal.record.RecordChangeBal;
+import nl.it.fixx.moknj.bal.module.ModuleChangeBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
-import nl.it.fixx.moknj.domain.modules.asset.Asset;
+import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.exception.BalException;
-import nl.it.fixx.moknj.repository.AssetRepository;
+import nl.it.fixx.moknj.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AssetChange extends RecordChangeBal<AssetRepository, Asset> {
+public class EmployeeChange extends ModuleChangeBal<EmployeeRepository, Employee> {
 
     private final UserBal userBal;
     private final AccessBal accessBal;
 
     @Autowired
-    public AssetChange(AssetRepository repository, UserBal userBal, AccessBal accessBal) {
+    public EmployeeChange(EmployeeRepository repository, UserBal userBal, AccessBal accessBal) {
         super(repository);
         this.userBal = userBal;
         this.accessBal = accessBal;
     }
 
     @Override
-    public String hasChange(Asset record, String templateId, String menuId, String token) throws BalException {
+    public String hasChange(Employee record, String templateId, String menuId, String token) throws BalException {
         try {
             String flag = null;
             if (record.getId() != null) {
                 // check if user has acess for edit record
                 User user = userBal.getUserByToken(token);
-                if (!accessBal.hasAccess(user, menuId, templateId,
-                        GlobalAccessRights.EDIT)) {
+                if (!accessBal.hasAccess(user, menuId, templateId, GlobalAccessRights.EDIT)) {
                     throw new BalException("This user does not have sufficient "
-                            + "access rights to update this asset!");
+                            + "access rights to update this employee!");
                 }
 
-                Asset asset = repository.findOne(record.getId());
-                if (record.equals(asset)) {
+                Employee employee = repository.findOne(record.getId());
+                if (record.equals(employee)) {
                     flag = "no_changes";
                 } else {
                     flag = "has_changes";
@@ -46,10 +45,9 @@ public class AssetChange extends RecordChangeBal<AssetRepository, Asset> {
             } else {
                 // check if user has acess for new record
                 User user = userBal.getUserByToken(token);
-                if (!accessBal.hasAccess(user, menuId, templateId,
-                        GlobalAccessRights.NEW)) {
+                if (!accessBal.hasAccess(user, menuId, templateId, GlobalAccessRights.NEW)) {
                     throw new BalException("This user does not have sufficient "
-                            + "access rights to save this asset!");
+                            + "access rights to create this employee!");
                 }
             }
             return flag;

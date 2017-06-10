@@ -1,7 +1,7 @@
 package nl.it.fixx.moknj.bal.core.access;
 
-import nl.it.fixx.moknj.bal.record.asset.AssetBal;
-import nl.it.fixx.moknj.bal.record.employee.EmployeeBal;
+import nl.it.fixx.moknj.bal.module.asset.AssetBal;
+import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -22,7 +22,6 @@ import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.exception.AccessException;
-import nl.it.fixx.moknj.bal.record.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +48,7 @@ public class MainAccessBal implements BusinessAccessLayer {
 
     @Autowired
     public MainAccessBal(AccessBal accessBal, UserBal userBal, MenuBal menuBal,
-            TemplateBal tempBal, AssetBal assetBal, EmployeeBal employeeBal,
-            RepositoryContext context) {
+            TemplateBal tempBal, AssetBal assetBal, EmployeeBal employeeBal) {
         this.accessBal = accessBal;
         this.userBal = userBal;
         this.menuBal = menuBal;
@@ -339,9 +337,7 @@ public class MainAccessBal implements BusinessAccessLayer {
      * @param token
      * @throws java.lang.Exception
      */
-    public void deleteTemplate(String id,
-            boolean cascade,
-            String token) throws Exception {
+    public void deleteTemplate(String id, boolean cascade, String token) throws Exception {
         try {
             User user = userBal.getUserByToken(token);
             if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
@@ -362,7 +358,6 @@ public class MainAccessBal implements BusinessAccessLayer {
                                     iterator.remove();
                                     menuBal.saveMenu(menu);
                                 }
-
                             } else if (GlobalTemplateType.GBL_TT_EMPLOYEE.equals(template.getTemplateType())) {
                                 List<Employee> employees = employeeBal.getAll(template.getId(), template.getId(), token);
                                 for (Employee emp : employees) {

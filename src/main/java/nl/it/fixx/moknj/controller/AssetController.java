@@ -1,6 +1,6 @@
 package nl.it.fixx.moknj.controller;
 
-import nl.it.fixx.moknj.bal.record.asset.AssetBal;
+import nl.it.fixx.moknj.bal.module.asset.AssetBal;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.response.AssetResponse;

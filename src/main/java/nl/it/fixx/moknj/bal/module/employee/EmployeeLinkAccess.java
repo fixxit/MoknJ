@@ -1,9 +1,9 @@
-package nl.it.fixx.moknj.bal.record.employee;
+package nl.it.fixx.moknj.bal.module.employee;
 
 import nl.it.fixx.moknj.bal.core.MenuBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.core.access.AccessBal;
-import nl.it.fixx.moknj.bal.record.RecordLinkAccess;
+import nl.it.fixx.moknj.bal.module.ModuleLinkAccess;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmployeeLinkAccess extends RecordLinkAccess<EmployeeLink> {
+public class EmployeeLinkAccess extends ModuleLinkAccess<EmployeeLink> {
 
     @Autowired
     public EmployeeLinkAccess(MenuBal menuBal, AccessBal accessBal,
@@ -29,7 +29,7 @@ public class EmployeeLinkAccess extends RecordLinkAccess<EmployeeLink> {
             link.setUser(fullname);
             link.setActionValue(link.getAction().getDisplayValue());
         } catch (Exception e) {
-            throw new BalException("Error while to set Review values for link access check", e);
+            throw new BalException("Error while to set view values for link access check", e);
         }
     }
 

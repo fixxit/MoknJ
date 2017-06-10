@@ -3,12 +3,12 @@ package nl.it.fixx.moknj.bal.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import nl.it.fixx.moknj.bal.record.RepositoryChain;
+import nl.it.fixx.moknj.bal.RepositoryBal;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.MenuRepository;
-import nl.it.fixx.moknj.bal.record.RepositoryContext;
+import nl.it.fixx.moknj.bal.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.comparator.NullSafeComparator;
 
 @Service
-public class MenuBal extends RepositoryChain<MenuRepository> {
+public class MenuBal extends RepositoryBal<MenuRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MenuBal.class);
-    
+
     @Autowired
     public MenuBal(RepositoryContext context) {
         super(context.getRepository(MenuRepository.class));
@@ -180,5 +180,26 @@ public class MenuBal extends RepositoryChain<MenuRepository> {
             LOG.error("error deleting menu[" + id + "]", e);
             throw e;
         }
+    }
+
+    /**
+     * Gets Template for the menu and template id, this is to get the saved
+     * settings to the template as menu template can differ to plain template as
+     * it has scope settings included.
+     *
+     * @param menuId
+     * @param templateId
+     * @return
+     * @throws Exception
+     */
+    public Template getMenuTemplate(String menuId, String templateId) throws Exception {
+        Menu menu = getMenuById(menuId);
+        List<Template> menuTemplates = menu.getTemplates();
+        for (Template menuTemplate : menuTemplates) {
+            if (templateId.equals(menuTemplate.getId())) {
+                return menuTemplate;
+            }
+        }
+        return null;
     }
 }

@@ -1,6 +1,5 @@
-package nl.it.fixx.moknj.bal.record;
+package nl.it.fixx.moknj.bal;
 
-import nl.it.fixx.moknj.bal.BusinessAccessLayer;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**
@@ -16,11 +15,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * @author adriaan
  * @param <T>
  */
-public abstract class RepositoryChain<T extends MongoRepository> implements BusinessAccessLayer {
+public abstract class RepositoryBal<T extends MongoRepository> implements BusinessAccessLayer {
 
     protected final T repository;
 
-    public RepositoryChain(T repository) {
+    public RepositoryBal(T repository) {
         this.repository = repository;
     }
 

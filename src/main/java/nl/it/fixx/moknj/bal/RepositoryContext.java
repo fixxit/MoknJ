@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.record;
+package nl.it.fixx.moknj.bal;
 
 import nl.it.fixx.moknj.properties.ApplicationProperties;
 import nl.it.fixx.moknj.repository.AccessRepository;

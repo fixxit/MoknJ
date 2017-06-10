@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.record;
+package nl.it.fixx.moknj.bal.module;
 
 import java.util.List;
 import nl.it.fixx.moknj.exception.BalException;
@@ -10,7 +10,7 @@ import nl.it.fixx.moknj.exception.BalException;
  * @author adriaan
  * @param <T>
  */
-public interface RecordBal<T> {
+public interface ModuleBal<T> {
 
     public boolean exists(String id);
 

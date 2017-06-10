@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package nl.it.fixx.moknj.bal.record.employee;
+package nl.it.fixx.moknj.bal.module.employee;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,9 +6,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
-import nl.it.fixx.moknj.bal.record.RecordLinkable;
-import nl.it.fixx.moknj.bal.record.RepositoryChain;
-import nl.it.fixx.moknj.bal.record.RepositoryContext;
+import nl.it.fixx.moknj.bal.RepositoryBal;
+import nl.it.fixx.moknj.bal.RepositoryContext;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_EMPLOYEE;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
@@ -23,10 +17,11 @@ import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import nl.it.fixx.moknj.bal.module.ModuleLinkable;
 
 @Service
-public class EmployeeLinkBal extends RepositoryChain<EmployeeLinkRepository>
-        implements RecordLinkable<EmployeeLink> {
+public class EmployeeLinkBal extends RepositoryBal<EmployeeLinkRepository>
+        implements ModuleLinkable<EmployeeLink> {
 
     private final UserBal userBal;
     private final EmployeeBal employeeBal;

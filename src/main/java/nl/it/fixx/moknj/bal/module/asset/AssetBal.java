@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.record.asset;
+package nl.it.fixx.moknj.bal.module.asset;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,12 +8,10 @@ import java.util.List;
 import java.util.Map;
 import nl.it.fixx.moknj.bal.core.access.AccessBal;
 import nl.it.fixx.moknj.bal.core.FieldBal;
-import nl.it.fixx.moknj.bal.core.LinkBal;
 import nl.it.fixx.moknj.bal.core.MenuBal;
-import nl.it.fixx.moknj.bal.record.RecordBal;
-import nl.it.fixx.moknj.bal.record.RepositoryChain;
+import nl.it.fixx.moknj.bal.RepositoryBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
-import nl.it.fixx.moknj.bal.record.RepositoryContext;
+import nl.it.fixx.moknj.bal.RepositoryContext;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
@@ -27,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import nl.it.fixx.moknj.bal.module.ModuleBal;
 
 /**
  * Asset Business Access Layer
@@ -34,7 +33,7 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class AssetBal extends RepositoryChain<AssetRepository> implements RecordBal<Asset> {
+public class AssetBal extends RepositoryBal<AssetRepository> implements ModuleBal<Asset> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetBal.class);
 
@@ -42,17 +41,15 @@ public class AssetBal extends RepositoryChain<AssetRepository> implements Record
     private final UserBal userBal;
     private final AccessBal accessBal;
     private final FieldBal fieldBal;
-    private final LinkBal linkBal;
 
     @Autowired
     public AssetBal(MenuBal menuBal, UserBal userBal, AccessBal accessBal,
-            FieldBal fieldBal, LinkBal linkBal, RepositoryContext context) {
+            FieldBal fieldBal, RepositoryContext context) {
         super(context.getRepository(AssetRepository.class));
         this.menuBal = menuBal;
         this.userBal = userBal;
         this.accessBal = accessBal;
         this.fieldBal = fieldBal;
-        this.linkBal = linkBal;
     }
 
     /**
@@ -250,11 +247,6 @@ public class AssetBal extends RepositoryChain<AssetRepository> implements Record
                 }
 
                 if (cascade) {
-                    // delete links
-                    linkBal.getAllAssetLinksByAssetId(result.getId(),
-                            token).stream().forEach((link) -> {
-                                linkBal.deleteAssetLink(link);
-                            });
                     // delete asset from the asset list.
                     repository.delete(result);
                 } else {
@@ -277,7 +269,7 @@ public class AssetBal extends RepositoryChain<AssetRepository> implements Record
 
     @Override
     public boolean exists(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.repository.exists(id);
     }
 
 }

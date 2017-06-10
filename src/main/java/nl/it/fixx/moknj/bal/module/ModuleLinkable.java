@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nl.it.fixx.moknj.bal.record;
+package nl.it.fixx.moknj.bal.module;
 
 import java.util.List;
 import nl.it.fixx.moknj.domain.core.link.Link;
@@ -14,7 +14,7 @@ import nl.it.fixx.moknj.exception.BalException;
  * @author SmarBullet
  * @param <I>
  */
-public interface RecordLinkable<I extends Link> {
+public interface ModuleLinkable<I extends Link> {
 
     public void delete(I link);
 

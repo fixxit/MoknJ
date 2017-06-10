@@ -1,11 +1,11 @@
 package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
-import nl.it.fixx.moknj.bal.record.RepositoryChain;
+import nl.it.fixx.moknj.bal.RepositoryBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.bal.record.RepositoryContext;
+import nl.it.fixx.moknj.bal.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class FieldBal extends RepositoryChain<FieldDetailRepository> {
+public class FieldBal extends RepositoryBal<FieldDetailRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldBal.class);
     
