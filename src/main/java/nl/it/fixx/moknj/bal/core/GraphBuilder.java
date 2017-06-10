@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import nl.it.fixx.moknj.bal.module.asset.AssetBal;
 import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
-import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.core.UserBal;
-import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
+import nl.it.fixx.moknj.bal.core.MainAccessBal;
 import nl.it.fixx.moknj.bal.RepositoryBal;
 import nl.it.fixx.moknj.bal.RepositoryContext;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_EMPLOYEE;

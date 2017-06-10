@@ -2,7 +2,7 @@ package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.core.access.AccessBal;
+import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.access.AccessRight;

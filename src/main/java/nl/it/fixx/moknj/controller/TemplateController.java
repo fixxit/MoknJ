@@ -3,7 +3,7 @@ package nl.it.fixx.moknj.controller;
 import java.util.ArrayList;
 import java.util.List;
 import nl.it.fixx.moknj.bal.core.TemplateBal;
-import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
+import nl.it.fixx.moknj.bal.core.MainAccessBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;

@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import nl.it.fixx.moknj.bal.core.access.AccessBal;
+import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.core.FieldBal;
 import nl.it.fixx.moknj.bal.core.MenuBal;
 import nl.it.fixx.moknj.bal.RepositoryBal;

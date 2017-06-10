@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.core.MenuBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
-import nl.it.fixx.moknj.bal.core.access.AccessBal;
+import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.link.Link;
 import nl.it.fixx.moknj.domain.core.template.Template;

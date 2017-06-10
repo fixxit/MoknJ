@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.core.access;
+package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
 import nl.it.fixx.moknj.bal.core.MenuBal;

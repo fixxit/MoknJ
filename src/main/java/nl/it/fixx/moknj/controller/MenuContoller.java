@@ -2,7 +2,7 @@ package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.core.access.MainAccessBal;
+import nl.it.fixx.moknj.bal.core.MainAccessBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalMenuType;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.menu.MenuType;

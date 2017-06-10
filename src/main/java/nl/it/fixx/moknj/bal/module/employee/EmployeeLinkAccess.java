@@ -2,7 +2,7 @@ package nl.it.fixx.moknj.bal.module.employee;
 
 import nl.it.fixx.moknj.bal.core.MenuBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
-import nl.it.fixx.moknj.bal.core.access.AccessBal;
+import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.module.ModuleLinkAccess;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;

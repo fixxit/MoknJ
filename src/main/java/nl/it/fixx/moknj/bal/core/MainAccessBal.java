@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.core.access;
+package nl.it.fixx.moknj.bal.core;
 
 import nl.it.fixx.moknj.bal.module.asset.AssetBal;
 import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
