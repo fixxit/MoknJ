@@ -14,7 +14,7 @@ import nl.it.fixx.moknj.exception.BalException;
  * @author SmarBullet
  * @param <I>
  */
-public interface ModuleLinkable<I extends Link> {
+public interface ModuleLinkBal<I extends Link> {
 
     public void delete(I link);
 

@@ -17,11 +17,11 @@ import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import nl.it.fixx.moknj.bal.module.ModuleLinkable;
+import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
 
 @Service
 public class EmployeeLinkBal extends RepositoryBal<EmployeeLinkRepository>
-        implements ModuleLinkable<EmployeeLink> {
+        implements ModuleLinkBal<EmployeeLink> {
 
     private final UserBal userBal;
     private final EmployeeBal employeeBal;

@@ -67,9 +67,8 @@ public class AssetBal extends RepositoryBal<AssetRepository> implements ModuleBa
                 // checks if the original object differs from new saved object
                 // stop the unique filter form check for duplicates on asset
                 // which has not changed from the db version...
-                String flag = new AssetChange(repository, userBal, accessBal).
-                        hasChange(record, templateId, menuId, token);
-
+                String flag = (record.equals(repository.findOne(record.getId())))
+                        ? "no_changes" : "has_changes";
                 /**
                  * Find unique fields for asset and check if the current list of
                  * assets is unique for the field...
@@ -82,7 +81,7 @@ public class AssetBal extends RepositoryBal<AssetRepository> implements ModuleBa
                 List<FieldValue> assetFields = record.getDetails();
                 assetFields.stream().forEach((field) -> {
                     try {
-                        FieldDetail detail = fieldBal.getField(field.getId());
+                        FieldDetail detail = fieldBal.get(field.getId());
                         if (detail != null && detail.isUnique()) {
                             uniqueFields.put(field.getId(), detail.getName());
                         }

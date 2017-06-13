@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * @author adriaan
  * @param <T>
  */
-public abstract class RepositoryBal<T extends MongoRepository> implements BusinessAccessLayer {
+public abstract class RepositoryBal<T extends MongoRepository> implements BAL {
 
     protected final T repository;
 

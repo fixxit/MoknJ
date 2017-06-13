@@ -55,7 +55,7 @@ public class GraphController {
             @RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
-            response.setGraphTemplate(graphBal.saveGraph(payload, access_token));
+            response.setGraphTemplate(graphBal.save(payload, access_token));
             response.setSuccess(true);
             response.setMessage("Saved graph successfully");
 
@@ -166,7 +166,7 @@ public class GraphController {
     GraphResponse getAllSavedGraphs(@RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
-            response.setSavedGraphs(graphBal.getAllGraphs(access_token));
+            response.setSavedGraphs(graphBal.getAll(access_token));
             response.setSuccess(true);
             response.setMessage("found all user graph templates");
         } catch (Exception ex) {
@@ -234,7 +234,7 @@ public class GraphController {
     GraphResponse delete(@PathVariable String id, @RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
-            graphBal.deleteGraph(id, access_token);
+            graphBal.delete(id, access_token);
             response.setSuccess(true);
             response.setMessage("Graph successfully deleted from system");
         } catch (Exception ex) {

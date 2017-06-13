@@ -8,17 +8,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.RepositoryBal;
 import nl.it.fixx.moknj.bal.RepositoryContext;
-import nl.it.fixx.moknj.bal.core.MenuBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.core.MainAccessBal;
-import nl.it.fixx.moknj.bal.module.ModuleLinkable;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_ASSET;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
-import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.exception.BalException;
@@ -27,9 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
 
 @Service
-public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements ModuleLinkable<AssetLink> {
+public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements ModuleLinkBal<AssetLink> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetLinkBal.class);
 
@@ -37,17 +35,17 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
     private final AssetBal assetBal;
     private final AccessBal accessBal;
     private final MainAccessBal mainAccessBal;
-    private final MenuBal menuBal;
+    private final AssetLinkAccess assetLinkAccess;
 
     @Autowired
     public AssetLinkBal(RepositoryContext context, UserBal userBal, AssetBal assetBal,
-            AccessBal accessBal, MainAccessBal mainAccessBal, MenuBal menuBal) {
+            AccessBal accessBal, MainAccessBal mainAccessBal, AssetLinkAccess assetLinkAccess) {
         super(context.getRepository(AssetLinkRepository.class));
         this.userBal = userBal;
         this.assetBal = assetBal;
         this.accessBal = accessBal;
         this.mainAccessBal = mainAccessBal;
-        this.menuBal = menuBal;
+        this.assetLinkAccess = assetLinkAccess;
     }
 
     @Override
@@ -111,53 +109,6 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
     }
 
     /**
-     * This not one of the the proudest pieces of code, but this code works,
-     * this check the audit list which is passed for scope challenge and access
-     * rights. Scope challenge basically adds records from the same template
-     * used over different menu to the list and bypasses the access rights.
-     *
-     * @param assetLinks
-     * @param menuId
-     * @param templateId
-     * @param user
-     * @return
-     * @throws Exception
-     */
-    public List<AssetLink> checkAssetRecordAccess(List<AssetLink> assetLinks, String menuId, String templateId, User user) throws Exception {
-        try {
-            Set<AssetLink> links = new HashSet<>();
-            for (AssetLink link : assetLinks) {
-                if (assetBal.exists(link.getAssetId())) {
-                    if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                        // Get template from menu item
-                        Template template = menuBal.getMenuTemplate(menuId, templateId);
-                        if (template == null) {
-                            continue;
-                        }
-                        if (!template.isAllowScopeChallenge()) {
-                            if (accessBal.hasAccess(
-                                    user,
-                                    menuId,
-                                    template.getId(),
-                                    GlobalAccessRights.VIEW)) {
-                                links.add(link);
-                            }
-                        } else {
-                            links.add(link);
-                        }
-                    } else {
-                        links.add(link);
-                    }
-                }
-            }
-            return links.stream().collect(Collectors.toList());
-        } catch (Exception e) {
-            LOG.error("Error while trying to check user access to employee", e);
-            throw e;
-        }
-    }
-
-    /**
      * Gets all asset in and out audit links for user token.
      *
      * @param token
@@ -173,7 +124,7 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
                     for (Template temp : menu.getTemplates()) {
                         List<Asset> assets = assetBal.getAll(temp.getId(), menu.getId(), token);
                         for (Asset asset : assets) {
-                            results.addAll(checkAssetRecordAccess(
+                            results.addAll(assetLinkAccess.filterRecordAccess(
                                     getAllAssetLinksByAssetId(
                                             asset.getId(),
                                             menu.getId(),
@@ -207,7 +158,7 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
             for (Menu menu : mainAccessBal.getUserMenus(token)) {
                 if (menu.getMenuType().equals(GBL_MT_ASSET)) {
                     for (Template temp : menu.getTemplates()) {
-                        results.addAll(checkAssetRecordAccess(
+                        results.addAll(assetLinkAccess.filterRecordAccess(
                                 repository.getAllByAssetId(assetId),
                                 menu.getId(),
                                 temp.getId(),
@@ -234,7 +185,7 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
      */
     public List<AssetLink> getAllAssetLinksByAssetId(String assetId, String menuId, String templateId, String token) throws Exception {
         try {
-            return checkAssetRecordAccess(
+            return assetLinkAccess.filterRecordAccess(
                     repository.getAllByAssetId(assetId),
                     menuId,
                     templateId,
@@ -259,7 +210,7 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
             for (Menu menu : mainAccessBal.getUserMenus(token)) {
                 if (menu.getMenuType().equals(GBL_MT_ASSET)) {
                     for (Template temp : menu.getTemplates()) {
-                        results.addAll(checkAssetRecordAccess(
+                        results.addAll(assetLinkAccess.filterRecordAccess(
                                 repository.getAllByResourceId(userId),
                                 menu.getId(),
                                 temp.getId(),

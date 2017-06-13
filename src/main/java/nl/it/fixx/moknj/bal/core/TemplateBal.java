@@ -45,7 +45,7 @@ public class TemplateBal extends RepositoryBal<TemplateRepository> {
 
             boolean exists = repository.existsByName(payload.getName());
             if (!exists || bypassExists) {
-                fieldBal.saveFields(payload.getDetails());
+                fieldBal.save(payload.getDetails());
                 Template template = this.repository.save(payload);
                 return template;
             } else {

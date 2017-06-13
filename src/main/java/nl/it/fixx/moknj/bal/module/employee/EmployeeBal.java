@@ -1,8 +1,6 @@
 package nl.it.fixx.moknj.bal.module.employee;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,8 +106,8 @@ public class EmployeeBal extends RepositoryBal<EmployeeRepository> implements Mo
                 // checks if the original object differs from new saved object
                 // stop the unique filter form check for duplicates on employee
                 // which has not changed from the db version...
-                String flag = new EmployeeChange(repository, userBal, accessBal).
-                        hasChange(record, templateId, menuId, token);
+                String changed = (record.equals(repository.findOne(record.getId())))
+                        ? "no_changes" : "has_changes";
                 /**
                  * Find unique fields for employee and check if the current list
                  * of employees is unique for the field...
@@ -122,7 +120,7 @@ public class EmployeeBal extends RepositoryBal<EmployeeRepository> implements Mo
                 List<FieldValue> newEmployeeFields = record.getDetails();
                 newEmployeeFields.stream().forEach((field) -> {
                     try {
-                        FieldDetail detail = fieldBal.getField(field.getId());
+                        FieldDetail detail = fieldBal.get(field.getId());
                         if (detail != null && detail.isUnique()) {
                             uniqueFields.put(field.getId(), detail.getName());
                         }
@@ -136,7 +134,7 @@ public class EmployeeBal extends RepositoryBal<EmployeeRepository> implements Mo
                     // if statement below checks that if update employee does not check
                     // it self to flag for duplication
                     if (!employee.getId().equals(record.getId())
-                            && !"no_changes".equals(flag)) {
+                            && !"no_changes".equals(changed)) {
                         List<FieldValue> details = employee.getDetails();
                         details.stream().filter((field) -> (uniqueFields.keySet().contains(field.getId()))).map((field) -> {
                             if (uniqueValues.get(field.getId()) == null) {
@@ -173,33 +171,11 @@ public class EmployeeBal extends RepositoryBal<EmployeeRepository> implements Mo
                     throw new BalException(message);
                 }
 
-                // Get user details who logged this employee using the token.
-                User user = userBal.getUserByToken(token);
-                if (user != null && user.isSystemUser()) {
-                    record.setLastModifiedBy(user.getUserName());
-                } else {
-                    throw new BalException("Employee save error, could not find system"
-                            + " user for this token");
-                }
-                // Save employee
-                String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
-                record.setLastModifiedDate(date);
-                if (record.getId() == null) {
-                    record.setCreatedBy(user.getUserName());
-                    record.setCreatedDate(date);
-                } else {
-                    Employee dbEmployee = repository.findOne(record.getId());
-                    record.setCreatedBy(dbEmployee.getCreatedBy());
-                    record.setCreatedDate(dbEmployee.getCreatedDate());
-                }
-
-                Employee savedEmployee = repository.save(record);
-
-                return savedEmployee;
+                return repository.save(record);
             } else {
                 throw new BalException("No employee type id provided.");
             }
-        } catch (Exception e) {
+        } catch (BalException e) {
             throw new BalException("Could not save employee due to internal error", e);
         }
     }

@@ -1,9 +1,6 @@
 package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
-import nl.it.fixx.moknj.bal.core.MenuBal;
-import nl.it.fixx.moknj.bal.core.TemplateBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.RepositoryBal;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;

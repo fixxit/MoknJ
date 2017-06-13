@@ -19,14 +19,14 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.exception.BalException;
 
-public abstract class ModuleLinkAccess<T extends Link> {
+public abstract class ModuleLinkAccessBal<T extends Link> {
 
     protected final MenuBal menuBal;
     protected final AccessBal accessBal;
     protected final ModuleBal recordBal;
     protected final UserBal userBal;
 
-    public ModuleLinkAccess(MenuBal menuBal, AccessBal accessBal,
+    public ModuleLinkAccessBal(MenuBal menuBal, AccessBal accessBal,
             ModuleBal recordBal, UserBal userBal) {
         this.menuBal = menuBal;
         this.accessBal = accessBal;
@@ -34,6 +34,7 @@ public abstract class ModuleLinkAccess<T extends Link> {
         this.userBal = userBal;
     }
 
+    
     public List<T> filterRecordAccess(List<T> records, String menuId, String templateId, User user) throws BalException {
         try {
             Set<T> links = new HashSet<>();

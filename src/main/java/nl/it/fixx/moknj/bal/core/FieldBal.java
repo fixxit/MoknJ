@@ -20,13 +20,13 @@ import org.springframework.stereotype.Service;
 public class FieldBal extends RepositoryBal<FieldDetailRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldBal.class);
-    
+
     @Autowired
     public FieldBal(RepositoryContext context) {
         super(context.getRepository(FieldDetailRepository.class));
     }
 
-    public FieldDetail getField(String id) throws Exception {
+    public FieldDetail get(String id) throws Exception {
         try {
             if (id == null || id.isEmpty()) {
                 LOG.debug("No Field id recieved to find Field");
@@ -45,7 +45,7 @@ public class FieldBal extends RepositoryBal<FieldDetailRepository> {
         }
     }
 
-    public void saveFields(List<FieldDetail> fields) {
+    public void save(List<FieldDetail> fields) {
         try {
             fields.stream().forEach((detail) -> {
                 repository.save(detail);

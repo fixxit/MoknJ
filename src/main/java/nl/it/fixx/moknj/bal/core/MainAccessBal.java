@@ -9,10 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.bal.BusinessAccessLayer;
-import nl.it.fixx.moknj.bal.core.MenuBal;
-import nl.it.fixx.moknj.bal.core.TemplateBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
@@ -27,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.comparator.NullSafeComparator;
+import nl.it.fixx.moknj.bal.BAL;
 
 /**
  * This is the main access bal used to access for any action related to template
@@ -35,7 +32,7 @@ import org.springframework.util.comparator.NullSafeComparator;
  * @author adriaan
  */
 @Service
-public class MainAccessBal implements BusinessAccessLayer {
+public class MainAccessBal implements BAL {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainAccessBal.class);
 
@@ -359,7 +356,7 @@ public class MainAccessBal implements BusinessAccessLayer {
                                     menuBal.saveMenu(menu);
                                 }
                             } else if (GlobalTemplateType.GBL_TT_EMPLOYEE.equals(template.getTemplateType())) {
-                                List<Employee> employees = employeeBal.getAll(template.getId(), template.getId(), token);
+                                List<Employee> employees = employeeBal.getAll(template.getId(), menu.getId(), token);
                                 for (Employee emp : employees) {
                                     employeeBal.delete(emp, menu.getId(), token, true);
                                     iterator.remove();

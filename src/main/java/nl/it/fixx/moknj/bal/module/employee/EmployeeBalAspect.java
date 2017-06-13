@@ -17,6 +17,7 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeAction;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
+import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -64,104 +65,121 @@ public class EmployeeBalAspect extends RepositoryBal<EmployeeRepository> {
 
     @Around("execution(* nl.it.fixx.moknj.bal.module.employee.EmployeeBal.save(String, String, nl.it.fixx.moknj.domain.modules.employee.Employee, String)) && args(templateId, menuId, record, token)")
     public void saveAround(ProceedingJoinPoint joinPoint, String templateId, String menuId, Employee record, String token) throws Throwable {
-        final String createdDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
-        EmployeeLink audit = new EmployeeLink();
-        // Set audit logs
-        audit.setCreatedDate(createdDate);
-        audit.setCreatedBy(record.getLastModifiedBy());
+        if (templateId != null) {
+            final String createdDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
+            EmployeeLink audit = new EmployeeLink();
+            // Set audit logs
+            audit.setCreatedDate(createdDate);
+            audit.setCreatedBy(record.getLastModifiedBy());
 
-        if (record.getTypeId() != null) {
-            Template template = tempBal.getTemplateById(record.getTypeId());
-            if (template != null) {
-                audit.setTemplate(template.getName());
+            // Get user details who logged this employee using the token.
+            User user = userBal.getUserByToken(token);
+            if (user != null && user.isSystemUser()) {
+                record.setLastModifiedBy(user.getUserName());
+            } else {
+                throw new BalException("Employee save error, could not find system"
+                        + " user for this token");
             }
-        }
+            // Save employee
+            record.setLastModifiedDate(createdDate);
+            if (record.getId() == null) {
+                record.setCreatedBy(user.getUserName());
+                record.setCreatedDate(createdDate);
+            } else {
+                Employee dbEmployee = repository.findOne(record.getId());
+                record.setCreatedBy(dbEmployee.getCreatedBy());
+                record.setCreatedDate(dbEmployee.getCreatedDate());
+            }
 
-        if (record.getId() != null) {
-            // get the field changes. This code scans fields for any
-            // changes then adds its to the string builder and saves
-            // it to the audit trail.
-            Employee employee = repository.findOne(record.getId());
-            StringBuilder changes = new StringBuilder();
+            if (record.getTypeId() != null) {
+                Template template = tempBal.getTemplateById(record.getTypeId());
+                if (template != null) {
+                    audit.setTemplate(template.getName());
+                }
+            }
 
-            if (!Objects.equals(employee.getDetails(), record.getDetails())) {
-                for (FieldValue dbFieldValue : employee.getDetails()) {
-                    for (FieldValue newFieldValue : record.getDetails()) {
-                        if (dbFieldValue.getId().equals(newFieldValue.getId())) {
-                            if (!dbFieldValue.getValue().equals(newFieldValue.getValue())) {
-                                // get field details
-                                FieldDetail detail = fieldBal.getField(dbFieldValue.getId());
-                                String change = detail.getName() + " value [";
-                                change += dbFieldValue.getValue() + "] ";
-                                change += "changed to [" + newFieldValue.getValue() + "], ";
-                                changes.append(change);
+            if (record.getId() != null) {
+                // get the field changes. This code scans fields for any
+                // changes then adds its to the string builder and saves
+                // it to the audit trail.
+                Employee employee = repository.findOne(record.getId());
+                StringBuilder changes = new StringBuilder();
+
+                if (!Objects.equals(employee.getDetails(), record.getDetails())) {
+                    for (FieldValue dbFieldValue : employee.getDetails()) {
+                        for (FieldValue newFieldValue : record.getDetails()) {
+                            if (dbFieldValue.getId().equals(newFieldValue.getId())) {
+                                if (!dbFieldValue.getValue().equals(newFieldValue.getValue())) {
+                                    // get field details
+                                    FieldDetail detail = fieldBal.get(dbFieldValue.getId());
+                                    String change = detail.getName() + " value [";
+                                    change += dbFieldValue.getValue() + "] ";
+                                    change += "changed to [" + newFieldValue.getValue() + "], ";
+                                    changes.append(change);
+                                }
                             }
                         }
                     }
                 }
-            }
-            // Remove trailing comma's
-            if (changes.toString() != null
-                    && !"".equals(changes.toString())) {
-                if (changes.toString().trim().endsWith(",")) {
-                    changes = new StringBuilder(changes.toString().trim().substring(0,
-                            changes.toString().trim().length() - 1));
+                // Remove trailing comma's
+                if (changes.toString() != null
+                        && !"".equals(changes.toString())) {
+                    if (changes.toString().trim().endsWith(",")) {
+                        changes = new StringBuilder(changes.toString().trim().substring(0,
+                                changes.toString().trim().length() - 1));
+                    }
+                    audit.setChanges(changes.toString());
+                } else {
+                    audit.setChanges("NO_CHANGE");
                 }
-                audit.setChanges(changes.toString());
             } else {
-                audit.setChanges("NO_CHANGE");
-            }
-        } else {
-            User emp = userBal.getUserById(record.getResourceId());
-            if (emp != null) {
-                record.setEmployee(emp.getFirstName() + " " + emp.getSurname());
+                User emp = userBal.getUserById(record.getResourceId());
+                if (emp != null) {
+                    record.setEmployee(emp.getFirstName() + " " + emp.getSurname());
+                }
+
+                if (menuId != null && !menuId.trim().isEmpty()) {
+                    Menu menu = menuBal.getMenuById(menuId);
+                    if (menu != null) {
+                        record.setMenu(menu.getName());
+                    }
+                }
+                audit.setChanges(toAuditString(record));
             }
 
-            if (menuId != null && !menuId.trim().isEmpty()) {
-                Menu menu = menuBal.getMenuById(menuId);
-                if (menu != null) {
-                    record.setMenu(menu.getName());
+            // Set action
+            audit.setAction(record.getId() != null
+                    ? EmployeeAction.EMP_ACTION_EDIT
+                    : EmployeeAction.EMP_ACTION_NEW);
+
+            // gets the user edited the record.
+            if (record.getResourceId() != null) {
+                User linkedUser = userBal.getUserById(record.getResourceId());
+                String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
+                audit.setUser(fullname);
+            }
+
+            // proceed and set the save return value to
+            record = (Employee) joinPoint.proceed(new Object[]{templateId, menuId, record, token});
+            // Set audit link employeeid
+            audit.setEmployeeId(record.getId());
+
+            // make sure action is added to audit.
+            if (audit.getAction() != null) {
+                if (!"NO_CHANGE".equals(audit.getChanges())) {
+                    employeeLinkBal.save(audit);
                 }
             }
-            audit.setChanges(toAuditString(record));
         }
-
-        // Set action
-        audit.setAction(record.getId() != null
-                ? EmployeeAction.EMP_ACTION_EDIT
-                : EmployeeAction.EMP_ACTION_NEW);
-
-        // gets the user edited the record.
-        if (record.getResourceId() != null) {
-            User linkedUser = userBal.getUserById(record.getResourceId());
-            String fullname = linkedUser.getFirstName() + " " + linkedUser.getSurname();
-            audit.setUser(fullname);
-        }
-
-        // proceed and set the save return value to
-        record = (Employee) joinPoint.proceed(new Object[]{templateId, menuId, record, token});
-        // Set audit link employeeid
-        audit.setEmployeeId(record.getId());
-
-        // make sure action is added to audit.
-        if (audit.getAction() != null) {
-            if (!"NO_CHANGE".equals(audit.getChanges())) {
-                employeeLinkBal.save(audit);
-            }
-        }
-
     }
 
     public String toAuditString(Employee emp) throws Exception {
-        String str = "";
-
-        str += emp.getMenu() + ", " + emp.getEmployee();
-
+        String str = emp.getMenu() + ", " + emp.getEmployee();
         if (emp.getDetails() != null && !emp.getDetails().isEmpty()) {
             String fields = "";
 
             for (FieldValue field : emp.getDetails()) {
-                FieldDetail dbField = fieldBal.getField(field.getId());
+                FieldDetail dbField = fieldBal.get(field.getId());
                 String fieldName = dbField.getName();
                 String fieldValue = field.getValue();
                 fields += fieldName + "=" + fieldValue + ",";

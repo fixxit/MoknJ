@@ -1,33 +1,36 @@
 package nl.it.fixx.moknj.bal.module.asset;
 
 import nl.it.fixx.moknj.bal.core.AccessBal;
-import nl.it.fixx.moknj.bal.module.ModuleChangeBal;
+import nl.it.fixx.moknj.bal.module.ModuleAccessBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.AssetRepository;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
-public class AssetChange extends ModuleChangeBal<AssetRepository, Asset> {
+@Aspect
+@Component
+public class AssetAccessBal extends ModuleAccessBal<Asset> {
 
     private final UserBal userBal;
     private final AccessBal accessBal;
 
     @Autowired
-    public AssetChange(AssetRepository repository, UserBal userBal, AccessBal accessBal) {
-        super(repository);
+    public AssetAccessBal(AssetRepository repository, UserBal userBal, AccessBal accessBal) {
         this.userBal = userBal;
         this.accessBal = accessBal;
     }
 
     @Override
-    public String hasChange(Asset record, String templateId, String menuId, String token) throws BalException {
+    @Before("execution(* nl.it.fixx.moknj.bal.module.asset.AssetBal.save(String, String, nl.it.fixx.moknj.domain.modules.asset.Asset, String)) && args(templateId, menuId, record, token)")
+    public void hasSaveAccess(JoinPoint joinPoint, String templateId, String menuId, Asset record, String token) throws BalException {
         try {
-            String flag = null;
             if (record.getId() != null) {
                 // check if user has acess for edit record
                 User user = userBal.getUserByToken(token);
@@ -35,13 +38,6 @@ public class AssetChange extends ModuleChangeBal<AssetRepository, Asset> {
                         GlobalAccessRights.EDIT)) {
                     throw new BalException("This user does not have sufficient "
                             + "access rights to update this asset!");
-                }
-
-                Asset asset = repository.findOne(record.getId());
-                if (record.equals(asset)) {
-                    flag = "no_changes";
-                } else {
-                    flag = "has_changes";
                 }
             } else {
                 // check if user has acess for new record
@@ -52,9 +48,8 @@ public class AssetChange extends ModuleChangeBal<AssetRepository, Asset> {
                             + "access rights to save this asset!");
                 }
             }
-            return flag;
         } catch (Exception e) {
-            throw new BalException("Error trying to find change", e);
+            throw new BalException(e);
         }
     }
 

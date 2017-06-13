@@ -33,10 +33,10 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
     private final RepositoryContext context;
-    private final GraphBuilder graphBuilder;
+    private final GraphDisplayBal graphBuilder;
 
     @Autowired
-    public GraphBal(RepositoryContext context, GraphBuilder graphBuilder) {
+    public GraphBal(RepositoryContext context, GraphDisplayBal graphBuilder) {
         super(context.getRepository(GraphRepository.class));
         this.graphBuilder = graphBuilder;
         this.context = context;
@@ -51,7 +51,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
      * @return
      * @throws Exception
      */
-    public Graph saveGraph(Graph payload, String token) throws Exception {
+    public Graph save(Graph payload, String token) throws Exception {
         try {
             // For updates if the type has a id then bypass the exists
             boolean bypassExists = false;
@@ -87,7 +87,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
      * @return list of graphs
      * @throws java.lang.Exception
      */
-    public List<Graph> getAllGraphs(String token) throws Exception {
+    public List<Graph> getAll(String token) throws Exception {
         try {
             User user = new UserBal(context).getUserByToken(token);
             Set<Graph> graphs = new HashSet();
@@ -155,7 +155,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
     public Map<String, List<GraphData>> getAllGraphData(String token) throws Exception {
         try {
             Map<String, List<GraphData>> allDataSets = new HashMap<>();
-            for (Graph graph : getAllGraphs(token)) {
+            for (Graph graph : getAll(token)) {
                 GraphData data = getGraphData(graph.getId(), token);
                 if (data != null) {
                     GlobalGraphType type = graph.getGraphType();
@@ -183,7 +183,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
      * @param token
      * @throws Exception
      */
-    public void deleteGraph(String id, String token) throws Exception {
+    public void delete(String id, String token) throws Exception {
         try {
             if (repository.exists(id)) {
                 Graph graph = repository.findOne(id);
