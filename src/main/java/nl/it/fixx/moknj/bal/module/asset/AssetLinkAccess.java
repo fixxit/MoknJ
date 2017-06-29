@@ -21,7 +21,7 @@ public class AssetLinkAccess extends ModuleLinkAccessBal<AssetLink> {
 
     @Override
     public void setRecordViewValues(String recordId, AssetLink link) throws BalException {
-
+    
     }
 
     /**

@@ -69,7 +69,7 @@ public class MainAccessBal implements BAL {
                 return menuBal.saveMenu(payload);
             }
             throw new AccessException("This user does not have " + ALL_ACCESS.toString());
-        } catch (Exception e) {
+        } catch (AccessException e) {
             LOG.error("Error on saving menu", e);
             throw e;
         }
@@ -104,7 +104,7 @@ public class MainAccessBal implements BAL {
      * @return list of templates
      * @throws Exception
      */
-    private List<Template> getMenuTemplates(Menu menu, User user, boolean bypassHidden) throws Exception {
+    private List<Template> getMenuTemplates(Menu menu, User user, boolean bypassHidden) {
         LOG.debug("========================================");
         LOG.debug("Menu [" + menu.getName() + "] ");
         List<Template> templates = new ArrayList<>();
@@ -172,7 +172,10 @@ public class MainAccessBal implements BAL {
      */
     public Template getTemplate(String templateId, String token) throws Exception {
         try {
-            return searchForTemplateByToken(templateId, token);
+            User user = userBal.getUserByToken(token);
+            return !(user.getAuthorities().contains(ALL_ACCESS.toString()))
+                    ? findTemplateByTokenAndId(templateId, user)
+                    : tempBal.getTemplateById(templateId);
         } catch (Exception e) {
             LOG.error("Error on saving template", e);
             throw e;
@@ -186,21 +189,15 @@ public class MainAccessBal implements BAL {
      * @param menuId
      * @param token
      * @return menu
-     * @throws Exception
      */
-    public Menu getMenu(String menuId, String token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            Menu menu = menuBal.getMenuById(menuId);
-            if (menu != null) {
-                menu.setTemplates(getMenuTemplates(menu, user, false));
-                return menu;
-            } else {
-                throw new AccessException("Menu not found");
-            }
-        } catch (Exception e) {
-            LOG.error("Error while get menu[" + menuId + "] for user token");
-            throw e;
+    public Menu getMenu(String menuId, String token) {
+        User user = userBal.getUserByToken(token);
+        Menu menu = menuBal.getMenuById(menuId);
+        if (menu != null) {
+            menu.setTemplates(getMenuTemplates(menu, user, false));
+            return menu;
+        } else {
+            throw new AccessException("Menu not found");
         }
     }
 
@@ -209,32 +206,26 @@ public class MainAccessBal implements BAL {
      *
      * @param access_token
      * @return list of menus
-     * @throws Exception
      */
-    public List<Menu> getUserMenus(String access_token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(access_token);
-            List<Menu> array = menuBal.getAllMenus();
-            List<Menu> menus = new ArrayList<>();
+    public List<Menu> getUserMenus(String access_token) {
+        User user = userBal.getUserByToken(access_token);
+        List<Menu> array = menuBal.getAllMenus();
+        List<Menu> menus = new ArrayList<>();
 
-            for (Menu menu : array) {
-                List<Template> templates = getMenuTemplates(menu, user, false);
-                if (!templates.isEmpty()) {
-                    menu.setTemplates(templates);
-                    menus.add(menu);
-                }
+        array.forEach((menu) -> {
+            List<Template> templates = getMenuTemplates(menu, user, false);
+            if (!templates.isEmpty()) {
+                menu.setTemplates(templates);
+                menus.add(menu);
             }
+        });
 
-            Collections.sort(menus, (Menu a1, Menu a2) -> {
-                return new NullSafeComparator<>(String::compareTo,
-                        true).compare(a1.getIndex(), a2.getIndex());
-            });
+        Collections.sort(menus, (Menu a1, Menu a2) -> {
+            return new NullSafeComparator<>(String::compareTo,
+                    true).compare(a1.getIndex(), a2.getIndex());
+        });
 
-            return menus;
-        } catch (Exception e) {
-            LOG.error("Error while get all menus for user token");
-            throw e;
-        }
+        return menus;
     }
 
     /**
@@ -252,7 +243,7 @@ public class MainAccessBal implements BAL {
             }
             throw new AccessException("Unable to delete. "
                     + "This user does not have " + ALL_ACCESS.toString());
-        } catch (Exception e) {
+        } catch (AccessException e) {
             LOG.error("Error while get all menus for user token");
             throw e;
         }
@@ -296,35 +287,23 @@ public class MainAccessBal implements BAL {
      * template which shares same template Id
      *
      * @param templateId
-     * @param token
+     * @param user
      * @return
-     * @throws java.lang.Exception
      */
-    public Template searchForTemplateByToken(String templateId, String token)
-            throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            List<Menu> menus = menuBal.getAllMenus();
-            if (tempBal.exists(templateId)) {
-                for (Menu menu : menus) {
-                    List<Template> templates = getMenuTemplates(menu, user, false);
-                    for (Template template : templates) {
-                        if (template.getId().equals(templateId)) {
-                            return template;
-                        }
+    public Template findTemplateByTokenAndId(String templateId, User user) {
+        List<Menu> menus = menuBal.getAllMenus();
+        if (tempBal.exists(templateId)) {
+            for (Menu menu : menus) {
+                List<Template> templates = getMenuTemplates(menu, user, false);
+                for (Template template : templates) {
+                    if (template.getId().equals(templateId)) {
+                        return template;
                     }
                 }
-
-                if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                    throw new AccessException("This user does not have access to this template.");
-                }
             }
-            LOG.debug("This template[" + templateId + "] seems to be deleted");
-            return null;
-        } catch (Exception e) {
-            LOG.error("Error while all templates for user token[" + token + "]");
-            throw e;
         }
+        LOG.debug("This template[" + templateId + "] seems to be deleted");
+        return null;
     }
 
     /**

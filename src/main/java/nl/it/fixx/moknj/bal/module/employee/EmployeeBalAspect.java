@@ -17,7 +17,7 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeAction;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
-import nl.it.fixx.moknj.exception.BalException;
+import nl.it.fixx.moknj.exception.AccessException;
 import nl.it.fixx.moknj.repository.EmployeeRepository;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -77,7 +77,7 @@ public class EmployeeBalAspect extends RepositoryBal<EmployeeRepository> {
             if (user != null && user.isSystemUser()) {
                 record.setLastModifiedBy(user.getUserName());
             } else {
-                throw new BalException("Employee save error, could not find system"
+                throw new AccessException("Employee save error, could not find system"
                         + " user for this token");
             }
             // Save employee

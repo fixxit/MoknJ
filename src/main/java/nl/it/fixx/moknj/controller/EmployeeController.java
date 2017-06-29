@@ -4,6 +4,8 @@ import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.response.EmployeeResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/employee")
 public class EmployeeController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(EmployeeController.class);
+
     @Autowired
     private EmployeeBal employeeBal;
 
@@ -36,12 +40,12 @@ public class EmployeeController {
                 throw new Exception("No menu id provided for the employee record");
             }
 
-            Employee savedEmployee = employeeBal.save(id, menuId, employee, access_token);
             response.setSuccess(true);
-            response.setEmployee(savedEmployee);
+            response.setEmployee(employeeBal.save(id, menuId, employee, access_token));
             response.setMessage("Successfully saved employee");
             return response;
         } catch (Exception ex) {
+            LOG.error("error", ex);
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
             return response;
@@ -63,6 +67,7 @@ public class EmployeeController {
         try {
             response.setEmployees(employeeBal.getAll(templateId, menuId, access_token));
         } catch (BalException ex) {
+            LOG.error("error", ex);
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
             return response;
@@ -82,6 +87,7 @@ public class EmployeeController {
         try {
             response.setEmployee(employeeBal.get(id));
         } catch (Exception ex) {
+            LOG.error("error", ex);
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
             return response;
@@ -108,6 +114,7 @@ public class EmployeeController {
             response.setMessage("Removed employee record successfully.");
             response.setSuccess(true);
         } catch (BalException ex) {
+            LOG.error("error", ex);
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }

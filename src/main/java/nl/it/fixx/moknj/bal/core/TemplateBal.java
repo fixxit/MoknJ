@@ -38,10 +38,7 @@ public class TemplateBal extends RepositoryBal<TemplateRepository> {
             }
 
             // For updates if the type has a id then bypass the exists
-            boolean bypassExists = false;
-            if (payload.getId() != null) {
-                bypassExists = true;
-            }
+            boolean bypassExists = (payload.getId() != null);
 
             boolean exists = repository.existsByName(payload.getName());
             if (!exists || bypassExists) {
@@ -62,34 +59,23 @@ public class TemplateBal extends RepositoryBal<TemplateRepository> {
      *
      * @param id
      * @return template.
-     * @throws Exception
      */
-    public Template getTemplateById(String id) throws Exception {
-        try {
-            if (id == null || id.isEmpty()) {
-                LOG.debug("No template id recieved to find template");
-                throw new BalException("No template found, no template id provided!");
-            }
-
-            Template template = repository.findOne(id);
-            if (template == null) {
-                LOG.debug("no template found for id[" + id + "]");
-                throw new BalException("No template found by this id[" + id + "]");
-            }
-            return template;
-        } catch (BalException e) {
-            LOG.error("Error getting template by id", e);
-            throw e;
+    public Template getTemplateById(String id) {
+        if (id == null || id.isEmpty()) {
+            LOG.debug("No template id recieved to find template");
+            throw new BalException("No template found, no template id provided!");
         }
+
+        Template template = repository.findOne(id);
+        if (template == null) {
+            LOG.debug("no template found for id[" + id + "]");
+            throw new BalException("No template found by this id[" + id + "]");
+        }
+        return template;
     }
 
-    public boolean exists(String id) throws Exception {
-        try {
-            return repository.exists(id);
-        } catch (Exception e) {
-            LOG.error("Error getting template by id", e);
-            throw e;
-        }
+    public boolean exists(String id) {
+        return repository.exists(id);
     }
 
     /**
@@ -156,7 +142,5 @@ public class TemplateBal extends RepositoryBal<TemplateRepository> {
             throw e;
         }
     }
-    
-    
-    
+
 }

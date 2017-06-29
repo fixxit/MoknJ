@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
+import nl.it.fixx.moknj.exception.AccessException;
 
 @Service
 public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements ModuleLinkBal<AssetLink> {
@@ -83,7 +84,7 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
                     LOG.info("user : " + user.getAuthorities());
 
                     if (!accessBal.hasAccess(user, menuId, templateId, GlobalAccessRights.EDIT)) {
-                        throw new BalException("Unable to check out/in this asset. "
+                        throw new AccessException("Unable to check out/in this asset. "
                                 + "This user does not have "
                                 + "" + GlobalAccessRights.EDIT.toString()
                                 + " rights");
@@ -102,7 +103,7 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
                 }
             }
             return repository.save(payload);
-        } catch (Exception e) {
+        } catch (BalException e) {
             LOG.error("Error while trying to link user to asset", e);
             throw e;
         }
@@ -157,17 +158,17 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
             Set<AssetLink> results = new HashSet<>();
             for (Menu menu : mainAccessBal.getUserMenus(token)) {
                 if (menu.getMenuType().equals(GBL_MT_ASSET)) {
-                    for (Template temp : menu.getTemplates()) {
+                    menu.getTemplates().forEach((temp) -> {
                         results.addAll(assetLinkAccess.filterRecordAccess(
                                 repository.getAllByAssetId(assetId),
                                 menu.getId(),
                                 temp.getId(),
                                 userBal.getUserByToken(token)));
-                    }
+                    });
                 }
             }
             return results.stream().collect(Collectors.toList());
-        } catch (Exception e) {
+        } catch (BalException e) {
             throw new BalException("Error while trying to find all asset links", e);
         }
     }
@@ -190,7 +191,7 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
                     menuId,
                     templateId,
                     userBal.getUserByToken(token));
-        } catch (Exception e) {
+        } catch (BalException e) {
             LOG.error("Error while trying to find all asset links", e);
             throw e;
         }
@@ -209,17 +210,17 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
             Set<AssetLink> results = new HashSet<>();
             for (Menu menu : mainAccessBal.getUserMenus(token)) {
                 if (menu.getMenuType().equals(GBL_MT_ASSET)) {
-                    for (Template temp : menu.getTemplates()) {
+                    menu.getTemplates().forEach((temp) -> {
                         results.addAll(assetLinkAccess.filterRecordAccess(
                                 repository.getAllByResourceId(userId),
                                 menu.getId(),
                                 temp.getId(),
                                 userBal.getUserByToken(token)));
-                    }
+                    });
                 }
             }
             return results.stream().collect(Collectors.toList());
-        } catch (Exception e) {
+        } catch (BalException e) {
             LOG.error("Error while trying to find all asset links", e);
             throw e;
         }

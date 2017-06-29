@@ -9,10 +9,10 @@ import nl.it.fixx.moknj.domain.core.access.Access;
  */
 public interface AccessRepositoryCustom {
 
-    public boolean hasAccess(String userId, String menuId, String templateId) throws Exception;
+    boolean hasAccess(String userId, String menuId, String templateId);
 
-    public Access getAccess(String userId, String menuId, String templateId) throws Exception;
+    Access getAccess(String userId, String menuId, String templateId);
 
-    public List<Access> getAccessList(String userId) throws Exception;
+    List<Access> getAccessList(String userId);
 
 }

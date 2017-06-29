@@ -25,10 +25,9 @@ public class AccessRepositoryImpl implements AccessRepositoryCustom {
      * @param menuId
      * @param templateId
      * @return
-     * @throws Exception
      */
     @Override
-    public boolean hasAccess(String userId, String menuId, String templateId) throws Exception {
+    public boolean hasAccess(String userId, String menuId, String templateId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("userId").is(userId)
                 .andOperator(Criteria.where("menuId").is(menuId),
@@ -46,10 +45,9 @@ public class AccessRepositoryImpl implements AccessRepositoryCustom {
      *
      * @param userId
      * @return
-     * @throws Exception
      */
     @Override
-    public List<Access> getAccessList(String userId) throws Exception {
+    public List<Access> getAccessList(String userId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("userId").is(userId));
         return operations.findAll(Access.class);
@@ -62,10 +60,9 @@ public class AccessRepositoryImpl implements AccessRepositoryCustom {
      * @param menuId
      * @param templateId
      * @return
-     * @throws Exception
      */
     @Override
-    public Access getAccess(String userId, String menuId, String templateId) throws Exception {
+    public Access getAccess(String userId, String menuId, String templateId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("userId").is(userId)
                 .andOperator(Criteria.where("menuId").is(menuId),

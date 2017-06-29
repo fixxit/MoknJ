@@ -4,6 +4,8 @@ import nl.it.fixx.moknj.bal.module.asset.AssetBal;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.response.AssetResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/asset")
 public class AssetController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AssetController.class);
+
     @Autowired
     private AssetBal bal;
 
@@ -31,13 +35,12 @@ public class AssetController {
             if (asset == null || asset.getMenuScopeIds().isEmpty()) {
                 throw new Exception("No menu id provided for the asset record");
             }
-
-            Asset savedAsset = bal.save(id, menuId, asset, access_token);
             response.setSuccess(true);
-            response.setAsset(savedAsset);
+            response.setAsset(bal.save(id, menuId, asset, access_token));
             response.setMessage("Successfully saved asset");
             return response;
         } catch (Exception ex) {
+            LOG.error("error", ex);
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
             return response;
@@ -60,6 +63,7 @@ public class AssetController {
             response.setAssets(bal.getAll(templateId, menuId, access_token));
             return response;
         } catch (BalException ex) {
+            LOG.error("error", ex);
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
             return response;
@@ -78,6 +82,7 @@ public class AssetController {
         try {
             response.setAsset(bal.get(id));
         } catch (Exception ex) {
+            LOG.error("error", ex);
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
             return response;
@@ -101,7 +106,8 @@ public class AssetController {
             bal.delete(asset, menuId, access_token, false);
             response.setSuccess(true);
             response.setMessage("Asset record was deleted successfully.");
-        } catch (BalException ex) {
+        } catch (Exception ex) {
+            LOG.error("error", ex);
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }

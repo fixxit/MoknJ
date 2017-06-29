@@ -13,13 +13,13 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * This interface is used as place holder interface or identifier.
  *
  * @author adriaan
- * @param <T>
+ * @param <REPOSITORY>
  */
-public abstract class RepositoryBal<T extends MongoRepository> implements BAL {
+public abstract class RepositoryBal<REPOSITORY extends MongoRepository> implements BAL {
 
-    protected final T repository;
+    protected final REPOSITORY repository;
 
-    public RepositoryBal(T repository) {
+    public RepositoryBal(REPOSITORY repository) {
         this.repository = repository;
     }
 

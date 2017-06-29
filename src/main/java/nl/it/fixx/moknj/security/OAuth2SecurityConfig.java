@@ -1,5 +1,6 @@
 package nl.it.fixx.moknj.security;
 
+import nl.it.fixx.moknj.exception.AccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -103,7 +104,7 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
         return store;
     }
 
-    public static String getUserForToken(String token) throws Exception {
+    public static String getUserForToken(String token) {
         return IN_MEM_TOKEN_STORE.readAuthentication(token) != null
                 ? IN_MEM_TOKEN_STORE.readAuthentication(token).getName()
                 : null;

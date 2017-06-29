@@ -12,105 +12,105 @@ public interface Record {
     /**
      * @return the id
      */
-    public String getId();
+    String getId();
 
     /**
      * @return the typeId
      */
-    public String getTypeId();
+    String getTypeId();
 
     /**
      * @param typeId the typeId to set
      */
-    public void setTypeId(String typeId);
+    void setTypeId(String typeId);
 
     /**
      * @return the details
      */
-    public List<FieldValue> getDetails();
+    List<FieldValue> getDetails();
 
     /**
      * @param details the details to set
      */
-    public void setDetails(List<FieldValue> details);
+    void setDetails(List<FieldValue> details);
 
     /**
      * @return the lastModifiedDate
      */
-    public String getLastModifiedDate();
+    String getLastModifiedDate();
 
     /**
      * @param lastModifiedDate the lastModifiedDate to set
      */
-    public void setLastModifiedDate(String lastModifiedDate);
+    void setLastModifiedDate(String lastModifiedDate);
 
     /**
      * @return the lastModifiedBy
      */
-    public String getLastModifiedBy();
+    String getLastModifiedBy();
 
     /**
      * @param lastModifiedBy the lastModifiedBy to set
      */
-    public void setLastModifiedBy(String lastModifiedBy);
+    void setLastModifiedBy(String lastModifiedBy);
 
     /**
      * @return the hidden
      */
-    public boolean isHidden();
+    boolean isHidden();
 
     /**
      * @param hidden the hidden to set
      */
-    public void setHidden(boolean hidden);
+    void setHidden(boolean hidden);
 
     /**
      * @return the menuScopeIds
      */
-    public List<String> getMenuScopeIds();
+    List<String> getMenuScopeIds();
 
     /**
      * @param menuScopeIds the menuScopeIds to set
      */
-    public void setMenuScopeIds(List<String> menuScopeIds);
+    void setMenuScopeIds(List<String> menuScopeIds);
 
     /**
      * @return the createdDate
      */
-    public String getCreatedDate();
+    String getCreatedDate();
 
     /**
      * @param createdDate the createdDate to set
      */
-    public void setCreatedDate(String createdDate);
+    void setCreatedDate(String createdDate);
 
     /**
      * @return the createdBy
      */
-    public String getCreatedBy();
+    String getCreatedBy();
 
     /**
      * @param createdBy the createdBy to set
      */
-    public void setCreatedBy(String createdBy);
+    void setCreatedBy(String createdBy);
 
     /**
      * @return the freeDate
      */
-    public String getFreeDate();
+    String getFreeDate();
 
     /**
      * @param freedate the freeDate to set
      */
-    public void setFreeDate(String freedate);
+    void setFreeDate(String freedate);
 
     /**
      * @return the freeValue
      */
-    public String getFreeValue();
+    String getFreeValue();
 
     /**
      * @param freeValue the freeValue to set
      */
-    public void setFreeValue(String freeValue);
+    void setFreeValue(String freeValue);
 }

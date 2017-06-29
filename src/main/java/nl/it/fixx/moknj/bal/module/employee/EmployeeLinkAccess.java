@@ -7,6 +7,7 @@ import nl.it.fixx.moknj.bal.module.ModuleLinkAccessBal;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
+import nl.it.fixx.moknj.exception.AccessException;
 import nl.it.fixx.moknj.exception.BalException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class EmployeeLinkAccess extends ModuleLinkAccessBal<EmployeeLink> {
             link.setUser(fullname);
             link.setActionValue(link.getAction().getDisplayValue());
         } catch (Exception e) {
-            throw new BalException("Error while to set view values for link access check", e);
+            throw new AccessException("Error while to set view values for link access check", e);
         }
     }
 

@@ -35,10 +35,9 @@ public class LinkController {
             @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
         try {
-            AssetLink link = assetLinkBal.linkAssetToUser(menuId, templateId,
-                    payload, access_token);
-            response.setLink(link);
-            response.setSuccess(link != null);
+            response.setLink(assetLinkBal.linkAssetToUser(menuId, templateId,
+                    payload, access_token));
+            response.setSuccess(true);
             response.setMessage("Saved link successfully");
         } catch (Exception ex) {
             response.setSuccess(false);

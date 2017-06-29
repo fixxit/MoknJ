@@ -94,35 +94,31 @@ public class UserBal extends RepositoryBal<UserRepository> {
      * @return @throws Exception
      */
     public List<User> getAll(boolean isAdmin, String token) throws Exception {
-        try {
-            User loginUser = getUserByToken(token);
-            List<User> users = new ArrayList<>();
-            if (repository != null) {
-                for (User user : repository.findAll()) {
-                    // if user has all access get all else only return his user
-                    if (loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
-                        if (!user.isHidden()) {
-                            if (isAdmin) {
-                                if (!context.getProperties().getAdmin().getUser().equals(user.getUserName())) {
-                                    users.add(user);
-                                }
-                            } else {
+        User loginUser = getUserByToken(token);
+        List<User> users = new ArrayList<>();
+        if (repository != null) {
+            for (User user : repository.findAll()) {
+                // if user has all access get all else only return his user
+                if (loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
+                    if (!user.isHidden()) {
+                        if (isAdmin) {
+                            if (!context.getProperties().getAdmin().getUser().equals(user.getUserName())) {
                                 users.add(user);
                             }
+                        } else {
+                            users.add(user);
                         }
-                    } else if (user.getId().equals(loginUser.getId())) {
-                        users.add(user);
-                        break;
                     }
+                } else if (user.getId().equals(loginUser.getId())) {
+                    users.add(user);
+                    break;
                 }
-            } else {
-                throw new BalException("UserRepository is null");
             }
-            return users;
-        } catch (Exception ex) {
-            LOG.error("Error while getting all users", ex);
-            throw ex;
+        } else {
+            throw new BalException("UserRepository is null");
         }
+        return users;
+
     }
 
     /**
@@ -168,69 +164,64 @@ public class UserBal extends RepositoryBal<UserRepository> {
      * @throws Exception
      */
     public User save(User payload, String token) throws Exception {
-        try {
-            User loginUser = getUserByToken(token);
-            if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
-                throw new BalException("This user does not have " + ALL_ACCESS.toString());
-            }
+        User loginUser = getUserByToken(token);
+        if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
+            throw new BalException("This user does not have " + ALL_ACCESS.toString());
+        }
 
-            User dbResource = null;
-            if (payload.getId() != null) {
-                dbResource = repository.findById(payload.getId());
-            }
+        User dbResource = null;
+        if (payload.getId() != null) {
+            dbResource = repository.findById(payload.getId());
+        }
 
-            List<User> results = repository.findByFullname(
-                    payload.getFirstName(), payload.getSurname());
+        List<User> results = repository.findByFullname(
+                payload.getFirstName(), payload.getSurname());
 
-            boolean exists = results.size() > 0;
+        boolean exists = results.size() > 0;
 
-            if (!exists || dbResource != null) {
-                // SET PASSWORD TO A SALT...
-                if (dbResource != null
-                        && payload.isSystemUser()
-                        && payload.getPassword() != null) {
-                    // if psw is not equal set new password else nothing
-                    // hass password but assigned new password.
-                    if (dbResource.getPassword() != null
-                            && !dbResource.getPassword().equals(payload.getPassword())) {
-                        payload.setPassword(passwordEncoder.encode(payload.getPassword()));
-                        // emmpty password but did recieve value for password field...
-                    } else if (dbResource.getPassword() == null && payload.getPassword() != null) {
-                        payload.setPassword(passwordEncoder.encode(payload.getPassword()));
-                    }
-                } else if (payload.isSystemUser() && payload.getPassword() != null) {
-                    // new with new password
+        if (!exists || dbResource != null) {
+            // SET PASSWORD TO A SALT...
+            if (dbResource != null
+                    && payload.isSystemUser()
+                    && payload.getPassword() != null) {
+                // if psw is not equal set new password else nothing
+                // hass password but assigned new password.
+                if (dbResource.getPassword() != null
+                        && !dbResource.getPassword().equals(payload.getPassword())) {
+                    payload.setPassword(passwordEncoder.encode(payload.getPassword()));
+                    // emmpty password but did recieve value for password field...
+                } else if (dbResource.getPassword() == null && payload.getPassword() != null) {
                     payload.setPassword(passwordEncoder.encode(payload.getPassword()));
                 }
+            } else if (payload.isSystemUser() && payload.getPassword() != null) {
+                // new with new password
+                payload.setPassword(passwordEncoder.encode(payload.getPassword()));
+            }
 
-                // checks if user name exists
-                if (payload.isSystemUser()
-                        && payload.getUserName() != null
-                        && !payload.getUserName().trim().isEmpty()) {
-                    String newUsername = payload.getUserName();
-                    String dbUsername = (dbResource != null
-                            && dbResource.isSystemUser())
-                            ? dbResource.getUserName() : "";
-                    // this should execute for new users too
-                    // as the dbUsername should then be empty string
-                    if (!newUsername.equals(dbUsername)) {
-                        User indb = repository.findByUserName(newUsername);
-                        if (indb != null && indb.getId() != null) {
-                            throw new BalException("Employee with a user name "
-                                    + "" + newUsername + " already exists");
-                        }
+            // checks if user name exists
+            if (payload.isSystemUser()
+                    && payload.getUserName() != null
+                    && !payload.getUserName().trim().isEmpty()) {
+                String newUsername = payload.getUserName();
+                String dbUsername = (dbResource != null
+                        && dbResource.isSystemUser())
+                        ? dbResource.getUserName() : "";
+                // this should execute for new users too
+                // as the dbUsername should then be empty string
+                if (!newUsername.equals(dbUsername)) {
+                    User indb = repository.findByUserName(newUsername);
+                    if (indb != null && indb.getId() != null) {
+                        throw new BalException("Employee with a user name "
+                                + "" + newUsername + " already exists");
                     }
                 }
-
-                return repository.save(payload);
-            } else {
-                throw new BalException("Employee by name "
-                        + "" + payload.getFirstName() + " "
-                        + "" + payload.getSurname() + " exists");
             }
-        } catch (Exception ex) {
-            LOG.error("Error while saving user", ex);
-            throw ex;
+
+            return repository.save(payload);
+        } else {
+            throw new BalException("Employee by name "
+                    + "" + payload.getFirstName() + " "
+                    + "" + payload.getSurname() + " exists");
         }
     }
 
@@ -239,25 +230,19 @@ public class UserBal extends RepositoryBal<UserRepository> {
      *
      * @param id
      * @return user.
-     * @throws Exception
      */
-    public User getUserById(String id) throws Exception {
-        try {
-            if (id == null || id.isEmpty()) {
-                LOG.debug("No user id recieved to find user");
-                throw new BalException("No user found, no user id provided!");
-            }
-
-            User user = repository.findOne(id);
-            if (user == null) {
-                LOG.debug("no user found for id[" + id + "]");
-                throw new BalException("No user found by this id[" + id + "]");
-            }
-            return user;
-        } catch (BalException e) {
-            LOG.error("Error on User Bal", e);
-            throw e;
+    public User getUserById(String id) {
+        if (id == null || id.isEmpty()) {
+            LOG.debug("No user id recieved to find user");
+            throw new BalException("No user found, no user id provided!");
         }
+
+        User user = repository.findOne(id);
+        if (user == null) {
+            LOG.debug("no user found for id[" + id + "]");
+            throw new BalException("No user found by this id[" + id + "]");
+        }
+        return user;
     }
 
     /**
@@ -265,35 +250,27 @@ public class UserBal extends RepositoryBal<UserRepository> {
      *
      * @param token
      * @return user
-     * @throws java.lang.Exception
      */
-    public User getUserByToken(String token) throws Exception {
-        try {
-            if (token == null || token.isEmpty()) {
-                LOG.debug("No token recieved to find user");
-                throw new BalException("No user found, no token provided!");
-            }
-            // Get user details who logged this employee using the token.
-            User user = repository.findByUserName(OAuth2SecurityConfig.getUserForToken(token));
-            if (user == null) {
-                LOG.debug("no user found for token[" + token + "]");
-                throw new BalException("No user found by this token[" + token + "]");
-            }
-
-            return user;
-        } catch (Exception e) {
-            LOG.error("Error on User Bal", e);
-            throw e;
+    public User getUserByToken(String token) {
+        if (token == null || token.isEmpty()) {
+            LOG.debug("No token recieved to find user");
+            throw new BalException("No user found, no token provided!");
         }
+        // Get user details who logged this employee using the token.
+        User user = repository.findByUserName(OAuth2SecurityConfig.getUserForToken(token));
+        if (user == null) {
+            LOG.debug("no user found for token[" + token + "]");
+            throw new BalException("No user found by this token[" + token + "]");
+        }
+        return user;
     }
 
     /**
      *
      * @param user
      * @return
-     * @throws Exception
      */
-    public String getFullName(User user) throws Exception {
+    public String getFullName(User user) {
         if (user == null) {
             throw new BalException("No user object provided");
         }

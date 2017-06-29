@@ -73,7 +73,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
             } else {
                 throw new BalException("Graph with the name " + payload.getName() + " exists");
             }
-        } catch (Exception e) {
+        } catch (BalException e) {
             LOG.error("Could not save the graph setup", e);
             throw e;
         }
@@ -199,7 +199,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
             } else {
                 throw new BalException("No graph by id[" + id + "] exists");
             }
-        } catch (Exception e) {
+        } catch (BalException e) {
             LOG.error("Could not delete this graph[" + id + "]", e);
             throw e;
         }

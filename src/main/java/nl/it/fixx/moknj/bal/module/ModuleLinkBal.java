@@ -12,15 +12,15 @@ import nl.it.fixx.moknj.exception.BalException;
 /**
  *
  * @author SmarBullet
- * @param <I>
+ * @param <DOMAIN>
  */
-public interface ModuleLinkBal<I extends Link> {
+public interface ModuleLinkBal<DOMAIN extends Link> {
 
-    public void delete(I link);
+    void delete(DOMAIN record);
 
-    public void save(I link);
+    void save(DOMAIN record);
 
-    public List<I> getAllLinks(String token) throws BalException;
+    List<DOMAIN> getAllLinks(String token) throws BalException;
 
-    public List<I> getAllLinksByRecordId(String recordId, String token) throws BalException;
+    List<DOMAIN> getAllLinksByRecordId(String recordId, String token) throws BalException;
 }

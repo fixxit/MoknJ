@@ -31,7 +31,7 @@ public class AccessBal extends RepositoryBal<AccessRepository> {
     private final UserBal userBal;
     private final TemplateBal templateBal;
     private final MenuBal menuBal;
-    
+
     @Autowired
     public AccessBal(RepositoryContext context, UserBal userBal,
             TemplateBal templateBal, MenuBal menuBal) {
@@ -136,39 +136,33 @@ public class AccessBal extends RepositoryBal<AccessRepository> {
      *
      * @param access rule to add.
      * @param token
-     * @throws Exception
      */
-    public void updateAccess(Access access, String token) throws Exception {
-        try {
-            User loginUser = userBal.getUserByToken(token);
-            if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
-                throw new AccessException("This user does not have " + ALL_ACCESS.toString());
-            }
-
-            if (access == null || access.getId() == null || access.getId().isEmpty()) {
-                LOG.debug("No access id provided to update access rules with");
-                throw new AccessException("Invalid access [unknown] provided for "
-                        + "access rule update!");
-            }
-
-            Access dbAcces = repository.findOne(access.getId());
-
-            if (dbAcces == null) {
-                LOG.debug("Access rule not found in db");
-                throw new AccessException("Invalid access [" + access.getId() + "]s provided, this "
-                        + "access does not exist in the db!");
-            }
-
-            dbAcces.setMenuId(access.getMenuId());
-            dbAcces.setRights(access.getRights());
-            dbAcces.setTemplateId(access.getTemplateId());
-            dbAcces.setUserId(access.getUserId());
-
-            repository.save(dbAcces);
-        } catch (Exception e) {
-            LOG.error("Error while updating user access rules");
-            throw e;
+    public void updateAccess(Access access, String token) {
+        User loginUser = userBal.getUserByToken(token);
+        if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
+            throw new AccessException("This user does not have " + ALL_ACCESS.toString());
         }
+
+        if (access == null || access.getId() == null || access.getId().isEmpty()) {
+            LOG.debug("No access id provided to update access rules with");
+            throw new AccessException("Invalid access [unknown] provided for "
+                    + "access rule update!");
+        }
+
+        Access dbAcces = repository.findOne(access.getId());
+
+        if (dbAcces == null) {
+            LOG.debug("Access rule not found in db");
+            throw new AccessException("Invalid access [" + access.getId() + "]s provided, this "
+                    + "access does not exist in the db!");
+        }
+
+        dbAcces.setMenuId(access.getMenuId());
+        dbAcces.setRights(access.getRights());
+        dbAcces.setTemplateId(access.getTemplateId());
+        dbAcces.setUserId(access.getUserId());
+
+        repository.save(dbAcces);
     }
 
     /**
@@ -177,9 +171,8 @@ public class AccessBal extends RepositoryBal<AccessRepository> {
      * @param userId
      * @param menuId
      * @param templateId
-     * @throws Exception if user does not have access.
      */
-    public void checkAccess(String userId, String menuId, String templateId) throws Exception {
+    public void checkAccess(String userId, String menuId, String templateId) {
         if (!repository.hasAccess(userId, menuId, templateId)) {
             User user = userBal.getUserById(userId);
             if (user != null) {
@@ -214,30 +207,24 @@ public class AccessBal extends RepositoryBal<AccessRepository> {
      * @param templateId
      * @param right
      * @return true if user has access
-     * @throws java.lang.Exception
      */
-    public boolean hasAccess(User user, String menuId, String templateId, GlobalAccessRights right) throws Exception {
-        try {
-            // If user is admin
-            if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                return true;
-            }
-            // plain access check...
-            if (repository.hasAccess(user.getId(), menuId, templateId)) {
-                Access access = repository.getAccess(user.getId(), menuId, templateId);
-                // empty check
-                if (access.getRights() == null || access.getRights().isEmpty()) {
-                    return false;
-                }
-                return access.getRights().contains(right);
-            }
-
-            // always return false if logic above is fails.
-            return false;
-        } catch (Exception e) {
-            LOG.error("Error while updating user access rules");
-            throw e;
+    public boolean hasAccess(User user, String menuId, String templateId, GlobalAccessRights right) {
+        // If user is admin
+        if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
+            return true;
         }
+        // plain access check...
+        if (repository.hasAccess(user.getId(), menuId, templateId)) {
+            Access access = repository.getAccess(user.getId(), menuId, templateId);
+            // empty check
+            if (access.getRights() == null || access.getRights().isEmpty()) {
+                return false;
+            }
+            return access.getRights().contains(right);
+        }
+
+        // always return false if logic above is fails.
+        return false;
     }
 
     /**

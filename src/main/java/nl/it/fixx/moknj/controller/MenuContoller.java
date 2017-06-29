@@ -59,8 +59,7 @@ public class MenuContoller {
     MenuResponse get(@PathVariable String id, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
         try {
-            Menu menu = mainAccessBal.getMenu(id, access_token);
-            response.setMenu(menu);
+            response.setMenu(mainAccessBal.getMenu(id, access_token));
         } catch (Exception ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());

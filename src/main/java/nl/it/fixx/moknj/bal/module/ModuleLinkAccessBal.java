@@ -17,9 +17,10 @@ import nl.it.fixx.moknj.domain.core.link.Link;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
+import nl.it.fixx.moknj.exception.AccessException;
 import nl.it.fixx.moknj.exception.BalException;
 
-public abstract class ModuleLinkAccessBal<T extends Link> {
+public abstract class ModuleLinkAccessBal<DOMAIN extends Link> {
 
     protected final MenuBal menuBal;
     protected final AccessBal accessBal;
@@ -34,11 +35,10 @@ public abstract class ModuleLinkAccessBal<T extends Link> {
         this.userBal = userBal;
     }
 
-    
-    public List<T> filterRecordAccess(List<T> records, String menuId, String templateId, User user) throws BalException {
+    public List<DOMAIN> filterRecordAccess(List<DOMAIN> records, String menuId, String templateId, User user) throws BalException {
         try {
-            Set<T> links = new HashSet<>();
-            for (T link : records) {
+            Set<DOMAIN> links = new HashSet<>();
+            for (DOMAIN link : records) {
                 if (recordBal.exists(link.getRecordId())) {
                     if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
                         // Get template from menu item
@@ -68,10 +68,10 @@ public abstract class ModuleLinkAccessBal<T extends Link> {
             }
             return links.stream().collect(Collectors.toList());
         } catch (Exception e) {
-            throw new BalException("Error while trying to check user access to employee", e);
+            throw new AccessException("Error while trying to check user access to employee", e);
         }
     }
 
-    public abstract void setRecordViewValues(String recordId, T link) throws BalException;
+    public abstract void setRecordViewValues(String recordId, DOMAIN link) throws BalException;
 
 }

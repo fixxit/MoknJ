@@ -10,10 +10,8 @@ import nl.it.fixx.moknj.bal.RepositoryBal;
 import nl.it.fixx.moknj.bal.RepositoryContext;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_EMPLOYEE;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
-import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
-import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,48 +47,42 @@ public class EmployeeLinkBal extends RepositoryBal<EmployeeLinkRepository>
     }
 
     @Override
-    public List<EmployeeLink> getAllLinks(String token) throws BalException {
-        try {
-            Set<EmployeeLink> results = new HashSet<>();
-            for (Menu menu : mainAccessBal.getUserMenus(token)) {
-                if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
-                    for (Template temp : menu.getTemplates()) {
-                        List<Employee> employees = employeeBal.getAll(temp.getId(), menu.getId(), token);
-                        for (Employee employee : employees) {
-                            results.addAll(empLinkAccess.filterRecordAccess(
-                                    getAllLinksByRecordId(employee.getId(), token),
-                                    menu.getId(),
-                                    temp.getId(),
-                                    userBal.getUserByToken(token)));
-                        }
-                    }
-                }
-            }
-            return results.stream().collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new BalException("Error while trying to find all employee links", e);
-        }
-    }
+    public List<EmployeeLink> getAllLinks(String token) {
 
-    @Override
-    public List<EmployeeLink> getAllLinksByRecordId(String recordId, String token) throws BalException {
-        try {
-            Set<EmployeeLink> results = new HashSet<>();
-            for (Menu menu : mainAccessBal.getUserMenus(token)) {
-                if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
-                    for (Template temp : menu.getTemplates()) {
+        Set<EmployeeLink> results = new HashSet<>();
+        for (Menu menu : mainAccessBal.getUserMenus(token)) {
+            if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
+                menu.getTemplates().forEach((temp) -> {
+                    List<Employee> employees = employeeBal.getAll(temp.getId(), menu.getId(), token);
+                    employees.forEach((employee) -> {
                         results.addAll(empLinkAccess.filterRecordAccess(
-                                repository.getAllByEmployeeId(recordId),
+                                getAllLinksByRecordId(employee.getId(), token),
                                 menu.getId(),
                                 temp.getId(),
                                 userBal.getUserByToken(token)));
-                    }
-                }
+                    });
+                });
             }
-            return results.stream().collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new BalException("Error while trying to find all employee links", e);
         }
+        return results.stream().collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<EmployeeLink> getAllLinksByRecordId(String recordId, String token) {
+        Set<EmployeeLink> results = new HashSet<>();
+        for (Menu menu : mainAccessBal.getUserMenus(token)) {
+            if (menu.getMenuType().equals(GBL_MT_EMPLOYEE)) {
+                menu.getTemplates().forEach((temp) -> {
+                    results.addAll(empLinkAccess.filterRecordAccess(
+                            repository.getAllByEmployeeId(recordId),
+                            menu.getId(),
+                            temp.getId(),
+                            userBal.getUserByToken(token)));
+                });
+            }
+        }
+        return results.stream().collect(Collectors.toList());
     }
 
 }

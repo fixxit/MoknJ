@@ -6,5 +6,5 @@ package nl.it.fixx.moknj.repository.custom;
  */
 public interface MenuRepositoryCustom {
 
-    public boolean existsByName(String name);
+    boolean existsByName(String name);
 }
