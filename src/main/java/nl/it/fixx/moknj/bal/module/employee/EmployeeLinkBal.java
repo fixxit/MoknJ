@@ -6,8 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.core.MainAccessBal;
-import nl.it.fixx.moknj.bal.RepositoryBal;
-import nl.it.fixx.moknj.bal.RepositoryContext;
+import nl.it.fixx.moknj.bal.BAL;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_EMPLOYEE;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
 
 @Service
-public class EmployeeLinkBal extends RepositoryBal<EmployeeLinkRepository>
+public class EmployeeLinkBal extends BAL<EmployeeLinkRepository>
         implements ModuleLinkBal<EmployeeLink> {
 
     private final UserBal userBal;
@@ -27,9 +26,9 @@ public class EmployeeLinkBal extends RepositoryBal<EmployeeLinkRepository>
     private final EmployeeLinkAccess empLinkAccess;
 
     @Autowired
-    public EmployeeLinkBal(RepositoryContext context, MainAccessBal mainAccessBal,
+    public EmployeeLinkBal(EmployeeLinkRepository employeeLinkRepo, MainAccessBal mainAccessBal,
             UserBal userBal, EmployeeBal employeeBal, EmployeeLinkAccess empLinkAccess) {
-        super(context.getRepository(EmployeeLinkRepository.class));
+        super(employeeLinkRepo);
         this.mainAccessBal = mainAccessBal;
         this.userBal = userBal;
         this.employeeBal = employeeBal;

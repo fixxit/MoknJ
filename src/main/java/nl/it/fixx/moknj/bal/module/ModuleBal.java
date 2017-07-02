@@ -1,6 +1,7 @@
 package nl.it.fixx.moknj.bal.module;
 
 import java.util.List;
+import nl.it.fixx.moknj.domain.core.record.Record;
 
 /**
  * Main Record BAL interface. All common Record REST Controllers logic needs to
@@ -9,7 +10,7 @@ import java.util.List;
  * @author adriaan
  * @param <DOMAIN>
  */
-public interface ModuleBal<DOMAIN> {
+public interface ModuleBal<DOMAIN extends Record> {
 
     boolean exists(String id);
 

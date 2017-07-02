@@ -1,14 +1,13 @@
 package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
-import nl.it.fixx.moknj.bal.RepositoryBal;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.exception.AccessException;
 import nl.it.fixx.moknj.repository.AccessRepository;
-import nl.it.fixx.moknj.bal.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class AccessBal extends RepositoryBal<AccessRepository> {
+public class AccessBal extends BAL<AccessRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccessBal.class);
 
@@ -33,9 +32,9 @@ public class AccessBal extends RepositoryBal<AccessRepository> {
     private final MenuBal menuBal;
 
     @Autowired
-    public AccessBal(RepositoryContext context, UserBal userBal,
+    public AccessBal(AccessRepository accessRepo, UserBal userBal,
             TemplateBal templateBal, MenuBal menuBal) {
-        super(context.getRepository(AccessRepository.class));
+        super(accessRepo);
         this.userBal = userBal;
         this.templateBal = templateBal;
         this.menuBal = menuBal;

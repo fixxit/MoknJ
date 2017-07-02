@@ -6,8 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.bal.RepositoryBal;
-import nl.it.fixx.moknj.bal.RepositoryContext;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.core.MainAccessBal;
@@ -28,7 +27,7 @@ import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
 import nl.it.fixx.moknj.exception.AccessException;
 
 @Service
-public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements ModuleLinkBal<AssetLink> {
+public class AssetLinkBal extends BAL<AssetLinkRepository> implements ModuleLinkBal<AssetLink> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetLinkBal.class);
 
@@ -39,9 +38,9 @@ public class AssetLinkBal extends RepositoryBal<AssetLinkRepository> implements 
     private final AssetLinkAccess assetLinkAccess;
 
     @Autowired
-    public AssetLinkBal(RepositoryContext context, UserBal userBal, AssetBal assetBal,
+    public AssetLinkBal(AssetLinkRepository assetLinkRepo, UserBal userBal, AssetBal assetBal,
             AccessBal accessBal, MainAccessBal mainAccessBal, AssetLinkAccess assetLinkAccess) {
-        super(context.getRepository(AssetLinkRepository.class));
+        super(assetLinkRepo);
         this.userBal = userBal;
         this.assetBal = assetBal;
         this.accessBal = accessBal;

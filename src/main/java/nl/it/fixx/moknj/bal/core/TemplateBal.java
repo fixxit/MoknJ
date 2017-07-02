@@ -1,10 +1,9 @@
 package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
-import nl.it.fixx.moknj.bal.RepositoryBal;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.exception.BalException;
-import nl.it.fixx.moknj.bal.RepositoryContext;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TemplateBal extends RepositoryBal<TemplateRepository> {
+public class TemplateBal extends BAL<TemplateRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TemplateBal.class);
     private final FieldBal fieldBal;
 
     @Autowired
-    public TemplateBal(RepositoryContext context) {
-        super(context.getRepository(TemplateRepository.class));
-        this.fieldBal = new FieldBal(context);
+    public TemplateBal(TemplateRepository templateRepo, FieldBal fieldBal) {
+        super(templateRepo);
+        this.fieldBal = fieldBal;
     }
 
     /**

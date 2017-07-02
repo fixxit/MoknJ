@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.bal.RepositoryBal;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
@@ -17,7 +17,6 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.GraphRepository;
-import nl.it.fixx.moknj.bal.RepositoryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +27,22 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class GraphBal extends RepositoryBal<GraphRepository> {
+public class GraphBal extends BAL<GraphRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
-    private final RepositoryContext context;
     private final GraphDisplayBal graphBuilder;
+    private final UserBal userBal;
+    private final TemplateBal templateBal;
+    private final MenuBal menuBal;
 
     @Autowired
-    public GraphBal(RepositoryContext context, GraphDisplayBal graphBuilder) {
-        super(context.getRepository(GraphRepository.class));
+    public GraphBal(GraphDisplayBal graphBuilder, UserBal userBal, TemplateBal templateBal, MenuBal menuBal, GraphRepository repository) {
+        super(repository);
         this.graphBuilder = graphBuilder;
-        this.context = context;
+        this.userBal = userBal;
+        this.templateBal = templateBal;
+        this.menuBal = menuBal;
     }
 
     /**
@@ -60,7 +63,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
                 Graph dbGraph = repository.findOne(payload.getId());
                 payload.setCreatorId(dbGraph.getCreatorId());
             } else {
-                User user = new UserBal(context).getUserByToken(token);
+                User user = userBal.getUserByToken(token);
                 if (user != null && user.isSystemUser()) {
                     payload.setCreatorId(user.getId());
                 }
@@ -89,7 +92,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
      */
     public List<Graph> getAll(String token) throws Exception {
         try {
-            User user = new UserBal(context).getUserByToken(token);
+            User user = userBal.getUserByToken(token);
             Set<Graph> graphs = new HashSet();
             if (user != null) {
                 List<Graph> savedGraphs = repository.findAll();
@@ -97,7 +100,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
                     // check if user has access to view and edit this graph template
                     if (user.getId().equals(graph.getCreatorId())) {
                         if (graph.getTemplateId() != null) {
-                            Template template = new TemplateBal(context).getTemplateById(graph.getTemplateId());
+                            Template template = templateBal.getTemplateById(graph.getTemplateId());
                             if (template != null) {
                                 graph.setTemplate(template.getName());
                             }
@@ -106,7 +109,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
                         graph.setType(graph.getGraphType().getName());
                         graph.setView(graph.getGraphView().getDisplayName());
 
-                        Menu menu = new MenuBal(context).getMenuById(graph.getMenuId());
+                        Menu menu = menuBal.getMenuById(graph.getMenuId());
                         if (menu != null) {
                             graph.setMenu(menu.getName());
                         }
@@ -132,7 +135,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
      */
     public GraphData getGraphData(String graphId, String token) throws Exception {
         try {
-            User user = new UserBal(context).getUserByToken(token);
+            User user = userBal.getUserByToken(token);
             Graph graph = repository.findOne(graphId);
             if (user.getId().equals(graph.getCreatorId())) {
                 return graphBuilder.buildGraphData(graph, token);
@@ -187,7 +190,7 @@ public class GraphBal extends RepositoryBal<GraphRepository> {
         try {
             if (repository.exists(id)) {
                 Graph graph = repository.findOne(id);
-                User user = new UserBal(context).getUserByToken(token);
+                User user = userBal.getUserByToken(token);
                 if (graph.getCreatorId().equals(user.getId())
                         || user.getAuthorities().contains(ALL_ACCESS.toString())) {
                     repository.delete(id);

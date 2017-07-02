@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.comparator.NullSafeComparator;
-import nl.it.fixx.moknj.bal.BAL;
 
 /**
  * This is the main access bal used to access for any action related to template
@@ -32,7 +31,7 @@ import nl.it.fixx.moknj.bal.BAL;
  * @author adriaan
  */
 @Service
-public class MainAccessBal implements BAL {
+public class MainAccessBal {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainAccessBal.class);
 

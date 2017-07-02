@@ -1,7 +1,6 @@
 package nl.it.fixx.moknj.bal.module.asset;
 
-import nl.it.fixx.moknj.bal.RepositoryBal;
-import nl.it.fixx.moknj.bal.RepositoryContext;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import org.aspectj.lang.JoinPoint;
@@ -14,15 +13,15 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class AssetBalAspect extends RepositoryBal<AssetRepository> {
+public class AssetBalAspect extends BAL<AssetRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetBalAspect.class);
 
     private final AssetLinkBal linkBal;
 
     @Autowired
-    public AssetBalAspect(RepositoryContext context, AssetLinkBal linkBal) {
-        super(context.getRepository(AssetRepository.class));
+    public AssetBalAspect(AssetRepository assetRepo, AssetLinkBal linkBal) {
+        super(assetRepo);
         this.linkBal = linkBal;
     }
 

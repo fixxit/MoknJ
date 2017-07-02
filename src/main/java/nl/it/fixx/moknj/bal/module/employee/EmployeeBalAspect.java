@@ -3,8 +3,7 @@ package nl.it.fixx.moknj.bal.module.employee;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
-import nl.it.fixx.moknj.bal.RepositoryBal;
-import nl.it.fixx.moknj.bal.RepositoryContext;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.bal.core.FieldBal;
 import nl.it.fixx.moknj.bal.core.MenuBal;
 import nl.it.fixx.moknj.bal.core.TemplateBal;
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class EmployeeBalAspect extends RepositoryBal<EmployeeRepository> {
+public class EmployeeBalAspect extends BAL<EmployeeRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeBalAspect.class);
 
@@ -42,9 +41,9 @@ public class EmployeeBalAspect extends RepositoryBal<EmployeeRepository> {
     private final MenuBal menuBal;
 
     @Autowired
-    public EmployeeBalAspect(RepositoryContext context, TemplateBal tempBal,
+    public EmployeeBalAspect(EmployeeRepository EmployeeRepo, TemplateBal tempBal,
             EmployeeLinkBal employeeLinkBal, UserBal userBal, FieldBal fieldBal, MenuBal menuBal) {
-        super(context.getRepository(EmployeeRepository.class));
+        super(EmployeeRepo);
         this.employeeLinkBal = employeeLinkBal;
         this.tempBal = tempBal;
         this.userBal = userBal;

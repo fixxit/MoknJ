@@ -2,17 +2,17 @@ package nl.it.fixx.moknj.bal.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.RepositoryBal;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.exception.BalException;
+import nl.it.fixx.moknj.properties.ApplicationProperties;
 import nl.it.fixx.moknj.repository.AccessRepository;
 import nl.it.fixx.moknj.repository.AssetLinkRepository;
 import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.bal.RepositoryContext;
 import nl.it.fixx.moknj.repository.UserRepository;
 import nl.it.fixx.moknj.security.OAuth2SecurityConfig;
 import static nl.it.fixx.moknj.security.OAuth2SecurityConfig.PSW_ENCODER;
@@ -29,18 +29,25 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class UserBal extends RepositoryBal<UserRepository> {
+public class UserBal extends BAL<UserRepository> {
 
-    private final BCryptPasswordEncoder passwordEncoder;
     private static final Logger LOG = LoggerFactory.getLogger(UserBal.class);
 
-    private final RepositoryContext context;
+    private final ApplicationProperties properties;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final AssetRepository assetRepo;
+    private final AssetLinkRepository assetLinkRepo;
+    private final AccessRepository accessRepo;
 
     @Autowired
-    public UserBal(RepositoryContext context) {
-        super(context.getRepository(UserRepository.class));
+    public UserBal(ApplicationProperties properties, AssetRepository assetRepo,
+            AssetLinkRepository assetLinkRepo, AccessRepository accessRepo, UserRepository repository) {
+        super(repository);
+        this.properties = properties;
         this.passwordEncoder = PSW_ENCODER;
-        this.context = context;
+        this.assetRepo = assetRepo;
+        this.assetLinkRepo = assetLinkRepo;
+        this.accessRepo = accessRepo;
     }
 
     /**
@@ -55,7 +62,7 @@ public class UserBal extends RepositoryBal<UserRepository> {
                 for (User user : repository.findAll()) {
                     // if user has all access get all else only return his user
                     if (!user.isHidden()) {
-                        if (!context.getProperties().getAdmin().getUser().equals(user.getUserName())) {
+                        if (!properties.getAdmin().getUser().equals(user.getUserName())) {
                             users.add(user);
                         }
                     }
@@ -102,7 +109,7 @@ public class UserBal extends RepositoryBal<UserRepository> {
                 if (loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
                     if (!user.isHidden()) {
                         if (isAdmin) {
-                            if (!context.getProperties().getAdmin().getUser().equals(user.getUserName())) {
+                            if (!properties.getAdmin().getUser().equals(user.getUserName())) {
                                 users.add(user);
                             }
                         } else {
@@ -136,17 +143,17 @@ public class UserBal extends RepositoryBal<UserRepository> {
             }
 
             User resource = repository.findById(userId);
-            List<Asset> assets = context.getRepository(AssetRepository.class).getAllByResourceId(userId);
-            List<AssetLink> links = context.getRepository(AssetLinkRepository.class).getAllByResourceId(userId);
+            List<Asset> assets = assetRepo.getAllByResourceId(userId);
+            List<AssetLink> links = assetLinkRepo.getAllByResourceId(userId);
 
             if (!assets.isEmpty() || !links.isEmpty()) {
                 resource.setHidden(true);
                 save(resource, token);
             } else {
                 // Delete all access rules relating to this user.
-                List<Access> accessRules = context.getRepository(AccessRepository.class).getAccessList(userId);
+                List<Access> accessRules = accessRepo.getAccessList(userId);
                 accessRules.forEach((access) -> {
-                    context.getRepository(AccessRepository.class).delete(access);
+                    accessRepo.delete(access);
                 });
                 repository.delete(resource);
             }
