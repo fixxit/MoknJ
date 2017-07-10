@@ -1,11 +1,5 @@
 # MoknJ 0.0.1 API #
 
-
-## Introduction ##
-This dragon scroll would serve for who ever takes on this project as a guide to unlock the unknowns and travel to far lands and slay dragons... One might ask ones self why would I be reading about dragons and I the writer would reply cause words can make a logical argument, does it matter? (rhetorical question)
-
-![funny_header.gif](https://github.com/fixxit/MoknJ/blob/master/images/funny%20header.gif?raw=true)
-
 ## Mission ##
 MoknJ started as an idea to move data from excel sheets to an customizable platform which creates an environment where it is easy for the user to build custom data templates that behave like predefined business components. 
 
