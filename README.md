@@ -76,7 +76,7 @@ User access can be defined once menu and template is loaded to the platform. **T
 ![access](https://github.com/fixxit/MoknJ/blob/master/images/access.jpg?raw=true)
 
 Screen shot info
-* MoknJ API Access rights in the red box, is used to define access to rest controller or path. Simple terms may this token access this url on the platform.
+* MoknJ API Access rights in the red box, is used to define access to rest controller or path.
 * Page access in blue box this used to give the user access to the template and menu item.
 
 ## How do I get set up? ##
