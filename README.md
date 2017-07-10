@@ -31,20 +31,20 @@ When this app starts for the 1st time you will see your username and password pr
 * The platform is split up in 2 applications ([GUI](https://github.com/fixxit/MoknJ-WebUI)) (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
 * As the GUI only handles rest (ajax) request and display (data manipulation) with the API which is tomcat/tomee/wildfly free to handle db related requests and data manipulation.
 * GUI is pure HTML5 and javascript which makes it easy for most developers to contribute to.
-* Moknj app consists out of templates and menu item (pages), templates and menu's are dynamic or abstract.
+* Moknj consists of templates(components with fields) and menu item (pages), templates and menu's are dynamic or abstract.
 * Moknj also contains simple graph stats implementation to setup and generate statistics on individual templates.
-* MoknJ overs the capability to change the database structure of save records on the fly as needs of the user grow.
+* Moknf offers the capability to change the database structure on the fly.
 
 ## Low level break down (Also high level but more detaaail hah!) ##
 ### Template ###
 Templates represent components in the platform. Templates define the fields and field behavior. Templates are linked to menu (pages). See menu for more information.
 
-* Template consists out of multiple fields, which can be saved. (Showed in red box of screen shot)
+* Template consists out of multiple fields, which can be manipulated and saved. (Showed in red box of screen shot)
 * Name of field to be displayed on the page. (Shown in green box of screen shot)
 * Field Type consists out of few types namely text, number, date, monetary. (Shown in blue box of screen shot)
 * Field Index, the index of the field on the view of the template. (Showed in red box of screen shot)
 * Drop down fields are fields which have multiple values. These fields are displayed as you guessed a drop down... 
-* Templates also have behavior (Asset, Employee) assigned to them.  
+* Templates also have behavior (Asset, Employee, more to come as we expand the functionality) assigned to them.  
 
 ![template](https://github.com/fixxit/MoknJ/blob/master/images/template.jpg?raw=true)
 
