@@ -5,10 +5,10 @@ import nl.it.fixx.moknj.domain.modules.asset.Asset;
 
 public interface AssetRepositoryCustom {
 
-    public List<Asset> findAll();
+    List<Asset> findAll();
 
-    public List<Asset> getAllByTypeId(String id);
-    
-    public List<Asset> getAllByResourceId(String id);
+    List<Asset> getAllByTypeId(String id);
+
+    List<Asset> getAllByResourceId(String id);
 
 }

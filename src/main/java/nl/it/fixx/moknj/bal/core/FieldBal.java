@@ -1,27 +1,31 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
-import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Field Detail Business Access Layer
  *
  * @author adriaan
  */
-public class FieldBal extends RepositoryChain<FieldDetailRepository> {
+@Service
+public class FieldBal extends BAL<FieldDetailRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldBal.class);
 
-    public FieldBal(SystemContext context) {
-        super(context.getRepository(FieldDetailRepository.class));
+    @Autowired
+    public FieldBal(FieldDetailRepository fieldDetailRepo) {
+        super(fieldDetailRepo);
     }
 
-    public FieldDetail getField(String id) throws Exception {
+    public FieldDetail get(String id) {
         try {
             if (id == null || id.isEmpty()) {
                 LOG.debug("No Field id recieved to find Field");
@@ -40,7 +44,7 @@ public class FieldBal extends RepositoryChain<FieldDetailRepository> {
         }
     }
 
-    public void saveFields(List<FieldDetail> fields) {
+    public void save(List<FieldDetail> fields) {
         try {
             fields.stream().forEach((detail) -> {
                 repository.save(detail);

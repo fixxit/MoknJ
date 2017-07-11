@@ -1,30 +1,30 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.MenuRepository;
-import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.comparator.NullSafeComparator;
 
-/**
- *
- * @author adriaan
- */
-public class MenuBal extends RepositoryChain<MenuRepository> {
+@Service
+public class MenuBal extends BAL<MenuRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MenuBal.class);
 
-    public MenuBal(SystemContext context) {
-        super(context.getRepository(MenuRepository.class));
+    @Autowired
+    public MenuBal(MenuRepository menuRepo) {
+        super(menuRepo);
     }
 
-    public Menu saveMenu(Menu payload) throws Exception {
+    public Menu saveMenu(Menu payload) {
         try {
             if (payload == null) {
                 throw new BalException("No menu recieved to update/insert");
@@ -60,9 +60,8 @@ public class MenuBal extends RepositoryChain<MenuRepository> {
      *
      * @param id
      * @return menu.
-     * @throws Exception
      */
-    public Menu getMenuById(String id) throws Exception {
+    public Menu getMenuById(String id) {
         try {
             if (id == null || id.isEmpty()) {
                 LOG.debug("No menu id recieved to find menu");
@@ -85,15 +84,10 @@ public class MenuBal extends RepositoryChain<MenuRepository> {
      * Gets all the menu's
      *
      * @return list of menus.
-     * @throws Exception
+     *
      */
-    public List<Menu> getAllMenus() throws Exception {
-        try {
-            return repository.findAll();
-        } catch (Exception e) {
-            LOG.error("error getting all menus", e);
-            throw e;
-        }
+    public List<Menu> getAllMenus() {
+        return repository.findAll();
     }
 
     /**
@@ -104,36 +98,29 @@ public class MenuBal extends RepositoryChain<MenuRepository> {
      *
      * @param templateId
      * @return list of menus
-     * @throws Exception
      */
-    public List<Menu> getMenusForTemplateId(String templateId) throws Exception {
-        try {
-            List<Menu> array = getAllMenus();
-            List<Menu> menus = new ArrayList<>();
+    public List<Menu> getMenusForTemplateId(String templateId) {
+        List<Menu> array = getAllMenus();
+        List<Menu> menus = new ArrayList<>();
 
-            array.forEach((menu) -> {
-                List<Template> templates = new ArrayList<>();
-                for (Template temp : menu.getTemplates()) {
-                    if (templateId.equals(temp.getId())) {
-                        templates.add(temp);
-                    }
-                }
-                if (!templates.isEmpty()) {
-                    menu.setTemplates(templates);
-                    menus.add(menu);
-                }
+        array.forEach((menu) -> {
+            List<Template> templates = new ArrayList<>();
+            menu.getTemplates().stream().filter((temp)
+                    -> (templateId.equals(temp.getId()))).forEachOrdered((temp) -> {
+                templates.add(temp);
             });
+            if (!templates.isEmpty()) {
+                menu.setTemplates(templates);
+                menus.add(menu);
+            }
+        });
 
-            Collections.sort(menus, (Menu a1, Menu a2) -> {
-                return new NullSafeComparator<>(String::compareTo,
-                        true).compare(a1.getIndex(), a2.getIndex());
-            });
+        Collections.sort(menus, (Menu a1, Menu a2) -> {
+            return new NullSafeComparator<>(String::compareTo,
+                    true).compare(a1.getIndex(), a2.getIndex());
+        });
 
-            return menus;
-        } catch (Exception e) {
-            LOG.error("Error while get all menus for user token");
-            throw e;
-        }
+        return menus;
     }
 
     /**
@@ -141,9 +128,8 @@ public class MenuBal extends RepositoryChain<MenuRepository> {
      *
      * @param menu
      * @return
-     * @throws Exception
      */
-    public String getDispayName(Menu menu) throws Exception {
+    public String getDispayName(Menu menu) {
         if (menu == null) {
             throw new BalException("No menu object provided");
         }
@@ -166,18 +152,38 @@ public class MenuBal extends RepositoryChain<MenuRepository> {
      * deletes the menu
      *
      * @param id
-     * @throws Exception
      */
-    public void deleteMenu(String id) throws Exception {
+    public void deleteMenu(String id) {
         try {
             Menu menu = getMenuById(id);
             if (menu == null) {
                 throw new BalException("Menu does not exists in the db");
             }
             repository.delete(menu);
-        } catch (Exception e) {
+        } catch (BalException e) {
             LOG.error("error deleting menu[" + id + "]", e);
             throw e;
         }
+    }
+
+    /**
+     * Gets Template for the menu and template id, this is to get the saved
+     * settings to the template as menu template can differ to plain template as
+     * it has scope settings included.
+     *
+     * @param menuId
+     * @param templateId
+     * @return
+     * @throws Exception
+     */
+    public Template getMenuTemplate(String menuId, String templateId) throws Exception {
+        Menu menu = getMenuById(menuId);
+        List<Template> menuTemplates = menu.getTemplates();
+        for (Template menuTemplate : menuTemplates) {
+            if (templateId.equals(menuTemplate.getId())) {
+                return menuTemplate;
+            }
+        }
+        return null;
     }
 }

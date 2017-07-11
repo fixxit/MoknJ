@@ -1,5 +1,7 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.core;
 
+import nl.it.fixx.moknj.bal.module.asset.AssetBal;
+import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,14 +18,11 @@ import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.exception.AccessException;
-import nl.it.fixx.moknj.repository.AssetRepository;
-import nl.it.fixx.moknj.repository.EmployeeRepository;
-import nl.it.fixx.moknj.service.SystemContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.comparator.NullSafeComparator;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * This is the main access bal used to access for any action related to template
@@ -31,26 +30,27 @@ import org.springframework.web.bind.annotation.RequestParam;
  *
  * @author adriaan
  */
-public class MainAccessBal implements BusinessAccessLayer {
+@Service
+public class MainAccessBal {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainAccessBal.class);
 
-    private final AccessBal userAccessBal;
+    private final AccessBal accessBal;
     private final UserBal userBal;
     private final MenuBal menuBal;
     private final TemplateBal tempBal;
     private final AssetBal assetBal;
     private final EmployeeBal employeeBal;
-    private final SystemContext context;
 
-    public MainAccessBal(SystemContext context) {
-        this.menuBal = new MenuBal(context);
-        this.tempBal = new TemplateBal(context);
-        this.userBal = new UserBal(context);
-        this.userAccessBal = new AccessBal(context, userBal, tempBal, menuBal);
-        this.assetBal = new AssetBal(context);
-        this.employeeBal = new EmployeeBal(context);
-        this.context = context;
+    @Autowired
+    public MainAccessBal(AccessBal accessBal, UserBal userBal, MenuBal menuBal,
+            TemplateBal tempBal, AssetBal assetBal, EmployeeBal employeeBal) {
+        this.accessBal = accessBal;
+        this.userBal = userBal;
+        this.menuBal = menuBal;
+        this.tempBal = tempBal;
+        this.assetBal = assetBal;
+        this.employeeBal = employeeBal;
     }
 
     /**
@@ -68,7 +68,7 @@ public class MainAccessBal implements BusinessAccessLayer {
                 return menuBal.saveMenu(payload);
             }
             throw new AccessException("This user does not have " + ALL_ACCESS.toString());
-        } catch (Exception e) {
+        } catch (AccessException e) {
             LOG.error("Error on saving menu", e);
             throw e;
         }
@@ -103,7 +103,7 @@ public class MainAccessBal implements BusinessAccessLayer {
      * @return list of templates
      * @throws Exception
      */
-    private List<Template> getMenuTemplates(Menu menu, User user, boolean bypassHidden) throws Exception {
+    private List<Template> getMenuTemplates(Menu menu, User user, boolean bypassHidden) {
         LOG.debug("========================================");
         LOG.debug("Menu [" + menu.getName() + "] ");
         List<Template> templates = new ArrayList<>();
@@ -115,7 +115,7 @@ public class MainAccessBal implements BusinessAccessLayer {
                     // sets teh template menu rules down to template passed back
                     globalTemplate.setAllowScopeChallenge(temp.isAllowScopeChallenge());
                     // check if template is hidden or has access
-                    boolean access = userAccessBal.hasAccess(user,
+                    boolean access = accessBal.hasAccess(user,
                             menu.getId(), globalTemplate.getId(), GlobalAccessRights.VIEW);
 
                     LOG.debug("User [" + user.getUserName() + "] has access : " + access);
@@ -171,7 +171,10 @@ public class MainAccessBal implements BusinessAccessLayer {
      */
     public Template getTemplate(String templateId, String token) throws Exception {
         try {
-            return searchForTemplateByToken(templateId, token);
+            User user = userBal.getUserByToken(token);
+            return !(user.getAuthorities().contains(ALL_ACCESS.toString()))
+                    ? findTemplateByTokenAndId(templateId, user)
+                    : tempBal.getTemplateById(templateId);
         } catch (Exception e) {
             LOG.error("Error on saving template", e);
             throw e;
@@ -185,21 +188,15 @@ public class MainAccessBal implements BusinessAccessLayer {
      * @param menuId
      * @param token
      * @return menu
-     * @throws Exception
      */
-    public Menu getMenu(String menuId, String token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            Menu menu = menuBal.getMenuById(menuId);
-            if (menu != null) {
-                menu.setTemplates(getMenuTemplates(menu, user, false));
-                return menu;
-            } else {
-                throw new AccessException("Menu not found");
-            }
-        } catch (Exception e) {
-            LOG.error("Error while get menu[" + menuId + "] for user token");
-            throw e;
+    public Menu getMenu(String menuId, String token) {
+        User user = userBal.getUserByToken(token);
+        Menu menu = menuBal.getMenuById(menuId);
+        if (menu != null) {
+            menu.setTemplates(getMenuTemplates(menu, user, false));
+            return menu;
+        } else {
+            throw new AccessException("Menu not found");
         }
     }
 
@@ -208,32 +205,26 @@ public class MainAccessBal implements BusinessAccessLayer {
      *
      * @param access_token
      * @return list of menus
-     * @throws Exception
      */
-    public List<Menu> getUserMenus(String access_token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(access_token);
-            List<Menu> array = menuBal.getAllMenus();
-            List<Menu> menus = new ArrayList<>();
+    public List<Menu> getUserMenus(String access_token) {
+        User user = userBal.getUserByToken(access_token);
+        List<Menu> array = menuBal.getAllMenus();
+        List<Menu> menus = new ArrayList<>();
 
-            for (Menu menu : array) {
-                List<Template> templates = getMenuTemplates(menu, user, false);
-                if (!templates.isEmpty()) {
-                    menu.setTemplates(templates);
-                    menus.add(menu);
-                }
+        array.forEach((menu) -> {
+            List<Template> templates = getMenuTemplates(menu, user, false);
+            if (!templates.isEmpty()) {
+                menu.setTemplates(templates);
+                menus.add(menu);
             }
+        });
 
-            Collections.sort(menus, (Menu a1, Menu a2) -> {
-                return new NullSafeComparator<>(String::compareTo,
-                        true).compare(a1.getIndex(), a2.getIndex());
-            });
+        Collections.sort(menus, (Menu a1, Menu a2) -> {
+            return new NullSafeComparator<>(String::compareTo,
+                    true).compare(a1.getIndex(), a2.getIndex());
+        });
 
-            return menus;
-        } catch (Exception e) {
-            LOG.error("Error while get all menus for user token");
-            throw e;
-        }
+        return menus;
     }
 
     /**
@@ -243,7 +234,7 @@ public class MainAccessBal implements BusinessAccessLayer {
      * @param token
      * @throws java.lang.Exception
      */
-    public void deleteMenu(@PathVariable String id, @RequestParam String token) throws Exception {
+    public void deleteMenu(String id, String token) throws Exception {
         try {
             User user = userBal.getUserByToken(token);
             if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
@@ -251,7 +242,7 @@ public class MainAccessBal implements BusinessAccessLayer {
             }
             throw new AccessException("Unable to delete. "
                     + "This user does not have " + ALL_ACCESS.toString());
-        } catch (Exception e) {
+        } catch (AccessException e) {
             LOG.error("Error while get all menus for user token");
             throw e;
         }
@@ -295,35 +286,23 @@ public class MainAccessBal implements BusinessAccessLayer {
      * template which shares same template Id
      *
      * @param templateId
-     * @param token
+     * @param user
      * @return
-     * @throws java.lang.Exception
      */
-    public Template searchForTemplateByToken(String templateId, String token)
-            throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            List<Menu> menus = menuBal.getAllMenus();
-            if (tempBal.exists(templateId)) {
-                for (Menu menu : menus) {
-                    List<Template> templates = getMenuTemplates(menu, user, false);
-                    for (Template template : templates) {
-                        if (template.getId().equals(templateId)) {
-                            return template;
-                        }
+    public Template findTemplateByTokenAndId(String templateId, User user) {
+        List<Menu> menus = menuBal.getAllMenus();
+        if (tempBal.exists(templateId)) {
+            for (Menu menu : menus) {
+                List<Template> templates = getMenuTemplates(menu, user, false);
+                for (Template template : templates) {
+                    if (template.getId().equals(templateId)) {
+                        return template;
                     }
                 }
-
-                if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                    throw new AccessException("This user does not have access to this template.");
-                }
             }
-            LOG.debug("This template[" + templateId + "] seems to be deleted");
-            return null;
-        } catch (Exception e) {
-            LOG.error("Error while all templates for user token[" + token + "]");
-            throw e;
         }
+        LOG.debug("This template[" + templateId + "] seems to be deleted");
+        return null;
     }
 
     /**
@@ -333,9 +312,7 @@ public class MainAccessBal implements BusinessAccessLayer {
      * @param token
      * @throws java.lang.Exception
      */
-    public void deleteTemplate(String id,
-            boolean cascade,
-            String token) throws Exception {
+    public void deleteTemplate(String id, boolean cascade, String token) throws Exception {
         try {
             User user = userBal.getUserByToken(token);
             if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
@@ -344,21 +321,20 @@ public class MainAccessBal implements BusinessAccessLayer {
             }
 
             if (cascade) {
-                List<Menu> menus = new MenuBal(context).getMenusForTemplateId(id);
-                for (Menu menu : menus) {
+                List<Menu> menus = menuBal.getMenusForTemplateId(id);
+                menus.forEach((menu) -> {
                     for (Iterator<Template> iterator = menu.getTemplates().iterator(); iterator.hasNext();) {
                         Template template = iterator.next();
                         if (template.getId().equals(id)) {
                             if (GlobalTemplateType.GBL_TT_ASSET.equals(template.getTemplateType())) {
-                                List<Asset> assets = context.getRepository(AssetRepository.class).getAllByTypeId(id);
+                                List<Asset> assets = assetBal.getAll(template.getId(), menu.getId(), token);
                                 for (Asset asset : assets) {
                                     assetBal.delete(asset, menu.getId(), token, true);
                                     iterator.remove();
                                     menuBal.saveMenu(menu);
                                 }
-
                             } else if (GlobalTemplateType.GBL_TT_EMPLOYEE.equals(template.getTemplateType())) {
-                                List<Employee> employees = context.getRepository(EmployeeRepository.class).getAllByTypeId(id);
+                                List<Employee> employees = employeeBal.getAll(template.getId(), menu.getId(), token);
                                 for (Employee emp : employees) {
                                     employeeBal.delete(emp, menu.getId(), token, true);
                                     iterator.remove();
@@ -367,7 +343,7 @@ public class MainAccessBal implements BusinessAccessLayer {
                             }
                         }
                     }
-                }
+                });
             }
 //            LOG.info("deleting template[" + id + "]");
             tempBal.deleteTemplate(id, cascade);

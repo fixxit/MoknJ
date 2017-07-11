@@ -1,11 +1,10 @@
 package nl.it.fixx.moknj.controller;
 
-import nl.it.fixx.moknj.bal.LinkBal;
+import nl.it.fixx.moknj.bal.module.asset.AssetLinkBal;
+import nl.it.fixx.moknj.bal.module.employee.EmployeeLinkBal;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.service.SystemContext;
+import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.response.LinkResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,18 +14,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- *
- * @author adriaan
- */
 @CrossOrigin // added for cors, allow access from another web server
 @RestController
 @RequestMapping(value = "/link")
 public class LinkController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LinkController.class);
+    private final AssetLinkBal assetLinkBal;
+    private final EmployeeLinkBal employeeLinkBal;
+
     @Autowired
-    private SystemContext context;
+    public LinkController(AssetLinkBal assetLinkBal, EmployeeLinkBal employeeLinkBal) {
+        this.assetLinkBal = assetLinkBal;
+        this.employeeLinkBal = employeeLinkBal;
+    }
 
     @RequestMapping(value = "/asset/{menuId}/{templateId}/add", method = RequestMethod.POST)
     public LinkResponse addAssetLink(@RequestBody AssetLink payload,
@@ -35,11 +35,9 @@ public class LinkController {
             @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
         try {
-            LinkBal bal = new LinkBal(context);
-            AssetLink link = bal.linkAssetToUser(menuId, templateId,
-                    payload, access_token);
-            response.setLink(link);
-            response.setSuccess(link != null);
+            response.setLink(assetLinkBal.linkAssetToUser(menuId, templateId,
+                    payload, access_token));
+            response.setSuccess(true);
             response.setMessage("Saved link successfully");
         } catch (Exception ex) {
             response.setSuccess(false);
@@ -49,7 +47,7 @@ public class LinkController {
     }
 
     /**
-     * Get getAllAssetLinks links
+     * Get getAllLinks links
      *
      * @param access_token
      * @return
@@ -58,10 +56,9 @@ public class LinkController {
     public LinkResponse getAllAssetLinks(@RequestParam String access_token) {
         final LinkResponse response = new LinkResponse();
         try {
-            LinkBal bal = new LinkBal(context);
-            response.setLinks(bal.getAllAssetLinks(access_token));
+            response.setLinks(assetLinkBal.getAllLinks(access_token));
             response.setSuccess(true);
-        } catch (Exception ex) {
+        } catch (BalException ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
@@ -69,7 +66,7 @@ public class LinkController {
     }
 
     /**
-     * Get getAllAssetLinks links
+     * Get getAllLinks links
      *
      * @param access_token
      * @return
@@ -78,10 +75,9 @@ public class LinkController {
     public LinkResponse getAllEmployeeLinks(@RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
         try {
-            LinkBal bal = new LinkBal(context);
-            response.setEmployeeLinks(bal.getAllEmployeeLinks(access_token));
+            response.setEmployeeLinks(employeeLinkBal.getAllLinks(access_token));
             response.setSuccess(true);
-        } catch (Exception ex) {
+        } catch (BalException ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
@@ -99,10 +95,9 @@ public class LinkController {
     public LinkResponse getAllEmployeeLinksByEmployeeId(@PathVariable String id, @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
         try {
-            LinkBal bal = new LinkBal(context);
-            response.setEmployeeLinks(bal.getAllEmployeeLinksForEmployee(id, access_token));
+            response.setEmployeeLinks(employeeLinkBal.getAllLinksByRecordId(id, access_token));
             response.setSuccess(true);
-        } catch (Exception ex) {
+        } catch (BalException ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
@@ -120,10 +115,9 @@ public class LinkController {
     public LinkResponse getAllAssetLinksByAssetId(@PathVariable String id, @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
         try {
-            LinkBal bal = new LinkBal(context);
-            response.setLinks(bal.getAllAssetLinksByAssetId(id, access_token));
+            response.setLinks(assetLinkBal.getAllLinksByRecordId(id, access_token));
             response.setSuccess(true);
-        } catch (Exception ex) {
+        } catch (BalException ex) {
             response.setSuccess(false);
             response.setMessage(ex.getMessage());
         }
@@ -141,8 +135,7 @@ public class LinkController {
     public LinkResponse getAllAssetLinksByRecourceId(@PathVariable String id, @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
         try {
-            LinkBal bal = new LinkBal(context);
-            response.setLinks(bal.getAllAssetLinksByResourceId(id, access_token));
+            response.setLinks(assetLinkBal.getAllAssetLinksByResourceId(id, access_token));
             response.setSuccess(true);
         } catch (Exception ex) {
             response.setSuccess(false);

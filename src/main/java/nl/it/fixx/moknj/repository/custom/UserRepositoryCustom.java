@@ -9,11 +9,11 @@ import nl.it.fixx.moknj.domain.core.user.User;
  */
 public interface UserRepositoryCustom {
 
-    public User findById(String id);
+    User findById(String id);
 
-    public User findByEmail(String email);
+    User findByEmail(String email);
 
-    public User findByUserName(String username);
+    User findByUserName(String username);
 
-    public List<User> findByFullname(String name, String surname);
+    List<User> findByFullname(String name, String surname);
 }

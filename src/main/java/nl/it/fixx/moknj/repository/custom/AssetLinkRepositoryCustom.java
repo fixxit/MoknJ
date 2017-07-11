@@ -9,7 +9,7 @@ import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
  */
 public interface AssetLinkRepositoryCustom {
 
-    public List<AssetLink> getAllByResourceId(String id);
+    List<AssetLink> getAllByResourceId(String id);
 
-    public List<AssetLink> getAllByAssetId(String id);
+    List<AssetLink> getAllByAssetId(String id);
 }

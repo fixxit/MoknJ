@@ -1,25 +1,25 @@
-package nl.it.fixx.moknj.bal;
+package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
+import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.exception.BalException;
-import nl.it.fixx.moknj.service.SystemContext;
 import nl.it.fixx.moknj.repository.TemplateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-/**
- *
- * @author adriaan
- */
-public class TemplateBal extends RepositoryChain<TemplateRepository> {
+@Service
+public class TemplateBal extends BAL<TemplateRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TemplateBal.class);
     private final FieldBal fieldBal;
 
-    public TemplateBal(SystemContext context) {
-        super(context.getRepository(TemplateRepository.class));
-        this.fieldBal = new FieldBal(context);
+    @Autowired
+    public TemplateBal(TemplateRepository templateRepo, FieldBal fieldBal) {
+        super(templateRepo);
+        this.fieldBal = fieldBal;
     }
 
     /**
@@ -37,14 +37,11 @@ public class TemplateBal extends RepositoryChain<TemplateRepository> {
             }
 
             // For updates if the type has a id then bypass the exists
-            boolean bypassExists = false;
-            if (payload.getId() != null) {
-                bypassExists = true;
-            }
+            boolean bypassExists = (payload.getId() != null);
 
             boolean exists = repository.existsByName(payload.getName());
             if (!exists || bypassExists) {
-                fieldBal.saveFields(payload.getDetails());
+                fieldBal.save(payload.getDetails());
                 Template template = this.repository.save(payload);
                 return template;
             } else {
@@ -61,34 +58,23 @@ public class TemplateBal extends RepositoryChain<TemplateRepository> {
      *
      * @param id
      * @return template.
-     * @throws Exception
      */
-    public Template getTemplateById(String id) throws Exception {
-        try {
-            if (id == null || id.isEmpty()) {
-                LOG.debug("No template id recieved to find template");
-                throw new BalException("No template found, no template id provided!");
-            }
-
-            Template template = repository.findOne(id);
-            if (template == null) {
-                LOG.debug("no template found for id[" + id + "]");
-                throw new BalException("No template found by this id[" + id + "]");
-            }
-            return template;
-        } catch (BalException e) {
-            LOG.error("Error getting template by id", e);
-            throw e;
+    public Template getTemplateById(String id) {
+        if (id == null || id.isEmpty()) {
+            LOG.debug("No template id recieved to find template");
+            throw new BalException("No template found, no template id provided!");
         }
+
+        Template template = repository.findOne(id);
+        if (template == null) {
+            LOG.debug("no template found for id[" + id + "]");
+            throw new BalException("No template found by this id[" + id + "]");
+        }
+        return template;
     }
 
-    public boolean exists(String id) throws Exception {
-        try {
-            return repository.exists(id);
-        } catch (Exception e) {
-            LOG.error("Error getting template by id", e);
-            throw e;
-        }
+    public boolean exists(String id) {
+        return repository.exists(id);
     }
 
     /**
@@ -155,4 +141,5 @@ public class TemplateBal extends RepositoryChain<TemplateRepository> {
             throw e;
         }
     }
+
 }

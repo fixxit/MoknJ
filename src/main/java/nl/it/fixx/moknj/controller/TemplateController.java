@@ -2,16 +2,14 @@ package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.MainAccessBal;
-import nl.it.fixx.moknj.bal.TemplateBal;
+import nl.it.fixx.moknj.bal.core.TemplateBal;
+import nl.it.fixx.moknj.bal.core.MainAccessBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.template.TemplateType;
-import nl.it.fixx.moknj.service.SystemContext;
-import nl.it.fixx.moknj.repository.TemplateRepository;
 import nl.it.fixx.moknj.response.TemplateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,25 +21,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- *
- * @author adriaan
- */
 @CrossOrigin // added for cors, allow access from another web server
 @RestController
 @RequestMapping(value = "/type")
 public class TemplateController {
 
     @Autowired
-    private SystemContext context;
+    private MainAccessBal mainAccessBal;
+    @Autowired
+    private TemplateBal templateBal;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody
     TemplateResponse add(@RequestBody Template payload, @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            Template template = bal.saveTemplate(payload, access_token);
+            Template template = mainAccessBal.saveTemplate(payload, access_token);
             response.setSuccess(template != null);
             response.setMessage("Saved " + template.getName());
             response.setType(template);
@@ -58,8 +53,7 @@ public class TemplateController {
     TemplateResponse get(@PathVariable String id, @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            response.setType(bal.getTemplate(id, access_token));
+            response.setType(mainAccessBal.getTemplate(id, access_token));
             response.setSuccess(true);
         } catch (Exception ex) {
             response.setSuccess(false);
@@ -74,8 +68,7 @@ public class TemplateController {
     TemplateResponse all(@RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            response.setTypes(bal.getAllTemplatesForToken(access_token));
+            response.setTypes(mainAccessBal.getAllTemplatesForToken(access_token));
             response.setSuccess(true);
         } catch (Exception ex) {
             response.setSuccess(false);
@@ -89,7 +82,7 @@ public class TemplateController {
     TemplateResponse hidden(@RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            List<Template> templates = context.getRepository(TemplateRepository.class).findAll();
+            List<Template> templates = templateBal.getAllTemplates();
             List<Template> types = new ArrayList<>();
             templates.stream().filter((type) -> (type.isHidden())).forEach((type) -> {
                 types.add(type);
@@ -115,10 +108,9 @@ public class TemplateController {
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal mainAccessBall = new MainAccessBal(context);
-            Template template = new TemplateBal(context).getTemplateById(id);
+            Template template = templateBal.getTemplateById(id);
             template.setHidden(false);
-            mainAccessBall.saveTemplate(template, access_token);
+            mainAccessBal.saveTemplate(template, access_token);
             response.setMessage("Template [" + template.getName() + "] "
                     + " set to visible!");
             response.setType(template);
@@ -145,8 +137,7 @@ public class TemplateController {
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            bal.deleteTemplate(id, cascade, access_token);
+            mainAccessBal.deleteTemplate(id, cascade, access_token);
             response.setSuccess(true);
             response.setMessage("Deleted template");
         } catch (Exception ex) {
@@ -189,8 +180,7 @@ public class TemplateController {
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            Template template = bal.getTemplate(id, access_token);
+            Template template = mainAccessBal.getTemplate(id, access_token);
             List<FieldDetail> fields = new ArrayList<>();
 
             template.getDetails().stream().filter((field)
@@ -214,8 +204,7 @@ public class TemplateController {
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
         try {
-            MainAccessBal bal = new MainAccessBal(context);
-            Template template = bal.getTemplate(id, access_token);
+            Template template = mainAccessBal.getTemplate(id, access_token);
             List<FieldDetail> fields = new ArrayList<>();
 
             template.getDetails().stream().filter((field)

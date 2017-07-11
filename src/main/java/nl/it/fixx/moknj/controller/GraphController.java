@@ -3,7 +3,8 @@ package nl.it.fixx.moknj.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import nl.it.fixx.moknj.bal.GraphBal;
+import nl.it.fixx.moknj.bal.core.GraphBal;
+import nl.it.fixx.moknj.bal.core.TemplateBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphFocus;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
@@ -15,8 +16,6 @@ import nl.it.fixx.moknj.domain.core.graph.GraphFocus;
 import nl.it.fixx.moknj.domain.core.graph.GraphType;
 import nl.it.fixx.moknj.domain.core.graph.GraphView;
 import nl.it.fixx.moknj.domain.core.template.Template;
-import nl.it.fixx.moknj.service.SystemContext;
-import nl.it.fixx.moknj.repository.TemplateRepository;
 import nl.it.fixx.moknj.response.GraphResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -38,7 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class GraphController {
 
     @Autowired
-    private SystemContext context;
+    private GraphBal graphBal;
+    @Autowired
+    private TemplateBal templateBal;
 
     /**
      * Saves the graph... Sets the creator id by the token. Only a user with
@@ -54,10 +55,7 @@ public class GraphController {
             @RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
-            response.setGraphTemplate(
-                    new GraphBal(context).
-                            saveGraph(payload, access_token)
-            );
+            response.setGraphTemplate(graphBal.save(payload, access_token));
             response.setSuccess(true);
             response.setMessage("Saved graph successfully");
 
@@ -116,7 +114,7 @@ public class GraphController {
     GraphResponse getDateTypes(@PathVariable String id) throws Exception {
         GraphResponse response = new GraphResponse();
         GlobalGraphDate[] types = GlobalGraphDate.values();
-        Template template = context.getRepository(TemplateRepository.class).findOne(id);
+        Template template = templateBal.getTemplateById(id);
         if (template != null) {
             List<GraphDate> graphDateOptions = new ArrayList<>();
             for (GlobalGraphDate type : types) {
@@ -143,7 +141,7 @@ public class GraphController {
     GraphResponse getFocuses(@PathVariable String id) throws Exception {
         GraphResponse response = new GraphResponse();
         GlobalGraphFocus[] graphFocuses = GlobalGraphFocus.values();
-        Template template = context.getRepository(TemplateRepository.class).findOne(id);
+        Template template = templateBal.getTemplateById(id);
         if (template != null) {
             List<GraphFocus> graphFocusOptions = new ArrayList<>();
             for (GlobalGraphFocus type : graphFocuses) {
@@ -168,8 +166,7 @@ public class GraphController {
     GraphResponse getAllSavedGraphs(@RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
-            GraphBal bal = new GraphBal(context);
-            response.setSavedGraphs(bal.getAllGraphs(access_token));
+            response.setSavedGraphs(graphBal.getAll(access_token));
             response.setSuccess(true);
             response.setMessage("found all user graph templates");
         } catch (Exception ex) {
@@ -191,8 +188,7 @@ public class GraphController {
     GraphResponse getAllGraphsData(@RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
-            GraphBal bal = new GraphBal(context);
-            response.setAllGraphsData(bal.getAllGraphData(access_token));
+            response.setAllGraphsData(graphBal.getAllGraphData(access_token));
             response.setSuccess(true);
             response.setMessage("found all user graphs data");
         } catch (Exception e) {
@@ -216,8 +212,7 @@ public class GraphController {
             @RequestParam String access_token) throws Exception {
         GraphResponse response = new GraphResponse();
         try {
-            GraphBal bal = new GraphBal(context);
-            response.setGraphData(bal.getGraphData(id, access_token));
+            response.setGraphData(graphBal.getGraphData(id, access_token));
             response.setSuccess(true);
             response.setMessage("Graph data found");
         } catch (Exception e) {
@@ -239,7 +234,7 @@ public class GraphController {
     GraphResponse delete(@PathVariable String id, @RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
         try {
-            new GraphBal(context).deleteGraph(id, access_token);
+            graphBal.delete(id, access_token);
             response.setSuccess(true);
             response.setMessage("Graph successfully deleted from system");
         } catch (Exception ex) {

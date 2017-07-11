@@ -9,7 +9,7 @@ import nl.it.fixx.moknj.domain.modules.employee.Employee;
  */
 public interface EmployeeRepositoryCustom {
 
-    public List<Employee> getAllByTypeId(String id);
+    List<Employee> getAllByTypeId(String id);
 
-    public List<Employee> findAll();
+    List<Employee> findAll();
 }

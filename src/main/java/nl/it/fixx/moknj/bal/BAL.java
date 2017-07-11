@@ -1,5 +1,7 @@
 package nl.it.fixx.moknj.bal;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
+
 /**
  * Main Business Access Layer interface. All common REST Controllers logic needs
  * to be consolidated on this layer. Ideally all business access layers should
@@ -11,13 +13,13 @@ package nl.it.fixx.moknj.bal;
  * This interface is used as place holder interface or identifier.
  *
  * @author adriaan
- * @param <T>
+ * @param <REPOSITORY>
  */
-public abstract class RepositoryChain<T> implements BusinessAccessLayer {
+public abstract class BAL<REPOSITORY extends MongoRepository> {
 
-    protected final T repository;
+    protected final REPOSITORY repository;
 
-    public RepositoryChain(T repository) {
+    public BAL(REPOSITORY repository) {
         this.repository = repository;
     }
 
