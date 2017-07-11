@@ -18,7 +18,7 @@ public class SaveRecordExecutionChain {
     }
 
     @Around("execution(@nl.it.fixx.moknj.bal.module.recordaction.save.SaveRecord * *(..)) && @annotation(saveRecordAnotation)")
-    public void accessValidation(ProceedingJoinPoint joinPoint, SaveRecord saveRecordAnotation) throws Throwable {
+    public void accessValidation(ProceedingJoinPoint joinPoint, Save saveRecordAnotation) throws Throwable {
         employeeRecordAction.execute(joinPoint, saveRecordAnotation);
     }
 

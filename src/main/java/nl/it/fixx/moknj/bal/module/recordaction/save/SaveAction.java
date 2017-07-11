@@ -12,5 +12,5 @@ public interface SaveAction<JOINDOMAIN, DOMAIN> {
 
     boolean valid(Object domain);
 
-    void execute(ProceedingJoinPoint joinPoint, SaveRecord saveRecordAnotation) throws Throwable;
+    void execute(ProceedingJoinPoint joinPoint, Save saveRecordAnotation) throws Throwable;
 }
