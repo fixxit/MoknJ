@@ -25,9 +25,9 @@ When this app starts for the 1st time you will see your username and password pr
 * The platform is split up in 2 applications ([GUI](https://github.com/fixxit/MoknJ-WebUI)) (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
 * As the GUI only handles rest (ajax) request and display (data manipulation) with the API which is tomcat/tomee/wildfly free to handle db related requests and data manipulation.
 * GUI is pure HTML5 and javascript which makes it easy for most developers to contribute to.
-* Moknj consists of templates(components with fields) and menu item (pages), templates and menu's are dynamic or abstract.
-* Moknj also contains simple graph stats implementation to setup and generate statistics on individual templates.
-* Moknf offers the capability to change the database structure on the fly.
+* Templates(components with fields) and menu's (componente with multiple templates), templates and menu's are dynamic or abstract.
+* Home Page Setup contains graph components which can be added/modified to generate statistics on individual templates.
+* Change the database structure on the fly like a spreadsheet.
 
 ## Low level break down (Also high level but more detaaail hah!) ##
 ### Template ###
@@ -60,7 +60,7 @@ Modules can be seen as view and behavior of a template and menu. The module dict
 * Employee view contains a horizontal user filter shown in red and tab view shown purple and list view shown in green.
 ![module_2](https://github.com/fixxit/MoknJ/blob/master/images/module_2.jpg?raw=true)
 ### User ###
-Users and employees are one of the same, a user is just an employee with user access. Employees are linked to the assets and employee templates records.
+Users and employees are one of the same, a user is just an employee with user access. Employees can be linked to the assets and employee templates records.
 
 Example of user view/new screen
 ![user](https://github.com/fixxit/MoknJ/blob/master/images/user.jpg?raw=true)
