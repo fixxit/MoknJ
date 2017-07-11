@@ -21,7 +21,7 @@ When this app starts for the 1st time you will see your username and password pr
 ```
 
 ## High level break down ##
-* MoknJ is rest API which which uses token authentication to identify the logged in user. 
+* Rest API which which uses token authentication to identify the logged in user. 
 * The platform is split up in 2 applications ([GUI](https://github.com/fixxit/MoknJ-WebUI)) (Node.js app) and API (Spring boot app). This creates the impression when using the app that is fast. 
 * As the GUI only handles rest (ajax) request and display (data manipulation) with the API which is tomcat/tomee/wildfly free to handle db related requests and data manipulation.
 * GUI is pure HTML5 and javascript which makes it easy for most developers to contribute to.
