@@ -10,7 +10,7 @@ MoknJ started as an idea to move data from excel sheets to an customizable platf
 HTML5, CSS, Bootstrap, AngularJS, AngularUI, Angular Routing, Node, Express, Spring Boot, Spring Security (OAuth 2), Mongo DB, Java 8, Rest (Jersey with Jackson), Maven, Junit
 
 ## Running API ##
-When this app starts for the 1st time you will see your username and password printed in the logs (this is your admin user). To start using the app you need to create template 1st with your respected fields mapped out then just add that template to menu (create menu) item and you are set. Repeat that few times with few unique templates and menu mappings and you've got yourself a web app (WHUTTT!!!!?)
+When this app starts for the 1st time you will see your username and password printed in the logs (this is your admin user). To start using the app you need to create template 1st with your respected fields mapped out then just add that template to menu (create menu) item and you are set. Repeat that few times with few unique templates and menu mappings and you've got yourself a web app or a glorified potato (WHUTTT!!!!?)
 
 ```
 2017-03-14 21:33:29.744  INFO 448 --- [io-8084-exec-21] n.i.fixx.moknj.runner.ServerInitializer  : ########Remove me in production########
