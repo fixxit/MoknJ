@@ -59,14 +59,12 @@ public class UserBal extends BAL<UserRepository> {
         try {
             List<User> users = new ArrayList<>();
             if (repository != null) {
-                for (User user : repository.findAll()) {
-                    // if user has all access get all else only return his user
-                    if (!user.isHidden()) {
-                        if (!properties.getAdmin().getUser().equals(user.getUserName())) {
-                            users.add(user);
-                        }
-                    }
-                }
+                repository.findAll().stream().filter((user)
+                        -> (!user.isHidden() 
+                                && !properties.getAdmin().getUser().equals(user.getUserName()))).forEachOrdered((user)
+                        -> {
+                    users.add(user);
+                }); // if user has all access get all else only return his user
             } else {
                 throw new BalException("UserRepository is null");
             }

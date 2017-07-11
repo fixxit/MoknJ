@@ -114,5 +114,5 @@
         </plugins>
     </build>
     <packaging>war</packaging>
-    <name>FiXXiTMoknjAPI</name>
+    <name>MoknjAPI</name>
 </project>

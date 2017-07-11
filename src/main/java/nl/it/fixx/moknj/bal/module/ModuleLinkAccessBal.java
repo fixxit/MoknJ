@@ -20,22 +20,22 @@ import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.exception.AccessException;
 import nl.it.fixx.moknj.exception.BalException;
 
-public abstract class ModuleLinkAccessBal<DOMAIN extends Link> {
+public abstract class ModuleLinkAccessBal<DOMAIN extends Link, MODBAL extends ModuleBal> {
 
+    protected final MODBAL recordBal;
     protected final MenuBal menuBal;
     protected final AccessBal accessBal;
-    protected final ModuleBal recordBal;
     protected final UserBal userBal;
 
     public ModuleLinkAccessBal(MenuBal menuBal, AccessBal accessBal,
-            ModuleBal recordBal, UserBal userBal) {
+            MODBAL recordBal, UserBal userBal) {
         this.menuBal = menuBal;
         this.accessBal = accessBal;
         this.recordBal = recordBal;
         this.userBal = userBal;
     }
 
-    public List<DOMAIN> filterRecordAccess(List<DOMAIN> records, String menuId, String templateId, User user) throws BalException {
+    public final List<DOMAIN> filterRecordAccess(List<DOMAIN> records, String menuId, String templateId, User user) throws BalException {
         try {
             Set<DOMAIN> links = new HashSet<>();
             for (DOMAIN link : records) {
@@ -72,6 +72,7 @@ public abstract class ModuleLinkAccessBal<DOMAIN extends Link> {
         }
     }
 
-    public abstract void setRecordViewValues(String recordId, DOMAIN link) throws BalException;
+    public void setRecordViewValues(String recordId, DOMAIN link) {
+    }
 
 }

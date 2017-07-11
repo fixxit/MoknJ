@@ -15,8 +15,13 @@ public class AssetAccessModule extends AccessModuleBase<Asset> {
     }
 
     @Override
-    public boolean canValidate(Object record) {
-        return (record instanceof Asset);
+    public boolean canValidate(Object[] args) {
+        for (Object arg : args) {
+            if (arg instanceof Asset) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -322,7 +322,7 @@ public class MainAccessBal {
 
             if (cascade) {
                 List<Menu> menus = menuBal.getMenusForTemplateId(id);
-                for (Menu menu : menus) {
+                menus.forEach((menu) -> {
                     for (Iterator<Template> iterator = menu.getTemplates().iterator(); iterator.hasNext();) {
                         Template template = iterator.next();
                         if (template.getId().equals(id)) {
@@ -343,7 +343,7 @@ public class MainAccessBal {
                             }
                         }
                     }
-                }
+                });
             }
 //            LOG.info("deleting template[" + id + "]");
             tempBal.deleteTemplate(id, cascade);

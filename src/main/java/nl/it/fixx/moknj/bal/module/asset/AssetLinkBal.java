@@ -155,17 +155,16 @@ public class AssetLinkBal extends BAL<AssetLinkRepository> implements ModuleLink
     public List<AssetLink> getAllLinksByRecordId(String assetId, String token) throws BalException {
         try {
             Set<AssetLink> results = new HashSet<>();
-            for (Menu menu : mainAccessBal.getUserMenus(token)) {
-                if (menu.getMenuType().equals(GBL_MT_ASSET)) {
-                    menu.getTemplates().forEach((temp) -> {
-                        results.addAll(assetLinkAccess.filterRecordAccess(
-                                repository.getAllByAssetId(assetId),
-                                menu.getId(),
-                                temp.getId(),
-                                userBal.getUserByToken(token)));
-                    });
-                }
-            }
+            mainAccessBal.getUserMenus(token).stream().filter((menu) 
+                    -> (menu.getMenuType().equals(GBL_MT_ASSET))).forEachOrdered((menu) -> {
+                menu.getTemplates().forEach((temp) -> {
+                    results.addAll(assetLinkAccess.filterRecordAccess(
+                            repository.getAllByAssetId(assetId),
+                            menu.getId(),
+                            temp.getId(),
+                            userBal.getUserByToken(token)));
+                });
+            });
             return results.stream().collect(Collectors.toList());
         } catch (BalException e) {
             throw new BalException("Error while trying to find all asset links", e);
@@ -207,17 +206,16 @@ public class AssetLinkBal extends BAL<AssetLinkRepository> implements ModuleLink
     public List<AssetLink> getAllAssetLinksByResourceId(String userId, String token) throws Exception {
         try {
             Set<AssetLink> results = new HashSet<>();
-            for (Menu menu : mainAccessBal.getUserMenus(token)) {
-                if (menu.getMenuType().equals(GBL_MT_ASSET)) {
-                    menu.getTemplates().forEach((temp) -> {
-                        results.addAll(assetLinkAccess.filterRecordAccess(
-                                repository.getAllByResourceId(userId),
-                                menu.getId(),
-                                temp.getId(),
-                                userBal.getUserByToken(token)));
-                    });
-                }
-            }
+            mainAccessBal.getUserMenus(token).stream().filter((menu) 
+                    -> (menu.getMenuType().equals(GBL_MT_ASSET))).forEachOrdered((menu) -> {
+                menu.getTemplates().forEach((temp) -> {
+                    results.addAll(assetLinkAccess.filterRecordAccess(
+                            repository.getAllByResourceId(userId),
+                            menu.getId(),
+                            temp.getId(),
+                            userBal.getUserByToken(token)));
+                });
+            });
             return results.stream().collect(Collectors.toList());
         } catch (BalException e) {
             LOG.error("Error while trying to find all asset links", e);

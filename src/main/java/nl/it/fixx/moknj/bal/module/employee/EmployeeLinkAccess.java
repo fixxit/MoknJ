@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmployeeLinkAccess extends ModuleLinkAccessBal<EmployeeLink> {
+public class EmployeeLinkAccess extends ModuleLinkAccessBal<EmployeeLink, EmployeeBal> {
 
     @Autowired
     public EmployeeLinkAccess(MenuBal menuBal, AccessBal accessBal,

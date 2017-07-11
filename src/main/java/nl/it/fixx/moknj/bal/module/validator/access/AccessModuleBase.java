@@ -32,28 +32,40 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
     }
 
     @Override
-    public void validate(Object obj, String menuId, String token, boolean cascade) {
+    public void validate(Object[] args) {
         String module = getModule();
-        if (canValidate(obj)) {
-            DOMAIN record = (DOMAIN) obj;
-            checkAccess(record, menuId, token, module);
+        if (canValidate(args)) {
+            checkAccess(args, module);
         } else {
             if (nextAccessValidation != null) {
-                nextAccessValidation.validate(obj, menuId, token, cascade);
+                nextAccessValidation.validate(args);
             }
         }
     }
 
-    private void checkAccess(DOMAIN record, String menuId, String token, String module) throws AccessException {
+    private void checkAccess(Object[] args, String module) throws AccessException {
+        DOMAIN record;
+        String menuId = null;
+        String templateId = null;
+        String token = null;
+
         GlobalAccessRights access = null;
         if ("delete".equals(type)) {
+            record = (DOMAIN) args[0];
+            menuId = (String) args[1];
+            templateId = record.getTypeId();
+            token = (String) args[2];
             access = GlobalAccessRights.DELETE;
         } else if ("save".equals(type)) {
+            templateId = (String) args[0];
+            menuId = (String) args[1];
+            record = (DOMAIN) args[2];
+            token = (String) args[3];
             access = (record.getId() != null) ? GlobalAccessRights.EDIT : GlobalAccessRights.NEW;
         }
 
         if (access != null) {
-            if (!accessBal.hasAccess(userBal.getUserByToken(token), menuId, record.getTypeId(), access)) {
+            if (!accessBal.hasAccess(userBal.getUserByToken(token), menuId, templateId, access)) {
                 throw new AccessException(String.format(ACCESS_ERROR, access.getDisplayValue(), module));
             }
         }

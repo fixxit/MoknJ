@@ -1,5 +1,6 @@
 package nl.it.fixx.moknj.domain.modules.employee;
 
+import nl.it.fixx.moknj.domain.transientdomain.TransientData;
 import java.util.List;
 import java.util.Objects;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
@@ -25,13 +26,7 @@ public class Employee implements Record {
     private boolean hidden;
 
     @Transient
-    private String freeDate;
-    @Transient
-    private String freeValue;
-    @Transient
-    private String menu;
-    @Transient
-    private String employee;
+    private TransientData transientData;
 
     /**
      * Scope id's define the menu's (cards) which this asset is visible on.
@@ -140,36 +135,6 @@ public class Employee implements Record {
         this.hidden = hidden;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + Objects.hashCode(this.id);
-        hash = 67 * hash + Objects.hashCode(this.typeId);
-        hash = 67 * hash + Objects.hashCode(this.details);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Employee other = (Employee) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        if (!Objects.equals(this.typeId, other.typeId)) {
-            return false;
-        }
-        return Objects.equals(this.details, other.details);
-    }
-
     /**
      * @return the menuScopeIds
      */
@@ -219,56 +184,81 @@ public class Employee implements Record {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.id);
+        hash = 67 * hash + Objects.hashCode(this.typeId);
+        hash = 67 * hash + Objects.hashCode(this.details);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Employee other = (Employee) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.typeId, other.typeId)) {
+            return false;
+        }
+        return Objects.equals(this.details, other.details);
+    }
+
+    @Override
     public String toString() {
         return "Employee{" + "id=" + id + ", typeId=" + typeId + ", details=" + details + ", resourceId=" + resourceId + ", lastModifiedDate=" + lastModifiedDate + ", lastModifiedBy=" + lastModifiedBy + ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", hidden=" + hidden + ", menuScopeIds=" + menuScopeIds + '}';
     }
 
     @Override
     public String getFreeDate() {
-        return this.freeDate;
+        return init().getFreeDate();
     }
 
     @Override
     public void setFreeDate(String freeDate) {
-        this.freeDate = freeDate;
+        init().setFreeDate(freeDate);
     }
 
     @Override
     public String getFreeValue() {
-        return this.freeValue;
+        return init().getFreeValue();
     }
 
     @Override
     public void setFreeValue(String freeValue) {
-        this.freeValue = freeValue;
+        init().setFreeValue(freeValue);
     }
 
-    /**
-     * @return the menu
-     */
     public String getMenu() {
-        return menu;
+        return init().getMenu();
     }
 
-    /**
-     * @param menu the menu to set
-     */
     public void setMenu(String menu) {
-        this.menu = menu;
+        init().setMenu(menu);
     }
 
-    /**
-     * @return the employee
-     */
     public String getEmployee() {
-        return employee;
+        return init().getEmployee();
     }
 
-    /**
-     * @param employee the employee to set
-     */
     public void setEmployee(String employee) {
-        this.employee = employee;
+        init().setEmployee(employee);
+    }
+
+    public synchronized TransientData init() {
+        if (transientData == null) {
+            transientData = new TransientData();
+        }
+        return transientData;
     }
 
 }

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleBaseBal;
 import nl.it.fixx.moknj.bal.module.validator.access.AccessValidation;
-import nl.it.fixx.moknj.bal.module.validator.field.FieldModuleBase;
 import nl.it.fixx.moknj.bal.module.validator.field.FieldValidation;
 
 /**

@@ -25,7 +25,7 @@ public class FieldBal extends BAL<FieldDetailRepository> {
         super(fieldDetailRepo);
     }
 
-    public FieldDetail get(String id) throws Exception {
+    public FieldDetail get(String id) {
         try {
             if (id == null || id.isEmpty()) {
                 LOG.debug("No Field id recieved to find Field");

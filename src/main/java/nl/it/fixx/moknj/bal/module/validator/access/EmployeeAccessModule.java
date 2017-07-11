@@ -15,8 +15,13 @@ public class EmployeeAccessModule extends AccessModuleBase<Employee> {
     }
 
     @Override
-    public boolean canValidate(Object record) {
-        return (record instanceof Employee);
+    public boolean canValidate(Object[] args) {
+        for (Object arg : args) {
+            if (arg instanceof Employee) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

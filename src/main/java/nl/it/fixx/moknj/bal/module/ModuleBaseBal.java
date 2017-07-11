@@ -90,15 +90,14 @@ public abstract class ModuleBaseBal<DOMAIN extends Record, REPO extends RecordRe
                 // delete asset from the asset list.
                 repository.delete(result);
             } else {
-                // hide asset by updating hidden field=
+                // hide asset by updating hidden field
                 result.setHidden(true);
                 repository.save(result);
                 LOG.debug("This record[" + result.getId() + "] is now "
                         + "hidden as audit links was detected");
             }
         } else {
-            throw new BalException("Could not remove record "
-                    + "[" + record.getId() + "] not found in db");
+            throw new BalException("Could not remove record [" + record.getId() + "] not found in db");
         }
     }
 

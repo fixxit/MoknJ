@@ -4,9 +4,9 @@ public interface AccessModule {
 
     void setNextIn(AccessModuleBase delete);
 
-    void validate(Object record, String menuId, String token, boolean cascade);
+    void validate(Object[] args);
 
-    boolean canValidate(Object record);
+    boolean canValidate(Object[] args);
 
     String getModule();
 

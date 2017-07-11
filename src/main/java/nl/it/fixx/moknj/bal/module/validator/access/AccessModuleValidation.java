@@ -22,13 +22,8 @@ public class AccessModuleValidation {
     public void accessValidation(ProceedingJoinPoint joinPoint, AccessValidation accessValidationnAnotation) throws Throwable {
         Object[] args = joinPoint.getArgs();
 
-        Object record = args[0];
-        String menuId = (String) args[1];
-        String token = (String) args[2];
-        boolean cascade = (boolean) args[3];
-
         validation.setType(accessValidationnAnotation.type());
-        validation.validate(record, menuId, token, cascade);
+        validation.validate(args);
 
         joinPoint.proceed();
     }
