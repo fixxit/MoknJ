@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public abstract class SaveActionBase<JOINDOMAIN, DOMAIN, REPO extends MongoRepository>
         extends BAL<REPO> implements SaveAction<JOINDOMAIN, DOMAIN> {
 
-    private SaveActionBase saveAction;
+    private SaveAction saveAction;
     private JOINDOMAIN join;
 
     public SaveActionBase(REPO repository) {
@@ -55,8 +55,13 @@ public abstract class SaveActionBase<JOINDOMAIN, DOMAIN, REPO extends MongoRepos
     }
 
     @Override
-    public void setNextIn(SaveActionBase saveAction) {
+    public void setNextIn(SaveAction saveAction) {
         this.saveAction = saveAction;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return this.saveAction != null;
     }
 
 }

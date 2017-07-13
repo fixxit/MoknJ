@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -23,17 +24,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServerInitializer implements ApplicationRunner {
 
-    @Autowired
-    private UserRepository resp;
-
-    @Autowired
-    private ApplicationProperties properties;
-
+    private final UserRepository resp;
+    private final ApplicationProperties properties;
     private final BCryptPasswordEncoder passwordEncoder;
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerInitializer.class);
 
-    public ServerInitializer() {
+    @Autowired
+    public ServerInitializer(ApplicationContext context, UserRepository resp, ApplicationProperties properties) {
+        this.resp = resp;
+        this.properties = properties;
         this.passwordEncoder = PSW_ENCODER;
     }
 
