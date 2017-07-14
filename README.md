@@ -1,5 +1,8 @@
 # MoknJ 0.0.1 API #
 
+## Notice ##
+Version 0.0.1 is a quick and dirty prototype and yet to implement proper GOF patterns. Devevelopment branch is latest, you should slowly start to see dev using better patterns and design.
+
 ## Mission ##
 MoknJ started as an idea to move data from excel sheets to an customizable platform which creates an environment where it is easy for the user to build custom data templates that behave like predefined business components. 
 
