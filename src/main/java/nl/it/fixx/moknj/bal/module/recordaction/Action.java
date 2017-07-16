@@ -1,8 +1,8 @@
 package nl.it.fixx.moknj.bal.module.recordaction;
 
-public interface Action {
+public interface Action<INTERFACE> {
 
-    void setNextIn(Action action);
+    void setNextIn(INTERFACE action);
 
     boolean hasNext();
 }
