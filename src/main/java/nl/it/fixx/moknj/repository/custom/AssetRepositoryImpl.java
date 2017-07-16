@@ -22,6 +22,7 @@ public class AssetRepositoryImpl implements AssetRepositoryCustom {
         return assetList;
     }
 
+    @Override
     public List<Asset> getAllByTypeId(String id) {
         Query query = new Query();
         query.addCriteria(Criteria.where("typeId").is(id));

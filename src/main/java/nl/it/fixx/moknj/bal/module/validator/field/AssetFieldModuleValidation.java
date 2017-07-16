@@ -15,8 +15,8 @@ public class AssetFieldModuleValidation extends FieldModuleBase<Asset, AssetRepo
     }
 
     @Override
-    public String getModule() {
-        return "Asset";
+    public Module getModule() {
+        return Module.ASSET;
     }
 
 }

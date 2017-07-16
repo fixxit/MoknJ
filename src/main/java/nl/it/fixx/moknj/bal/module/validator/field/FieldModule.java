@@ -6,7 +6,7 @@ public interface FieldModule {
 
     void validate(String templateId, String menuId, Object record);
 
-    String getModule();
+    Module getModule();
 
-    void setModuleAllowed(String module);
+    void setModuleAllowed(Module module);
 }

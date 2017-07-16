@@ -8,7 +8,7 @@ import nl.it.fixx.moknj.bal.module.recordaction.Intercept;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DeleteRecord {
+public @interface Delete {
 
-    Intercept[] position();
+    Intercept[] intercepts();
 }

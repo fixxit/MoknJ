@@ -14,11 +14,11 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
     private final UserBal userBal;
     private final AccessBal accessBal;
     private AccessModuleBase nextAccessValidation;
-    private String type;
+    private Access access;
 
     @Override
-    public void setType(String type) {
-        this.type = type;
+    public void setType(Access access) {
+        this.access = access;
     }
 
     public AccessModuleBase(UserBal userBal, AccessBal accessBal) {
@@ -49,24 +49,24 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
         String templateId = null;
         String token = null;
 
-        GlobalAccessRights access = null;
-        if ("delete".equals(type)) {
+        GlobalAccessRights gar = null;
+        if (Access.DELETE.equals(this.access)) {
             record = (DOMAIN) args[0];
             menuId = (String) args[1];
             templateId = record.getTypeId();
             token = (String) args[2];
-            access = GlobalAccessRights.DELETE;
-        } else if ("save".equals(type)) {
+            gar = GlobalAccessRights.DELETE;
+        } else if (Access.SAVE.equals(this.access)) {
             templateId = (String) args[0];
             menuId = (String) args[1];
             record = (DOMAIN) args[2];
             token = (String) args[3];
-            access = (record.getId() != null) ? GlobalAccessRights.EDIT : GlobalAccessRights.NEW;
+            gar = (record.getId() != null) ? GlobalAccessRights.EDIT : GlobalAccessRights.NEW;
         }
 
-        if (access != null) {
-            if (!accessBal.hasAccess(userBal.getUserByToken(token), menuId, templateId, access)) {
-                throw new AccessException(String.format(ACCESS_ERROR, access.getDisplayValue(), module));
+        if (gar != null) {
+            if (!accessBal.hasAccess(userBal.getUserByToken(token), menuId, templateId, gar)) {
+                throw new AccessException(String.format(ACCESS_ERROR, gar.getDisplayValue(), module));
             }
         }
     }

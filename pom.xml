@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>nl.fixxit</groupId>
-    <artifactId>FiXXiTMoknJ</artifactId>
-    <version>0.0.1</version>
+    <groupId>nl.fixx.it</groupId>
+    <artifactId>moknj-api</artifactId>
+    <version>0.0.2</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -97,7 +97,7 @@
     <build>
         <resources>
             <resource>
-                <directory>src/main/java</directory>
+                <directory>src/main/resources</directory>
             </resource>
         </resources>
         <plugins>
@@ -114,5 +114,5 @@
         </plugins>
     </build>
     <packaging>war</packaging>
-    <name>MoknjAPI</name>
+    <name>moknj-api</name>
 </project>

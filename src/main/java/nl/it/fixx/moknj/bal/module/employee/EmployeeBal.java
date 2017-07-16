@@ -11,8 +11,10 @@ import nl.it.fixx.moknj.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleBaseBal;
+import nl.it.fixx.moknj.bal.module.validator.access.Access;
 import nl.it.fixx.moknj.bal.module.validator.access.AccessValidation;
 import nl.it.fixx.moknj.bal.module.validator.field.FieldValidation;
+import nl.it.fixx.moknj.bal.module.validator.field.Module;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.exception.AccessException;
@@ -32,8 +34,8 @@ public class EmployeeBal extends ModuleBaseBal<Employee, EmployeeRepository> {
     }
 
     @Override
-    @AccessValidation(type = "save")
-    @FieldValidation(module = "employee")
+    @AccessValidation(access = Access.SAVE)
+    @FieldValidation(module = Module.EMPLOYEE)
     public Employee save(String templateId, String menuId, Employee record, String token) throws BalException {
         if (templateId != null) {
             final String createdDate = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());

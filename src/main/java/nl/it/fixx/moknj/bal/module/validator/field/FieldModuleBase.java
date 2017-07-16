@@ -23,7 +23,7 @@ public abstract class FieldModuleBase<DOMAIN extends Record, REPO extends Record
     private final Logger log;
     private final FieldBal fieldBal;
     private FieldModuleBase nextFieldValidation;
-    private String module;
+    private Module module;
 
     public FieldModuleBase(REPO repository, FieldBal fieldBal, Class cls) {
         super(repository);
@@ -37,7 +37,7 @@ public abstract class FieldModuleBase<DOMAIN extends Record, REPO extends Record
     }
 
     @Override
-    public void setModuleAllowed(String module) {
+    public void setModuleAllowed(Module module) {
         this.module = module;
     }
 

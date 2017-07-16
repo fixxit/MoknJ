@@ -1,6 +1,5 @@
 package nl.it.fixx.moknj.security;
 
-import nl.it.fixx.moknj.exception.AccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -6,6 +6,7 @@ import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.core.MenuBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
+import nl.it.fixx.moknj.bal.module.validator.access.Access;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.record.Record;
@@ -81,7 +82,7 @@ public abstract class ModuleBaseBal<DOMAIN extends Record, REPO extends RecordRe
         throw new BalException("Could not find record for id [" + id + "]");
     }
 
-    @AccessValidation(type = "delete")
+    @AccessValidation(access = Access.DELETE)
     @Override
     public void delete(DOMAIN record, String menuId, String access_token, boolean cascade) {
         DOMAIN result = repository.findOne(record.getId());

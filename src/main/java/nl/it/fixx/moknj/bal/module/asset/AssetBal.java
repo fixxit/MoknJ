@@ -13,8 +13,10 @@ import nl.it.fixx.moknj.repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleBaseBal;
+import nl.it.fixx.moknj.bal.module.validator.access.Access;
 import nl.it.fixx.moknj.bal.module.validator.access.AccessValidation;
 import nl.it.fixx.moknj.bal.module.validator.field.FieldValidation;
+import nl.it.fixx.moknj.bal.module.validator.field.Module;
 
 /**
  * Asset Business Access Layer
@@ -39,8 +41,8 @@ public class AssetBal extends ModuleBaseBal<Asset, AssetRepository> {
      * @param token
      * @return the saved asset for id
      */
-    @AccessValidation(type = "save")
-    @FieldValidation(module = "asset")
+    @AccessValidation(access = Access.SAVE)
+    @FieldValidation(module = Module.ASSET)
     @Override
     public Asset save(String templateId, String menuId, Asset record, String token) {
         if (templateId != null) {

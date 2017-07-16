@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.record.Record;
+import nl.it.fixx.moknj.domain.transientdomain.TransientData;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
@@ -23,11 +24,9 @@ public class Asset implements Record {
     private String createdDate;
     private String createdBy;
     private boolean hidden;
+    @Transient
+    private TransientData transientData;
 
-    @Transient
-    private String freeDate;
-    @Transient
-    private String freeValue;
     /**
      * Scope id's define the menu's (cards) which this asset is visible on.
      */
@@ -225,22 +224,22 @@ public class Asset implements Record {
 
     @Override
     public String getFreeDate() {
-        return this.freeDate;
+        return transientData.getFreeDate();
     }
 
     @Override
     public void setFreeDate(String freeDate) {
-        this.freeDate = freeDate;
+        transientData.setFreeDate(freeDate);
     }
 
     @Override
     public String getFreeValue() {
-        return this.freeValue;
+        return transientData.getFreeValue();
     }
 
     @Override
     public void setFreeValue(String freeValue) {
-        this.freeValue = freeValue;
+        this.transientData.setFreeDate(freeValue);
     }
 
 }

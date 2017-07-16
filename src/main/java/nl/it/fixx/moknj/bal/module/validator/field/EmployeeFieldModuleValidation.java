@@ -15,8 +15,8 @@ public class EmployeeFieldModuleValidation extends FieldModuleBase<Employee, Emp
     }
 
     @Override
-    public String getModule() {
-        return "Employee";
+    public Module getModule() {
+        return Module.EMPLOYEE;
     }
 
 }
