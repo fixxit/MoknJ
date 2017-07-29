@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class FieldModuleValidation {
+public class FieldModuleValidationExecution {
 
     private final FieldModule validation;
 
     @Autowired
-    public FieldModuleValidation(EmployeeFieldModuleValidation employeeFieldValidation, AssetFieldModuleValidation assetFieldValidation) {
+    public FieldModuleValidationExecution(EmployeeFieldModuleValidation employeeFieldValidation, AssetFieldModuleValidation assetFieldValidation) {
         this.validation = employeeFieldValidation;
         this.validation.setNextIn(assetFieldValidation);
     }

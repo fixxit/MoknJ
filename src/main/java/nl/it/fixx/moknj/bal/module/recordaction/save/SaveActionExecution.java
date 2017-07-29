@@ -1,6 +1,5 @@
 package nl.it.fixx.moknj.bal.module.recordaction.save;
 
-import nl.it.fixx.moknj.bal.module.recordaction.RecordActionChain;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,15 +10,15 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public final class SaveRecordExecutionChain {
+public final class SaveActionExecution {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SaveRecordExecutionChain.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SaveActionExecution.class);
 
     private final SaveAction action;
 
     @Autowired
-    public SaveRecordExecutionChain(RecordActionChain<SaveAction> chain) {
-        action = chain.getActionChain(SaveAction.class);
+    public SaveActionExecution(SaveAction saveActionChain) {
+        action = saveActionChain;
     }
 
     @Around("execution(@nl.it.fixx.moknj.bal.module.recordaction.save.Save * *(..)) && @annotation(saveRecordAnotation)")

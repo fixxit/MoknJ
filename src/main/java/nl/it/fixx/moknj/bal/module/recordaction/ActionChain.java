@@ -17,14 +17,14 @@ import org.springframework.stereotype.Component;
  * @param <ACTION> must be of Action interface.
  */
 @Component
-public class RecordActionChain<ACTION extends Action> {
+public class ActionChain<ACTION extends Action> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RecordActionChain.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ActionChain.class);
 
     private final ApplicationContext context;
 
     @Autowired
-    public RecordActionChain(ApplicationContext context) {
+    public ActionChain(ApplicationContext context) {
         this.context = context;
     }
 
@@ -34,10 +34,11 @@ public class RecordActionChain<ACTION extends Action> {
      * @param cls
      * @return Action chain
      */
-    public ACTION getActionChain(Class cls) {
+    public ACTION getActionChain(Class<ACTION> cls) {
         ACTION action = null;
-        Map<String, ACTION> types = context.getBeansOfType(cls);
         ACTION focus = null;
+        
+        Map<String, ACTION> types = context.getBeansOfType(cls);
         Iterator<Map.Entry<String, ACTION>> actions = types.entrySet().iterator();
         while (actions.hasNext()) {
             Map.Entry<String, ACTION> pair = actions.next();

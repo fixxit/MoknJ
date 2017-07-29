@@ -41,9 +41,9 @@ public class AssetBal extends ModuleBaseBal<Asset, AssetRepository> {
      * @param token
      * @return the saved asset for id
      */
+    @Override
     @AccessValidation(access = Access.SAVE)
     @FieldValidation(module = Module.ASSET)
-    @Override
     public Asset save(String templateId, String menuId, Asset record, String token) {
         if (templateId != null) {
             record.setTypeId(templateId);

@@ -113,4 +113,17 @@ public interface Record {
      * @param freeValue the freeValue to set
      */
     void setFreeValue(String freeValue);
+
+    //Transiant Data
+    String getMenuId();
+
+    void setMenuId(String menuId);
+
+    String getToken();
+
+    void setToken(String token);
+
+    boolean isCascade();
+
+    void setCascade(boolean cascade);
 }

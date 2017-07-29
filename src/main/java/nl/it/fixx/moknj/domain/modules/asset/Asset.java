@@ -224,22 +224,59 @@ public class Asset implements Record {
 
     @Override
     public String getFreeDate() {
-        return transientData.getFreeDate();
+        return init().getFreeDate();
     }
 
     @Override
     public void setFreeDate(String freeDate) {
-        transientData.setFreeDate(freeDate);
+        init().setFreeDate(freeDate);
     }
 
     @Override
     public String getFreeValue() {
-        return transientData.getFreeValue();
+        return init().getFreeValue();
     }
 
     @Override
     public void setFreeValue(String freeValue) {
-        this.transientData.setFreeDate(freeValue);
+        init().setFreeDate(freeValue);
+    }
+
+    @Override
+    public String getMenuId() {
+        return init().getMenuId();
+    }
+
+    @Override
+    public void setMenuId(String menuId) {
+        init().setMenuId(menuId);
+    }
+
+    @Override
+    public String getToken() {
+        return init().getToken();
+    }
+
+    @Override
+    public void setToken(String token) {
+        init().setToken(token);
+    }
+
+    @Override
+    public boolean isCascade() {
+        return init().isCascade();
+    }
+
+    @Override
+    public void setCascade(boolean cascade) {
+        init().setCascade(cascade);
+    }
+
+    public synchronized TransientData init() {
+        if (transientData == null) {
+            transientData = new TransientData();
+        }
+        return transientData;
     }
 
 }

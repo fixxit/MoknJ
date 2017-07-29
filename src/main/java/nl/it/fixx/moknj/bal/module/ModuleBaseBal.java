@@ -82,13 +82,16 @@ public abstract class ModuleBaseBal<DOMAIN extends Record, REPO extends RecordRe
         throw new BalException("Could not find record for id [" + id + "]");
     }
 
-    @AccessValidation(access = Access.DELETE)
     @Override
+    @AccessValidation(access = Access.DELETE)
     public void delete(DOMAIN record, String menuId, String access_token, boolean cascade) {
         DOMAIN result = repository.findOne(record.getId());
         if (result != null) {
             if (cascade) {
                 // delete asset from the asset list.
+                result.setCascade(cascade);
+                result.setMenuId(menuId);
+                result.setToken(access_token);
                 repository.delete(result);
             } else {
                 // hide asset by updating hidden field

@@ -5,7 +5,8 @@ import nl.it.fixx.moknj.bal.module.recordaction.Intercept;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public abstract class DeleteActionBase<JOINDOMAIN, DOMAIN, REPO extends MongoRepository> extends BAL<REPO> implements DeleteAction<JOINDOMAIN, DOMAIN> {
+public abstract class DeleteActionBase<JOINDOMAIN, DOMAIN, REPO extends MongoRepository>
+        extends BAL<REPO> implements DeleteAction<JOINDOMAIN, DOMAIN> {
 
     private DeleteAction deleteAction;
     private JOINDOMAIN join;

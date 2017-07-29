@@ -68,6 +68,7 @@ public abstract class ModuleLinkAccessBal<DOMAIN extends Link, MODBAL extends Mo
     }
 
     public void setRecordViewValues(String recordId, DOMAIN link) {
+        //DO NOTHING IF NOT OVERRIDDEN
     }
 
 }

@@ -254,6 +254,36 @@ public class Employee implements Record {
         init().setEmployee(employee);
     }
 
+    @Override
+    public String getMenuId() {
+        return init().getMenuId();
+    }
+
+    @Override
+    public void setMenuId(String menuId) {
+        init().setMenuId(menuId);
+    }
+
+    @Override
+    public String getToken() {
+        return init().getToken();
+    }
+
+    @Override
+    public void setToken(String token) {
+        init().setToken(token);
+    }
+
+    @Override
+    public boolean isCascade() {
+        return init().isCascade();
+    }
+
+    @Override
+    public void setCascade(boolean cascade) {
+        init().setCascade(cascade);
+    }
+
     public synchronized TransientData init() {
         if (transientData == null) {
             transientData = new TransientData();

@@ -1,6 +1,5 @@
 package nl.it.fixx.moknj.bal.module.recordaction.delete;
 
-import nl.it.fixx.moknj.bal.module.recordaction.RecordActionChain;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,15 +10,15 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class DeleteRecordExecutionChain {
+public class DeleteActionExecution {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DeleteRecordExecutionChain.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DeleteActionExecution.class);
 
     private final DeleteAction action;
 
     @Autowired
-    public DeleteRecordExecutionChain(RecordActionChain<DeleteAction> chain) {
-        action = chain.getActionChain(DeleteAction.class);
+    public DeleteActionExecution(DeleteAction deleteActionChain) {
+        action = deleteActionChain;
     }
 
     @Around("execution(@nl.it.fixx.moknj.bal.module.recordaction.delete.Delete * *(..)) && @annotation(deleteAnnotation)")
