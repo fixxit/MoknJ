@@ -225,8 +225,8 @@ public class UserBal extends BAL<UserRepository> {
             return repository.save(payload);
         } else {
             throw new BalException("Employee by name "
-                    + "" + payload.getFirstName() + " "
-                    + "" + payload.getSurname() + " exists");
+                    + payload.getFirstName() + " "
+                    + payload.getSurname() + " exists");
         }
     }
 

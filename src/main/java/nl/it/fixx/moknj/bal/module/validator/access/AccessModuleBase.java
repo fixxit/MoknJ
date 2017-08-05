@@ -5,8 +5,12 @@ import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.exception.AccessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessModule {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AccessModuleBase.class);
 
     private final String ACCESS_ERROR = "This user does not have sufficient "
             + "access rights to %s this %s!";
@@ -14,10 +18,10 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
     private final UserBal userBal;
     private final AccessBal accessBal;
     private AccessModuleBase nextAccessValidation;
-    private Access access;
+    private AccessValidation access;
 
     @Override
-    public void setType(Access access) {
+    public void setType(AccessValidation access) {
         this.access = access;
     }
 
@@ -38,25 +42,27 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
             checkAccess(args, module);
         } else {
             if (nextAccessValidation != null) {
+                nextAccessValidation.setType(access);
                 nextAccessValidation.validate(args);
             }
         }
     }
 
     private void checkAccess(Object[] args, String module) throws AccessException {
+        LOG.info("Activated access check {}", this.access.access());
         DOMAIN record;
         String menuId = null;
         String templateId = null;
         String token = null;
 
         GlobalAccessRights gar = null;
-        if (Access.DELETE.equals(this.access)) {
+        if (Access.DELETE.equals(this.access.access())) {
             record = (DOMAIN) args[0];
             menuId = (String) args[1];
             templateId = record.getTypeId();
             token = (String) args[2];
             gar = GlobalAccessRights.DELETE;
-        } else if (Access.SAVE.equals(this.access)) {
+        } else if (Access.SAVE.equals(this.access.access())) {
             templateId = (String) args[0];
             menuId = (String) args[1];
             record = (DOMAIN) args[2];
@@ -64,7 +70,11 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
             gar = (record.getId() != null) ? GlobalAccessRights.EDIT : GlobalAccessRights.NEW;
         }
 
+        LOG.info("Activated access for {}", gar);
+
         if (gar != null) {
+
+            LOG.info("{} access {}", userBal.getUserByToken(token).getUserName(), !accessBal.hasAccess(userBal.getUserByToken(token), menuId, templateId, gar));
             if (!accessBal.hasAccess(userBal.getUserByToken(token), menuId, templateId, gar)) {
                 throw new AccessException(String.format(ACCESS_ERROR, gar.getDisplayValue(), module));
             }

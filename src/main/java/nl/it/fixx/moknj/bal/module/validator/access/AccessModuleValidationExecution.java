@@ -21,7 +21,7 @@ public class AccessModuleValidationExecution {
     @Around("execution(@nl.it.fixx.moknj.bal.module.validator.access.AccessValidation * *(..)) && @annotation(accessValidationnAnotation)")
     public void accessValidation(ProceedingJoinPoint joinPoint, AccessValidation accessValidationnAnotation) throws Throwable {
         Object[] args = joinPoint.getArgs();
-        validation.setType(accessValidationnAnotation.access());
+        validation.setType(accessValidationnAnotation);
         validation.validate(args);
         joinPoint.proceed();
     }

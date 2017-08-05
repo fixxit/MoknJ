@@ -10,6 +10,6 @@ public interface AccessModule {
 
     String getModule();
 
-    void setType(Access access);
+    void setType(AccessValidation access);
 
 }

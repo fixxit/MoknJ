@@ -25,7 +25,8 @@ public class EmployeeSaveAction extends SaveActionBase<EmployeeLink, Employee, E
     private final FieldBal fieldBal;
 
     @Autowired
-    public EmployeeSaveAction(EmployeeLinkBal employeeLinkBal, TemplateBal tempBal, UserBal userBal, FieldBal fieldBal, EmployeeRepository repository) {
+    public EmployeeSaveAction(EmployeeLinkBal employeeLinkBal, TemplateBal tempBal,
+            UserBal userBal, FieldBal fieldBal, EmployeeRepository repository) {
         super(repository);
         this.employeeLinkBal = employeeLinkBal;
         this.tempBal = tempBal;

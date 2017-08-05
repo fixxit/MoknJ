@@ -47,6 +47,7 @@ public abstract class FieldModuleBase<DOMAIN extends Record, REPO extends Record
             validateFields(templateId, menuId, (DOMAIN) record);
         } else {
             if (nextFieldValidation != null) {
+                nextFieldValidation.setModuleAllowed(module);
                 nextFieldValidation.validate(templateId, menuId, record);
             }
         }
