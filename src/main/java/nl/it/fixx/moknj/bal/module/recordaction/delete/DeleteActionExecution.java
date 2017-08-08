@@ -1,5 +1,6 @@
 package nl.it.fixx.moknj.bal.module.recordaction.delete;
 
+import nl.it.fixx.moknj.bal.module.chainable.impl.RecordDeleteActionChain;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,8 +18,8 @@ public class DeleteActionExecution {
     private final DeleteAction action;
 
     @Autowired
-    public DeleteActionExecution(DeleteAction deleteActionChain) {
-        action = deleteActionChain;
+    public DeleteActionExecution(RecordDeleteActionChain deleteActionChain) {
+        action = deleteActionChain.getChain();
     }
 
     @Around("execution(@nl.it.fixx.moknj.bal.module.recordaction.delete.Delete * *(..)) && @annotation(deleteAnnotation)")

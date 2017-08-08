@@ -1,5 +1,6 @@
-package nl.it.fixx.moknj.bal.module.recordaction.save;
+package nl.it.fixx.moknj.bal.module.recordaction.save.impl;
 
+import nl.it.fixx.moknj.bal.module.recordaction.save.SaveActionBase;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.repository.AssetRepository;

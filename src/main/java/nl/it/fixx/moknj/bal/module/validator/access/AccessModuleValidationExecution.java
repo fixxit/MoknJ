@@ -1,5 +1,6 @@
 package nl.it.fixx.moknj.bal.module.validator.access;
 
+import nl.it.fixx.moknj.bal.module.chainable.impl.AccessModuleValidationChain;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,19 +11,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccessModuleValidationExecution {
 
-    private final AccessModule validation;
+    private final AccessModule chain;
 
     @Autowired
-    public AccessModuleValidationExecution(AssetAccessModule assetValidation, EmployeeAccessModule employeeValidation) {
-        this.validation = assetValidation;
-        this.validation.setNextIn(employeeValidation);
+    public AccessModuleValidationExecution(AccessModuleValidationChain chain) {
+        this.chain = chain.getChain();
     }
 
     @Around("execution(@nl.it.fixx.moknj.bal.module.validator.access.AccessValidation * *(..)) && @annotation(accessValidationnAnotation)")
     public void accessValidation(ProceedingJoinPoint joinPoint, AccessValidation accessValidationnAnotation) throws Throwable {
         Object[] args = joinPoint.getArgs();
-        validation.setType(accessValidationnAnotation);
-        validation.validate(args);
+        chain.setType(accessValidationnAnotation);
+        chain.validate(args);
         joinPoint.proceed();
     }
 

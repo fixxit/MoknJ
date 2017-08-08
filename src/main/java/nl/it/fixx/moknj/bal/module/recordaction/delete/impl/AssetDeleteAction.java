@@ -1,6 +1,7 @@
-package nl.it.fixx.moknj.bal.module.recordaction.delete;
+package nl.it.fixx.moknj.bal.module.recordaction.delete.impl;
 
 import nl.it.fixx.moknj.bal.module.asset.AssetLinkBal;
+import nl.it.fixx.moknj.bal.module.recordaction.delete.DeleteActionBase;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;

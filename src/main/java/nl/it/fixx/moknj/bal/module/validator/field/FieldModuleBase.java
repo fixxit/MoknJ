@@ -22,7 +22,7 @@ public abstract class FieldModuleBase<DOMAIN extends Record, REPO extends Record
 
     private final Logger log;
     private final FieldBal fieldBal;
-    private FieldModuleBase nextFieldValidation;
+    private FieldModule nextFieldValidation;
     private Module module;
 
     public FieldModuleBase(REPO repository, FieldBal fieldBal, Class cls) {
@@ -32,7 +32,12 @@ public abstract class FieldModuleBase<DOMAIN extends Record, REPO extends Record
     }
 
     @Override
-    public void setNextIn(FieldModuleBase nextFieldValidation) {
+    public boolean hasNext() {
+        return this.nextFieldValidation != null;
+    }
+
+    @Override
+    public void setNextIn(FieldModule nextFieldValidation) {
         this.nextFieldValidation = nextFieldValidation;
     }
 

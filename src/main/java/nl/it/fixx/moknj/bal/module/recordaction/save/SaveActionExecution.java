@@ -1,5 +1,6 @@
 package nl.it.fixx.moknj.bal.module.recordaction.save;
 
+import nl.it.fixx.moknj.bal.module.chainable.impl.RecordSaveActionChain;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,8 +18,8 @@ public final class SaveActionExecution {
     private final SaveAction action;
 
     @Autowired
-    public SaveActionExecution(SaveAction saveActionChain) {
-        action = saveActionChain;
+    public SaveActionExecution(RecordSaveActionChain saveActionChain) {
+        action = saveActionChain.getChain();
     }
 
     @Around("execution(@nl.it.fixx.moknj.bal.module.recordaction.save.Save * *(..)) && @annotation(saveRecordAnotation)")

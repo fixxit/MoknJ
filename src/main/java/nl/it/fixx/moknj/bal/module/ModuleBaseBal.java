@@ -2,7 +2,6 @@ package nl.it.fixx.moknj.bal.module;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.BAL;
 import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.core.MenuBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
@@ -17,18 +16,20 @@ import nl.it.fixx.moknj.repository.RecordRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import nl.it.fixx.moknj.bal.module.validator.access.AccessValidation;
+import nl.it.fixx.moknj.repository.wrapper.ModuleWrapper;
 
-public abstract class ModuleBaseBal<DOMAIN extends Record, REPO extends RecordRepository<DOMAIN>>
-        extends BAL<REPO> implements ModuleBal<DOMAIN> {
+public abstract class ModuleBaseBal<DOMAIN extends Record, REPO extends RecordRepository<DOMAIN>, WRAPPER extends ModuleWrapper<DOMAIN, REPO>>
+        implements ModuleBal<DOMAIN> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ModuleBaseBal.class);
 
     protected final MenuBal menuBal;
     protected final UserBal userBal;
     protected final AccessBal accessBal;
+    protected WRAPPER wrapper;
 
-    public ModuleBaseBal(REPO repository, MenuBal menuBal, UserBal userBal, AccessBal accessBal) {
-        super(repository);
+    public ModuleBaseBal(WRAPPER wrapper, MenuBal menuBal, UserBal userBal, AccessBal accessBal) {
+        this.wrapper = wrapper;
         this.menuBal = menuBal;
         this.userBal = userBal;
         this.accessBal = accessBal;
@@ -40,7 +41,7 @@ public abstract class ModuleBaseBal<DOMAIN extends Record, REPO extends RecordRe
             List<DOMAIN> returnRecords = new ArrayList<>();
             User user = userBal.getUserByToken(token);
             if (accessBal.hasAccess(user, menuId, templateId, GlobalAccessRights.VIEW)) {
-                List<DOMAIN> records = repository.getAllByTypeId(templateId);
+                List<DOMAIN> records = wrapper.getAllByTypeId(templateId);
                 // Gets custom template settings saved to menu.
                 Menu menu = menuBal.getMenuById(menuId);
                 menu.getTemplates().stream().filter((template)
@@ -70,12 +71,12 @@ public abstract class ModuleBaseBal<DOMAIN extends Record, REPO extends RecordRe
 
     @Override
     public boolean exists(String id) {
-        return this.repository.exists(id);
+        return wrapper.getRepository().exists(id);
     }
 
     @Override
     public DOMAIN get(String id) {
-        DOMAIN record = repository.findOne(id);
+        DOMAIN record = wrapper.getRepository().findOne(id);
         if (record != null) {
             return record;
         }
@@ -85,20 +86,20 @@ public abstract class ModuleBaseBal<DOMAIN extends Record, REPO extends RecordRe
     @Override
     @AccessValidation(access = Access.DELETE)
     public void delete(DOMAIN record, String menuId, String access_token, boolean cascade) {
-        DOMAIN result = repository.findOne(record.getId());
+        DOMAIN result = wrapper.getRepository().findOne(record.getId());
         if (result != null) {
             if (cascade) {
                 // delete asset from the asset list.
                 result.setCascade(cascade);
                 result.setMenuId(menuId);
                 result.setToken(access_token);
-                repository.delete(result);
+                wrapper.delete(result);
             } else {
                 // hide asset by updating hidden field
                 result.setHidden(true);
-                repository.save(result);
-                LOG.debug("This record[" + result.getId() + "] is now "
-                        + "hidden as audit links was detected");
+                wrapper.save(result);
+                LOG.debug("This record[" + result.getId() + "] is now hidden as "
+                        + "audit links was detected");
             }
         } else {
             throw new BalException("Could not remove record [" + record.getId() + "] not found in db");

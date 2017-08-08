@@ -7,7 +7,6 @@ import nl.it.fixx.moknj.bal.core.MenuBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.exception.BalException;
-import nl.it.fixx.moknj.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleBaseBal;
@@ -18,6 +17,8 @@ import nl.it.fixx.moknj.bal.module.validator.field.Module;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.exception.AccessException;
+import nl.it.fixx.moknj.repository.EmployeeRepository;
+import nl.it.fixx.moknj.repository.wrapper.impl.EmployeeWrapper;
 
 /**
  * Employee Business Access Layer
@@ -25,10 +26,10 @@ import nl.it.fixx.moknj.exception.AccessException;
  * @author adriaan
  */
 @Service
-public class EmployeeBal extends ModuleBaseBal<Employee, EmployeeRepository> {
+public class EmployeeBal extends ModuleBaseBal<Employee, EmployeeRepository, EmployeeWrapper> {
 
     @Autowired
-    public EmployeeBal(EmployeeRepository employeeRepo, MenuBal menuBal,
+    public EmployeeBal(EmployeeWrapper employeeRepo, MenuBal menuBal,
             UserBal userBal, AccessBal accessBal) {
         super(employeeRepo, menuBal, userBal, accessBal);
     }
@@ -56,7 +57,7 @@ public class EmployeeBal extends ModuleBaseBal<Employee, EmployeeRepository> {
                 record.setCreatedBy(user.getUserName());
                 record.setCreatedDate(createdDate);
             } else {
-                Employee dbEmployee = repository.findOne(record.getId());
+                Employee dbEmployee = wrapper.getRepository().findOne(record.getId());
                 record.setCreatedBy(dbEmployee.getCreatedBy());
                 record.setCreatedDate(dbEmployee.getCreatedDate());
             }
@@ -75,7 +76,7 @@ public class EmployeeBal extends ModuleBaseBal<Employee, EmployeeRepository> {
                 }
             }
 
-            return repository.save(record);
+            return wrapper.save(record);
         } else {
             throw new BalException("No employee type id provided.");
         }

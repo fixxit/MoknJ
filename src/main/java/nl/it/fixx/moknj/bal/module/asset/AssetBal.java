@@ -17,6 +17,7 @@ import nl.it.fixx.moknj.bal.module.validator.access.Access;
 import nl.it.fixx.moknj.bal.module.validator.access.AccessValidation;
 import nl.it.fixx.moknj.bal.module.validator.field.FieldValidation;
 import nl.it.fixx.moknj.bal.module.validator.field.Module;
+import nl.it.fixx.moknj.repository.wrapper.impl.AssetWrapper;
 
 /**
  * Asset Business Access Layer
@@ -24,11 +25,11 @@ import nl.it.fixx.moknj.bal.module.validator.field.Module;
  * @author adriaan
  */
 @Service
-public class AssetBal extends ModuleBaseBal<Asset, AssetRepository> {
+public class AssetBal extends ModuleBaseBal<Asset, AssetRepository, AssetWrapper> {
 
     @Autowired
     public AssetBal(MenuBal menuBal, UserBal userBal, AccessBal accessBal,
-            FieldBal fieldBal, AssetRepository assetRepo) {
+            FieldBal fieldBal, AssetWrapper assetRepo) {
         super(assetRepo, menuBal, userBal, accessBal);
     }
 
@@ -62,12 +63,12 @@ public class AssetBal extends ModuleBaseBal<Asset, AssetRepository> {
                 record.setCreatedBy(user.getUserName());
                 record.setCreatedDate(date);
             } else {
-                Asset dbAsset = repository.findOne(record.getId());
+                Asset dbAsset = wrapper.getRepository().findOne(record.getId());
                 record.setCreatedBy(dbAsset.getCreatedBy());
                 record.setCreatedDate(dbAsset.getCreatedDate());
             }
 
-            return repository.save(record);
+            return wrapper.save(record);
         } else {
             throw new BalException("No asset type id provided.");
         }

@@ -1,8 +1,11 @@
 package nl.it.fixx.moknj.bal.module.validator.field;
 
-public interface FieldModule {
+import nl.it.fixx.moknj.bal.module.chainable.ChainBal;
 
-    void setNextIn(FieldModuleBase nextFieldValidation);
+public interface FieldModule extends ChainBal<FieldModule> {
+
+    @Override
+    void setNextIn(FieldModule nextFieldValidation);
 
     void validate(String templateId, String menuId, Object record);
 

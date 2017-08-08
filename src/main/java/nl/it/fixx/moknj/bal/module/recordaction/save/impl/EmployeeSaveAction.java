@@ -1,10 +1,11 @@
-package nl.it.fixx.moknj.bal.module.recordaction.save;
+package nl.it.fixx.moknj.bal.module.recordaction.save.impl;
 
 import java.util.Objects;
 import nl.it.fixx.moknj.bal.core.FieldBal;
 import nl.it.fixx.moknj.bal.core.TemplateBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.module.employee.EmployeeLinkBal;
+import nl.it.fixx.moknj.bal.module.recordaction.save.SaveActionBase;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.template.Template;

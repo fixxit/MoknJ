@@ -17,7 +17,7 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
 
     private final UserBal userBal;
     private final AccessBal accessBal;
-    private AccessModuleBase nextAccessValidation;
+    private AccessModule nextAccessValidation;
     private AccessValidation access;
 
     @Override
@@ -31,7 +31,12 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
     }
 
     @Override
-    public void setNextIn(AccessModuleBase next) {
+    public boolean hasNext() {
+        return this.nextAccessValidation != null;
+    }
+
+    @Override
+    public void setNextIn(AccessModule next) {
         this.nextAccessValidation = next;
     }
 
@@ -49,7 +54,6 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
     }
 
     private void checkAccess(Object[] args, String module) throws AccessException {
-        LOG.info("Activated access check {}", this.access.access());
         DOMAIN record;
         String menuId = null;
         String templateId = null;
@@ -70,11 +74,7 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
             gar = (record.getId() != null) ? GlobalAccessRights.EDIT : GlobalAccessRights.NEW;
         }
 
-        LOG.info("Activated access for {}", gar);
-
         if (gar != null) {
-
-            LOG.info("{} access {}", userBal.getUserByToken(token).getUserName(), !accessBal.hasAccess(userBal.getUserByToken(token), menuId, templateId, gar));
             if (!accessBal.hasAccess(userBal.getUserByToken(token), menuId, templateId, gar)) {
                 throw new AccessException(String.format(ACCESS_ERROR, gar.getDisplayValue(), module));
             }

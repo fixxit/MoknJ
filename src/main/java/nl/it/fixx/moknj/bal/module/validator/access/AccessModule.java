@@ -1,8 +1,11 @@
 package nl.it.fixx.moknj.bal.module.validator.access;
 
-public interface AccessModule {
+import nl.it.fixx.moknj.bal.module.chainable.ChainBal;
 
-    void setNextIn(AccessModuleBase delete);
+public interface AccessModule extends ChainBal<AccessModule> {
+
+    @Override
+    void setNextIn(AccessModule delete);
 
     void validate(Object[] args);
 

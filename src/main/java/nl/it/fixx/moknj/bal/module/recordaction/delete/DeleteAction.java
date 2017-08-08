@@ -1,9 +1,9 @@
 package nl.it.fixx.moknj.bal.module.recordaction.delete;
 
-import nl.it.fixx.moknj.bal.module.recordaction.Action;
+import nl.it.fixx.moknj.bal.module.chainable.ChainBal;
 import org.aspectj.lang.ProceedingJoinPoint;
 
-public interface DeleteAction<JOINDOMAIN, DOMAIN> extends Action<DeleteAction> {
+public interface DeleteAction<JOINDOMAIN, DOMAIN> extends ChainBal<DeleteAction> {
 
     @Override
     void setNextIn(DeleteAction deleteAction);

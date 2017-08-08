@@ -1,23 +1,24 @@
-package nl.it.fixx.moknj.bal.module.validator.access;
+package nl.it.fixx.moknj.bal.module.validator.access.impl;
 
 import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.core.UserBal;
-import nl.it.fixx.moknj.domain.modules.asset.Asset;
+import nl.it.fixx.moknj.bal.module.validator.access.AccessModuleBase;
+import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AssetAccessModule extends AccessModuleBase<Asset> {
+public class EmployeeAccessModule extends AccessModuleBase<Employee> {
 
     @Autowired
-    public AssetAccessModule(UserBal userBal, AccessBal accessBal) {
+    public EmployeeAccessModule(UserBal userBal, AccessBal accessBal) {
         super(userBal, accessBal);
     }
 
     @Override
     public boolean canValidate(Object[] args) {
         for (Object arg : args) {
-            if (arg instanceof Asset) {
+            if (arg instanceof Employee) {
                 return true;
             }
         }
@@ -26,7 +27,7 @@ public class AssetAccessModule extends AccessModuleBase<Asset> {
 
     @Override
     public String getModule() {
-        return "asset";
+        return "employee";
     }
 
 }
