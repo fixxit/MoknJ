@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.BalBase;
-import nl.it.fixx.moknj.bal.core.UserBal;
-import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.core.MainAccessBal;
+import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
+import nl.it.fixx.moknj.bal.module.ModuleBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_ASSET;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
@@ -25,21 +26,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
 import nl.it.fixx.moknj.exception.AccessException;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service("assetLinkBal")
 public class AssetLinkBal extends BalBase<AssetLinkRepository> implements ModuleLinkBal<AssetLink> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetLinkBal.class);
 
-    private final UserBal userBal;
-    private final AssetBal assetBal;
-    private final AccessBal accessBal;
+    private final UserCoreBal userBal;
+    private final ModuleBal<Asset> assetBal;
+    private final AccessCoreBal accessBal;
     private final MainAccessBal mainAccessBal;
     private final AssetLinkAccess assetLinkAccess;
 
     @Autowired
-    public AssetLinkBal(AssetLinkRepository assetLinkRepo, UserBal userBal, AssetBal assetBal,
-            AccessBal accessBal, MainAccessBal mainAccessBal, AssetLinkAccess assetLinkAccess) {
+    public AssetLinkBal(AssetLinkRepository assetLinkRepo, UserCoreBal userBal, @Qualifier("assetBal") ModuleBal<Asset> assetBal,
+            AccessCoreBal accessBal, MainAccessBal mainAccessBal, AssetLinkAccess assetLinkAccess) {
         super(assetLinkRepo);
         this.userBal = userBal;
         this.assetBal = assetBal;
@@ -155,7 +157,7 @@ public class AssetLinkBal extends BalBase<AssetLinkRepository> implements Module
     public List<AssetLink> getAllLinksByRecordId(String assetId, String token) throws BalException {
         try {
             Set<AssetLink> results = new HashSet<>();
-            mainAccessBal.getUserMenus(token).stream().filter((menu) 
+            mainAccessBal.getUserMenus(token).stream().filter((menu)
                     -> (menu.getMenuType().equals(GBL_MT_ASSET))).forEachOrdered((menu) -> {
                 menu.getTemplates().forEach((temp) -> {
                     results.addAll(assetLinkAccess.filterRecordAccess(
@@ -206,7 +208,7 @@ public class AssetLinkBal extends BalBase<AssetLinkRepository> implements Module
     public List<AssetLink> getAllAssetLinksByResourceId(String userId, String token) throws Exception {
         try {
             Set<AssetLink> results = new HashSet<>();
-            mainAccessBal.getUserMenus(token).stream().filter((menu) 
+            mainAccessBal.getUserMenus(token).stream().filter((menu)
                     -> (menu.getMenuType().equals(GBL_MT_ASSET))).forEachOrdered((menu) -> {
                 menu.getTemplates().forEach((temp) -> {
                     results.addAll(assetLinkAccess.filterRecordAccess(

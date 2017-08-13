@@ -4,9 +4,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.bal.core.MenuBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
-import nl.it.fixx.moknj.bal.core.AccessBal;
+import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
+import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.link.Link;
 import nl.it.fixx.moknj.domain.core.template.Template;
@@ -18,12 +18,12 @@ import nl.it.fixx.moknj.exception.BalException;
 public abstract class ModuleLinkAccessBal<DOMAIN extends Link, MODBAL extends ModuleBal> {
 
     protected final MODBAL recordBal;
-    protected final MenuBal menuBal;
-    protected final AccessBal accessBal;
-    protected final UserBal userBal;
+    protected final MenuCoreBal menuBal;
+    protected final AccessCoreBal accessBal;
+    protected final UserCoreBal userBal;
 
-    public ModuleLinkAccessBal(MenuBal menuBal, AccessBal accessBal,
-            MODBAL recordBal, UserBal userBal) {
+    public ModuleLinkAccessBal(MenuCoreBal menuBal, AccessCoreBal accessBal,
+            MODBAL recordBal, UserCoreBal userBal) {
         this.menuBal = menuBal;
         this.accessBal = accessBal;
         this.recordBal = recordBal;

@@ -1,8 +1,8 @@
 package nl.it.fixx.moknj.bal.module.employee;
 
-import nl.it.fixx.moknj.bal.core.MenuBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
-import nl.it.fixx.moknj.bal.core.AccessBal;
+import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
+import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.bal.module.ModuleLinkAccessBal;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 public class EmployeeLinkAccess extends ModuleLinkAccessBal<EmployeeLink, EmployeeBal> {
 
     @Autowired
-    public EmployeeLinkAccess(MenuBal menuBal, AccessBal accessBal,
-            EmployeeBal employeeBal, UserBal userBal) {
+    public EmployeeLinkAccess(MenuCoreBal menuBal, AccessCoreBal accessBal,
+            EmployeeBal employeeBal, UserCoreBal userBal) {
         super(menuBal, accessBal, employeeBal, userBal);
     }
 

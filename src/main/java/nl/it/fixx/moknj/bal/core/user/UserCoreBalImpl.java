@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.core;
+package nl.it.fixx.moknj.bal.core.user;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +29,9 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class UserBal extends BalBase<UserRepository> {
+public class UserCoreBalImpl extends BalBase<UserRepository> implements UserCoreBal {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UserBal.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserCoreBalImpl.class);
 
     private final ApplicationProperties properties;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -40,7 +40,7 @@ public class UserBal extends BalBase<UserRepository> {
     private final AccessRepository accessRepo;
 
     @Autowired
-    public UserBal(ApplicationProperties properties, AssetRepository assetRepo,
+    public UserCoreBalImpl(ApplicationProperties properties, AssetRepository assetRepo,
             AssetLinkRepository assetLinkRepo, AccessRepository accessRepo, UserRepository repository) {
         super(repository);
         this.properties = properties;
@@ -55,13 +55,14 @@ public class UserBal extends BalBase<UserRepository> {
      *
      * @return @throws Exception
      */
+    @Override
     public List<User> getAll() throws Exception {
         try {
             List<User> users = new ArrayList<>();
             if (repository != null) {
                 repository.findAll().stream().filter((user)
-                        -> (!user.isHidden() 
-                                && !properties.getAdmin().getUser().equals(user.getUserName()))).forEachOrdered((user)
+                        -> (!user.isHidden()
+                        && !properties.getAdmin().getUser().equals(user.getUserName()))).forEachOrdered((user)
                         -> {
                     users.add(user);
                 }); // if user has all access get all else only return his user
@@ -81,6 +82,7 @@ public class UserBal extends BalBase<UserRepository> {
      * @param token
      * @return @throws Exception
      */
+    @Override
     public List<User> getAll(String token) throws Exception {
         try {
             return getAll(false, token);
@@ -98,6 +100,7 @@ public class UserBal extends BalBase<UserRepository> {
      * @param token
      * @return @throws Exception
      */
+    @Override
     public List<User> getAll(boolean isAdmin, String token) throws Exception {
         User loginUser = getUserByToken(token);
         List<User> users = new ArrayList<>();
@@ -133,6 +136,7 @@ public class UserBal extends BalBase<UserRepository> {
      * @param token
      * @throws Exception
      */
+    @Override
     public void delete(String userId, String token) throws Exception {
         try {
             User loginUser = getUserByToken(token);
@@ -168,6 +172,7 @@ public class UserBal extends BalBase<UserRepository> {
      * @return
      * @throws Exception
      */
+    @Override
     public User save(User payload, String token) throws Exception {
         User loginUser = getUserByToken(token);
         if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
@@ -236,6 +241,7 @@ public class UserBal extends BalBase<UserRepository> {
      * @param id
      * @return user.
      */
+    @Override
     public User getUserById(String id) {
         if (id == null || id.isEmpty()) {
             LOG.debug("No user id recieved to find user");
@@ -256,6 +262,7 @@ public class UserBal extends BalBase<UserRepository> {
      * @param token
      * @return user
      */
+    @Override
     public User getUserByToken(String token) {
         if (token == null || token.isEmpty()) {
             LOG.debug("No token recieved to find user");
@@ -275,6 +282,7 @@ public class UserBal extends BalBase<UserRepository> {
      * @param user
      * @return
      */
+    @Override
     public String getFullName(User user) {
         if (user == null) {
             throw new BalException("No user object provided");
@@ -298,6 +306,7 @@ public class UserBal extends BalBase<UserRepository> {
      * @return
      * @throws Exception
      */
+    @Override
     public String getFullName(String userId) throws Exception {
         return getFullName(getUserById(userId));
     }

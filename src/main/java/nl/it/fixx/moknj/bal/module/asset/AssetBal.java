@@ -2,10 +2,10 @@ package nl.it.fixx.moknj.bal.module.asset;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import nl.it.fixx.moknj.bal.core.AccessBal;
-import nl.it.fixx.moknj.bal.core.FieldBal;
-import nl.it.fixx.moknj.bal.core.MenuBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
+import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
+import nl.it.fixx.moknj.bal.core.field.FieldCoreBal;
+import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.exception.BalException;
@@ -28,8 +28,8 @@ import nl.it.fixx.moknj.repository.wrapper.impl.AssetWrapper;
 public class AssetBal extends ModuleBaseBal<Asset, AssetRepository, AssetWrapper> {
 
     @Autowired
-    public AssetBal(MenuBal menuBal, UserBal userBal, AccessBal accessBal,
-            FieldBal fieldBal, AssetWrapper assetRepo) {
+    public AssetBal(MenuCoreBal menuBal, UserCoreBal userBal, AccessCoreBal accessBal,
+            FieldCoreBal fieldBal, AssetWrapper assetRepo) {
         super(assetRepo, menuBal, userBal, accessBal);
     }
 

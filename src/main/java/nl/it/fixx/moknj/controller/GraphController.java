@@ -3,8 +3,8 @@ package nl.it.fixx.moknj.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import nl.it.fixx.moknj.bal.core.GraphBal;
-import nl.it.fixx.moknj.bal.core.TemplateBal;
+import nl.it.fixx.moknj.bal.core.graph.GraphBal;
+import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphFocus;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
@@ -39,7 +39,7 @@ public class GraphController {
     @Autowired
     private GraphBal graphBal;
     @Autowired
-    private TemplateBal templateBal;
+    private TemplateCoreBal templateBal;
 
     /**
      * Saves the graph... Sets the creator id by the token. Only a user with

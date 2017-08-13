@@ -2,8 +2,8 @@ package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.core.AccessBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
+import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.access.AccessRight;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
@@ -29,9 +29,9 @@ public class UserController {
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    private UserBal userBal;
+    private UserCoreBal userBal;
     @Autowired
-    private AccessBal accessBal;
+    private AccessCoreBal accessBal;
 
     @RequestMapping(value = "/get/all", method = RequestMethod.POST)
     public UserResponse all(@RequestParam String access_token) {

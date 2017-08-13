@@ -1,7 +1,10 @@
-package nl.it.fixx.moknj.bal.core;
+package nl.it.fixx.moknj.bal.core.access;
 
 import java.util.List;
 import nl.it.fixx.moknj.bal.BalBase;
+import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
+import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
@@ -23,17 +26,17 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class AccessBal extends BalBase<AccessRepository> {
+public class AccessCoreBalImpl extends BalBase<AccessRepository> implements AccessCoreBal {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AccessBal.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AccessCoreBalImpl.class);
 
-    private final UserBal userBal;
-    private final TemplateBal templateBal;
-    private final MenuBal menuBal;
+    private final UserCoreBal userBal;
+    private final TemplateCoreBal templateBal;
+    private final MenuCoreBal menuBal;
 
     @Autowired
-    public AccessBal(AccessRepository accessRepo, UserBal userBal,
-            TemplateBal templateBal, MenuBal menuBal) {
+    public AccessCoreBalImpl(AccessRepository accessRepo, UserCoreBal userBal,
+            TemplateCoreBal templateBal, MenuCoreBal menuBal) {
         super(accessRepo);
         this.userBal = userBal;
         this.templateBal = templateBal;
@@ -49,6 +52,7 @@ public class AccessBal extends BalBase<AccessRepository> {
      * @param token
      * @throws Exception
      */
+    @Override
     public void addAccess(String userId, List<Access> newList, String token) throws Exception {
         try {
             List<Access> currentList = getAccessList(userId);
@@ -81,6 +85,7 @@ public class AccessBal extends BalBase<AccessRepository> {
      * @param token
      * @throws Exception on db related issues.
      */
+    @Override
     public void addAccess(Access access, String token) throws Exception {
         if (!repository.hasAccess(access.getUserId(), access.getMenuId(), access.getTemplateId())) {
             User loginUser = userBal.getUserByToken(token);
@@ -112,6 +117,7 @@ public class AccessBal extends BalBase<AccessRepository> {
      * @param token
      * @throws Exception
      */
+    @Override
     public void deleteAccess(String id, String token) throws Exception {
         User loginUser = userBal.getUserByToken(token);
         if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
@@ -136,6 +142,7 @@ public class AccessBal extends BalBase<AccessRepository> {
      * @param access rule to add.
      * @param token
      */
+    @Override
     public void updateAccess(Access access, String token) {
         User loginUser = userBal.getUserByToken(token);
         if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
@@ -171,6 +178,7 @@ public class AccessBal extends BalBase<AccessRepository> {
      * @param menuId
      * @param templateId
      */
+    @Override
     public void checkAccess(String userId, String menuId, String templateId) {
         if (!repository.hasAccess(userId, menuId, templateId)) {
             User user = userBal.getUserById(userId);
@@ -192,6 +200,7 @@ public class AccessBal extends BalBase<AccessRepository> {
      * @return true if user has access
      * @throws java.lang.Exception
      */
+    @Override
     public boolean hasAccess(User user, String menuId, String templateId) throws Exception {
         return repository.hasAccess(user.getId(), menuId, templateId)
                 || user.getAuthorities().contains(ALL_ACCESS.toString());
@@ -207,6 +216,7 @@ public class AccessBal extends BalBase<AccessRepository> {
      * @param right
      * @return true if user has access
      */
+    @Override
     public boolean hasAccess(User user, String menuId, String templateId, GlobalAccessRights right) {
         // If user is admin
         if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
@@ -233,6 +243,7 @@ public class AccessBal extends BalBase<AccessRepository> {
      * @return list of user access.
      * @throws Exception
      */
+    @Override
     public List<Access> getAccessList(String userId) throws Exception {
         List<Access> accessList = repository.getAccessList(userId);
         if (accessList == null || accessList.isEmpty()) {

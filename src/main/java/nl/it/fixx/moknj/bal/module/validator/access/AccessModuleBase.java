@@ -1,22 +1,18 @@
 package nl.it.fixx.moknj.bal.module.validator.access;
 
-import nl.it.fixx.moknj.bal.core.AccessBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
+import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.exception.AccessException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessModule {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AccessModuleBase.class);
 
     private final String ACCESS_ERROR = "This user does not have sufficient "
             + "access rights to %s this %s!";
 
-    private final UserBal userBal;
-    private final AccessBal accessBal;
+    private final UserCoreBal userBal;
+    private final AccessCoreBal accessBal;
     private AccessModule nextAccessValidation;
     private AccessValidation access;
 
@@ -25,7 +21,7 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
         this.access = access;
     }
 
-    public AccessModuleBase(UserBal userBal, AccessBal accessBal) {
+    public AccessModuleBase(UserCoreBal userBal, AccessCoreBal accessBal) {
         this.userBal = userBal;
         this.accessBal = accessBal;
     }

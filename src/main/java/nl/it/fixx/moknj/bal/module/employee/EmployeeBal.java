@@ -2,9 +2,9 @@ package nl.it.fixx.moknj.bal.module.employee;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import nl.it.fixx.moknj.bal.core.AccessBal;
-import nl.it.fixx.moknj.bal.core.MenuBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
+import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
+import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.exception.BalException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +29,8 @@ import nl.it.fixx.moknj.repository.wrapper.impl.EmployeeWrapper;
 public class EmployeeBal extends ModuleBaseBal<Employee, EmployeeRepository, EmployeeWrapper> {
 
     @Autowired
-    public EmployeeBal(EmployeeWrapper employeeRepo, MenuBal menuBal,
-            UserBal userBal, AccessBal accessBal) {
+    public EmployeeBal(EmployeeWrapper employeeRepo, MenuCoreBal menuBal,
+            UserCoreBal userBal, AccessCoreBal accessBal) {
         super(employeeRepo, menuBal, userBal, accessBal);
     }
 

@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.core;
+package nl.it.fixx.moknj.bal.core.field;
 
 import java.util.List;
 import nl.it.fixx.moknj.bal.BalBase;
@@ -16,15 +16,16 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class FieldBal extends BalBase<FieldDetailRepository> {
+public class FieldCoreBalImpl extends BalBase<FieldDetailRepository> implements FieldCoreBal {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FieldBal.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FieldCoreBalImpl.class);
 
     @Autowired
-    public FieldBal(FieldDetailRepository fieldDetailRepo) {
+    public FieldCoreBalImpl(FieldDetailRepository fieldDetailRepo) {
         super(fieldDetailRepo);
     }
 
+    @Override
     public FieldDetail get(String id) {
         try {
             if (id == null || id.isEmpty()) {
@@ -44,6 +45,7 @@ public class FieldBal extends BalBase<FieldDetailRepository> {
         }
     }
 
+    @Override
     public void save(List<FieldDetail> fields) {
         try {
             fields.stream().forEach((detail) -> {

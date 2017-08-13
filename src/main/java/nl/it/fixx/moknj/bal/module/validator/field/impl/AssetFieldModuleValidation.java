@@ -1,6 +1,6 @@
 package nl.it.fixx.moknj.bal.module.validator.field.impl;
 
-import nl.it.fixx.moknj.bal.core.FieldBal;
+import nl.it.fixx.moknj.bal.core.field.FieldCoreBal;
 import nl.it.fixx.moknj.bal.module.validator.field.FieldModuleBase;
 import nl.it.fixx.moknj.bal.module.validator.field.Module;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class AssetFieldModuleValidation extends FieldModuleBase<Asset, AssetRepository> {
 
     @Autowired
-    public AssetFieldModuleValidation(AssetRepository repository, FieldBal fieldBal) {
+    public AssetFieldModuleValidation(AssetRepository repository, FieldCoreBal fieldBal) {
         super(repository, fieldBal, AssetFieldModuleValidation.class);
     }
 

@@ -4,9 +4,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.core.MainAccessBal;
 import nl.it.fixx.moknj.bal.BalBase;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
+import nl.it.fixx.moknj.bal.module.ModuleBal;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_EMPLOYEE;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
@@ -14,19 +15,22 @@ import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service("employeeLinkBal")
 public class EmployeeLinkBal extends BalBase<EmployeeLinkRepository>
         implements ModuleLinkBal<EmployeeLink> {
 
-    private final UserBal userBal;
-    private final EmployeeBal employeeBal;
+    private final UserCoreBal userBal;
+    private final ModuleBal<Employee> employeeBal;
     private final MainAccessBal mainAccessBal;
     private final EmployeeLinkAccess empLinkAccess;
 
     @Autowired
-    public EmployeeLinkBal(EmployeeLinkRepository employeeLinkRepo, MainAccessBal mainAccessBal,
-            UserBal userBal, EmployeeBal employeeBal, EmployeeLinkAccess empLinkAccess) {
+    public EmployeeLinkBal(EmployeeLinkRepository employeeLinkRepo,
+            MainAccessBal mainAccessBal, UserCoreBal userBal,
+            @Qualifier("employeeBal") ModuleBal<Employee> employeeBal,
+            EmployeeLinkAccess empLinkAccess) {
         super(employeeLinkRepo);
         this.mainAccessBal = mainAccessBal;
         this.userBal = userBal;
@@ -47,7 +51,7 @@ public class EmployeeLinkBal extends BalBase<EmployeeLinkRepository>
     @Override
     public List<EmployeeLink> getAllLinks(String token) {
         Set<EmployeeLink> results = new HashSet<>();
-        mainAccessBal.getUserMenus(token).stream().filter((menu) 
+        mainAccessBal.getUserMenus(token).stream().filter((menu)
                 -> (menu.getMenuType().equals(GBL_MT_EMPLOYEE))).forEachOrdered((menu) -> {
             menu.getTemplates().forEach((temp) -> {
                 List<Employee> employees = employeeBal.getAll(temp.getId(), menu.getId(), token);
@@ -67,7 +71,7 @@ public class EmployeeLinkBal extends BalBase<EmployeeLinkRepository>
     @Override
     public List<EmployeeLink> getAllLinksByRecordId(String recordId, String token) {
         Set<EmployeeLink> results = new HashSet<>();
-        mainAccessBal.getUserMenus(token).stream().filter((menu) 
+        mainAccessBal.getUserMenus(token).stream().filter((menu)
                 -> (menu.getMenuType().equals(GBL_MT_EMPLOYEE))).forEachOrdered((menu) -> {
             menu.getTemplates().forEach((temp) -> {
                 results.addAll(empLinkAccess.filterRecordAccess(

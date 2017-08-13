@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.core;
+package nl.it.fixx.moknj.bal.core.menu;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,15 +15,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.comparator.NullSafeComparator;
 
 @Service
-public class MenuBal extends BalBase<MenuRepository> {
+public class MenuCoreBaImpl extends BalBase<MenuRepository> implements MenuCoreBal {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MenuBal.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MenuCoreBaImpl.class);
 
     @Autowired
-    public MenuBal(MenuRepository menuRepo) {
+    public MenuCoreBaImpl(MenuRepository menuRepo) {
         super(menuRepo);
     }
 
+    @Override
     public Menu saveMenu(Menu payload) {
         try {
             if (payload == null) {
@@ -61,6 +62,7 @@ public class MenuBal extends BalBase<MenuRepository> {
      * @param id
      * @return menu.
      */
+    @Override
     public Menu getMenuById(String id) {
         try {
             if (id == null || id.isEmpty()) {
@@ -86,6 +88,7 @@ public class MenuBal extends BalBase<MenuRepository> {
      * @return list of menus.
      *
      */
+    @Override
     public List<Menu> getAllMenus() {
         return repository.findAll();
     }
@@ -99,6 +102,7 @@ public class MenuBal extends BalBase<MenuRepository> {
      * @param templateId
      * @return list of menus
      */
+    @Override
     public List<Menu> getMenusForTemplateId(String templateId) {
         List<Menu> array = getAllMenus();
         List<Menu> menus = new ArrayList<>();
@@ -129,6 +133,7 @@ public class MenuBal extends BalBase<MenuRepository> {
      * @param menu
      * @return
      */
+    @Override
     public String getDispayName(Menu menu) {
         if (menu == null) {
             throw new BalException("No menu object provided");
@@ -144,6 +149,7 @@ public class MenuBal extends BalBase<MenuRepository> {
      * @return
      * @throws Exception
      */
+    @Override
     public String getDispayName(String menuId) throws Exception {
         return getDispayName(getMenuById(menuId));
     }
@@ -153,6 +159,7 @@ public class MenuBal extends BalBase<MenuRepository> {
      *
      * @param id
      */
+    @Override
     public void deleteMenu(String id) {
         try {
             Menu menu = getMenuById(id);
@@ -176,6 +183,7 @@ public class MenuBal extends BalBase<MenuRepository> {
      * @return
      * @throws Exception
      */
+    @Override
     public Template getMenuTemplate(String menuId, String templateId) throws Exception {
         Menu menu = getMenuById(menuId);
         List<Template> menuTemplates = menu.getTemplates();

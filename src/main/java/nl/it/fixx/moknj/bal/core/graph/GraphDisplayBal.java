@@ -1,10 +1,12 @@
-package nl.it.fixx.moknj.bal.core;
+package nl.it.fixx.moknj.bal.core.graph;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import nl.it.fixx.moknj.bal.core.MainAccessBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.bal.module.asset.AssetBal;
 import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
@@ -31,6 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleBal;
 import nl.it.fixx.moknj.bal.module.asset.AssetLinkBal;
+import nl.it.fixx.moknj.domain.modules.employee.Employee;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * This class is used to group the graph data for display in the UI
@@ -51,14 +55,16 @@ public class GraphDisplayBal {
     private static final String MDL_ASSET_STATUS_OUT = "Out";
 
     private final MainAccessBal mainAccessBal;
-    private final AssetBal assetBal;
-    private final EmployeeBal employeeBal;
+    private final ModuleBal<Asset> assetBal;
+    private final ModuleBal<Employee> employeeBal;
     private final AssetLinkBal linkBal;
-    private final UserBal userBal;
+    private final UserCoreBal userBal;
 
     @Autowired
-    public GraphDisplayBal(MainAccessBal mainAccessBal, AssetBal assetBal,
-            EmployeeBal employeeBal, AssetLinkBal linkBal, UserBal userBal) {
+    public GraphDisplayBal(MainAccessBal mainAccessBal,
+            @Qualifier("assetBal") ModuleBal<Asset> assetBal,
+            @Qualifier("employeeBal") ModuleBal<Employee> employeeBal,
+            AssetLinkBal linkBal, UserCoreBal userBal) {
         this.mainAccessBal = mainAccessBal;
         this.assetBal = assetBal;
         this.employeeBal = employeeBal;

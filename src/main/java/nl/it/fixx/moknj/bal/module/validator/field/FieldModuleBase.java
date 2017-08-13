@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import nl.it.fixx.moknj.bal.BalBase;
-import nl.it.fixx.moknj.bal.core.FieldBal;
+import nl.it.fixx.moknj.bal.core.field.FieldCoreBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
 import nl.it.fixx.moknj.domain.core.record.Record;
@@ -21,11 +21,11 @@ public abstract class FieldModuleBase<DOMAIN extends Record, REPO extends Record
     private static final String NO_CHANGE = "no_changes";
 
     private final Logger log;
-    private final FieldBal fieldBal;
+    private final FieldCoreBal fieldBal;
     private FieldModule nextFieldValidation;
     private Module module;
 
-    public FieldModuleBase(REPO repository, FieldBal fieldBal, Class cls) {
+    public FieldModuleBase(REPO repository, FieldCoreBal fieldBal, Class cls) {
         super(repository);
         this.fieldBal = fieldBal;
         this.log = LoggerFactory.getLogger(cls);

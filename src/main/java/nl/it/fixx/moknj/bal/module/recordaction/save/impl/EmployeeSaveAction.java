@@ -1,9 +1,9 @@
 package nl.it.fixx.moknj.bal.module.recordaction.save.impl;
 
 import java.util.Objects;
-import nl.it.fixx.moknj.bal.core.FieldBal;
-import nl.it.fixx.moknj.bal.core.TemplateBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
+import nl.it.fixx.moknj.bal.core.field.FieldCoreBal;
+import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.bal.module.employee.EmployeeLinkBal;
 import nl.it.fixx.moknj.bal.module.recordaction.save.SaveActionBase;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
@@ -21,13 +21,13 @@ import org.springframework.stereotype.Service;
 public class EmployeeSaveAction extends SaveActionBase<EmployeeLink, Employee, EmployeeRepository> {
 
     private final EmployeeLinkBal employeeLinkBal;
-    private final TemplateBal tempBal;
-    private final UserBal userBal;
-    private final FieldBal fieldBal;
+    private final TemplateCoreBal tempBal;
+    private final UserCoreBal userBal;
+    private final FieldCoreBal fieldBal;
 
     @Autowired
-    public EmployeeSaveAction(EmployeeLinkBal employeeLinkBal, TemplateBal tempBal,
-            UserBal userBal, FieldBal fieldBal, EmployeeRepository repository) {
+    public EmployeeSaveAction(EmployeeLinkBal employeeLinkBal, TemplateCoreBal tempBal,
+            UserCoreBal userBal, FieldCoreBal fieldBal, EmployeeRepository repository) {
         super(repository);
         this.employeeLinkBal = employeeLinkBal;
         this.tempBal = tempBal;

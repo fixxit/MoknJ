@@ -1,7 +1,8 @@
-package nl.it.fixx.moknj.bal.core;
+package nl.it.fixx.moknj.bal.core.template;
 
 import java.util.List;
 import nl.it.fixx.moknj.bal.BalBase;
+import nl.it.fixx.moknj.bal.core.field.FieldCoreBal;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.TemplateRepository;
@@ -11,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TemplateBal extends BalBase<TemplateRepository> {
+public class TemplateCoreBalImpl extends BalBase<TemplateRepository> implements TemplateCoreBal {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TemplateBal.class);
-    private final FieldBal fieldBal;
+    private static final Logger LOG = LoggerFactory.getLogger(TemplateCoreBalImpl.class);
+    private final FieldCoreBal fieldBal;
 
     @Autowired
-    public TemplateBal(TemplateRepository templateRepo, FieldBal fieldBal) {
+    public TemplateCoreBalImpl(TemplateRepository templateRepo, FieldCoreBal fieldBal) {
         super(templateRepo);
         this.fieldBal = fieldBal;
     }
@@ -30,6 +31,7 @@ public class TemplateBal extends BalBase<TemplateRepository> {
      * @return Template
      * @throws Exception
      */
+    @Override
     public Template saveTemplate(Template payload) throws Exception {
         try {
             if (payload.getDetails() == null && payload.getDetails().isEmpty()) {
@@ -59,6 +61,7 @@ public class TemplateBal extends BalBase<TemplateRepository> {
      * @param id
      * @return template.
      */
+    @Override
     public Template getTemplateById(String id) {
         if (id == null || id.isEmpty()) {
             LOG.debug("No template id recieved to find template");
@@ -73,6 +76,7 @@ public class TemplateBal extends BalBase<TemplateRepository> {
         return template;
     }
 
+    @Override
     public boolean exists(String id) {
         return repository.exists(id);
     }
@@ -84,6 +88,7 @@ public class TemplateBal extends BalBase<TemplateRepository> {
      * @return
      * @throws Exception
      */
+    @Override
     public String getDispayName(Template template) throws Exception {
         if (template == null) {
             throw new BalException("No template object provided");
@@ -99,6 +104,7 @@ public class TemplateBal extends BalBase<TemplateRepository> {
      * @return
      * @throws Exception
      */
+    @Override
     public String getDispayName(String templateId) throws Exception {
         return getDispayName(getTemplateById(templateId));
     }
@@ -109,6 +115,7 @@ public class TemplateBal extends BalBase<TemplateRepository> {
      * @return list of menus.
      * @throws Exception
      */
+    @Override
     public List<Template> getAllTemplates() throws Exception {
         try {
             return repository.findAll();
@@ -125,6 +132,7 @@ public class TemplateBal extends BalBase<TemplateRepository> {
      * @param cascade
      * @throws Exception
      */
+    @Override
     public void deleteTemplate(String id, boolean cascade) throws Exception {
         try {
             Template template = getTemplateById(id);

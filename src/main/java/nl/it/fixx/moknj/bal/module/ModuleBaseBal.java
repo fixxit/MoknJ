@@ -2,9 +2,9 @@ package nl.it.fixx.moknj.bal.module;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.core.AccessBal;
-import nl.it.fixx.moknj.bal.core.MenuBal;
-import nl.it.fixx.moknj.bal.core.UserBal;
+import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
+import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.bal.module.validator.access.Access;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
@@ -23,12 +23,12 @@ public abstract class ModuleBaseBal<DOMAIN extends Record, REPO extends RecordRe
 
     private static final Logger LOG = LoggerFactory.getLogger(ModuleBaseBal.class);
 
-    protected final MenuBal menuBal;
-    protected final UserBal userBal;
-    protected final AccessBal accessBal;
+    protected final MenuCoreBal menuBal;
+    protected final UserCoreBal userBal;
+    protected final AccessCoreBal accessBal;
     protected WRAPPER wrapper;
 
-    public ModuleBaseBal(WRAPPER wrapper, MenuBal menuBal, UserBal userBal, AccessBal accessBal) {
+    public ModuleBaseBal(WRAPPER wrapper, MenuCoreBal menuBal, UserCoreBal userBal, AccessCoreBal accessBal) {
         this.wrapper = wrapper;
         this.menuBal = menuBal;
         this.userBal = userBal;

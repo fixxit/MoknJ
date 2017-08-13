@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.core;
+package nl.it.fixx.moknj.bal.core.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.BalBase;
+import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
+import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
@@ -32,12 +35,12 @@ public class GraphBal extends BalBase<GraphRepository> {
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
     private final GraphDisplayBal graphBuilder;
-    private final UserBal userBal;
-    private final TemplateBal templateBal;
-    private final MenuBal menuBal;
+    private final UserCoreBal userBal;
+    private final TemplateCoreBal templateBal;
+    private final MenuCoreBal menuBal;
 
     @Autowired
-    public GraphBal(GraphDisplayBal graphBuilder, UserBal userBal, TemplateBal templateBal, MenuBal menuBal, GraphRepository repository) {
+    public GraphBal(GraphDisplayBal graphBuilder, UserCoreBal userBal, TemplateCoreBal templateBal, MenuCoreBal menuBal, GraphRepository repository) {
         super(repository);
         this.graphBuilder = graphBuilder;
         this.userBal = userBal;

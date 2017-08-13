@@ -1,7 +1,5 @@
 package nl.it.fixx.moknj.bal.core;
 
-import nl.it.fixx.moknj.bal.module.asset.AssetBal;
-import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -9,6 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
+import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
+import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
+import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
+import nl.it.fixx.moknj.bal.module.ModuleBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.global.GlobalTemplateType;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
@@ -21,6 +24,7 @@ import nl.it.fixx.moknj.exception.AccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.comparator.NullSafeComparator;
 
@@ -35,16 +39,17 @@ public class MainAccessBal {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainAccessBal.class);
 
-    private final AccessBal accessBal;
-    private final UserBal userBal;
-    private final MenuBal menuBal;
-    private final TemplateBal tempBal;
-    private final AssetBal assetBal;
-    private final EmployeeBal employeeBal;
+    private final AccessCoreBal accessBal;
+    private final UserCoreBal userBal;
+    private final MenuCoreBal menuBal;
+    private final TemplateCoreBal tempBal;
+    private final ModuleBal<Asset> assetBal;
+    private final ModuleBal<Employee> employeeBal;
 
     @Autowired
-    public MainAccessBal(AccessBal accessBal, UserBal userBal, MenuBal menuBal,
-            TemplateBal tempBal, AssetBal assetBal, EmployeeBal employeeBal) {
+    public MainAccessBal(AccessCoreBal accessBal, UserCoreBal userBal, MenuCoreBal menuBal,
+            TemplateCoreBal tempBal, @Qualifier("assetBal") ModuleBal<Asset> assetBal,
+            @Qualifier("employeeBal") ModuleBal<Employee> employeeBal) {
         this.accessBal = accessBal;
         this.userBal = userBal;
         this.menuBal = menuBal;
@@ -107,28 +112,28 @@ public class MainAccessBal {
         LOG.debug("========================================");
         LOG.debug("Menu [" + menu.getName() + "] ");
         List<Template> templates = new ArrayList<>();
-        for (Template temp : menu.getTemplates()) {
+        menu.getTemplates().stream().filter((temp)
+                -> (tempBal.exists(temp.getId()))).forEachOrdered((temp)
+                -> {
             LOG.debug("Temp [" + temp.getName() + "] ");
-            if (tempBal.exists(temp.getId())) {
-                Template globalTemplate = tempBal.getTemplateById(temp.getId());
-                if (globalTemplate != null) {
-                    // sets teh template menu rules down to template passed back
-                    globalTemplate.setAllowScopeChallenge(temp.isAllowScopeChallenge());
-                    // check if template is hidden or has access
-                    boolean access = accessBal.hasAccess(user,
-                            menu.getId(), globalTemplate.getId(), GlobalAccessRights.VIEW);
+            Template globalTemplate = tempBal.getTemplateById(temp.getId());
+            if (globalTemplate != null) {
+                // sets teh template menu rules down to template passed back
+                globalTemplate.setAllowScopeChallenge(temp.isAllowScopeChallenge());
+                // check if template is hidden or has access
+                boolean access = accessBal.hasAccess(user,
+                        menu.getId(), globalTemplate.getId(), GlobalAccessRights.VIEW);
 
-                    LOG.debug("User [" + user.getUserName() + "] has access : " + access);
-                    // check if template is hidden
-                    if ((!bypassHidden && globalTemplate.isHidden()) || !access) {
-                        LOG.debug("skipping template [" + globalTemplate.getName() + "] for menu [" + menu.getName() + "]");
-                    } else {
-                        // update template with db version
-                        templates.add(Template.copy(globalTemplate));
-                    }
+                LOG.debug("User [" + user.getUserName() + "] has access : " + access);
+                // check if template is hidden
+                if ((!bypassHidden && globalTemplate.isHidden()) || !access) {
+                    LOG.debug("skipping template [" + globalTemplate.getName() + "] for menu [" + menu.getName() + "]");
+                } else {
+                    // update template with db version
+                    templates.add(Template.copy(globalTemplate));
                 }
             }
-        }
+        });
         return templates;
     }
 
@@ -260,12 +265,13 @@ public class MainAccessBal {
             User user = userBal.getUserByToken(token);
             Set<Template> values = new HashSet<>();
             List<Menu> menus = menuBal.getAllMenus();
-            for (Menu menu : menus) {
-                List<Template> tempates = getMenuTemplates(menu, user, false);
+            menus.stream().map((menu)
+                    -> getMenuTemplates(menu, user, false)).forEachOrdered((tempates)
+                    -> {
                 tempates.stream().forEach((template) -> {
                     values.add(template);
                 });
-            }
+            });
 
             if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
                 getAllTemplates().stream().forEach((template) -> {
