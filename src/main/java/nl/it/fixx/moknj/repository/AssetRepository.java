@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.repository.custom.AssetRepositoryCustom;
 
-@Repository
+@Repository("assetRepository")
 public interface AssetRepository extends RecordRepository<Asset>, AssetRepositoryCustom {
 
 }

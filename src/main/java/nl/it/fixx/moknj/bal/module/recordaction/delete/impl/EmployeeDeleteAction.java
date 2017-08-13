@@ -1,19 +1,24 @@
 package nl.it.fixx.moknj.bal.module.recordaction.delete.impl;
 
-import nl.it.fixx.moknj.bal.module.employee.EmployeeLinkBal;
+import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
 import nl.it.fixx.moknj.bal.module.recordaction.delete.DeleteActionBase;
+import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
-import nl.it.fixx.moknj.repository.EmployeeRepository;
+import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
+import nl.it.fixx.moknj.repository.RecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmployeeDeleteAction extends DeleteActionBase<Void, Employee, EmployeeRepository> {
+public class EmployeeDeleteAction extends DeleteActionBase<Void, Record, RecordRepository<Employee>> {
 
-    private final EmployeeLinkBal employeeLinkBal;
+    private final ModuleLinkBal<EmployeeLink> employeeLinkBal;
 
     @Autowired
-    public EmployeeDeleteAction(EmployeeRepository repository, EmployeeLinkBal employeeLinkBal) {
+    public EmployeeDeleteAction(
+            @Qualifier("employeeRepository") RecordRepository<Employee> repository,
+            @Qualifier("employeeLinkBal") ModuleLinkBal<EmployeeLink> employeeLinkBal) {
         super(repository);
         this.employeeLinkBal = employeeLinkBal;
     }
@@ -24,10 +29,12 @@ public class EmployeeDeleteAction extends DeleteActionBase<Void, Employee, Emplo
     }
 
     @Override
-    public Void before(Employee domain) {
+    public Void before(Record domain) {
         Employee result = repository.findOne(domain.getId());
         if (result != null && domain.isCascade()) {
-            employeeLinkBal.getAllLinksByRecordId(domain.getId(), domain.getToken()).stream().forEach((link) -> {
+            // delete links
+            employeeLinkBal.getAllLinksByRecordId(domain.getId(), 
+                    domain.getToken()).stream().forEach((link) -> {
                 employeeLinkBal.delete(link);
             });
         }

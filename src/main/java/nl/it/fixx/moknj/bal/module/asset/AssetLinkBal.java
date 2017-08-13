@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.core.AccessBal;
 import nl.it.fixx.moknj.bal.core.MainAccessBal;
@@ -26,8 +26,8 @@ import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
 import nl.it.fixx.moknj.exception.AccessException;
 
-@Service
-public class AssetLinkBal extends BAL<AssetLinkRepository> implements ModuleLinkBal<AssetLink> {
+@Service("assetLinkBal")
+public class AssetLinkBal extends BalBase<AssetLinkRepository> implements ModuleLinkBal<AssetLink> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetLinkBal.class);
 

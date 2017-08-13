@@ -15,12 +15,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * @author adriaan
  * @param <REPOSITORY>
  */
-public abstract class BAL<REPOSITORY extends MongoRepository> {
-
+public abstract class BalBase<REPOSITORY extends MongoRepository> implements Bal<REPOSITORY> {
+    
     protected final REPOSITORY repository;
-
-    public BAL(REPOSITORY repository) {
+    
+    public BalBase(REPOSITORY repository) {
         this.repository = repository;
     }
-
+    
 }

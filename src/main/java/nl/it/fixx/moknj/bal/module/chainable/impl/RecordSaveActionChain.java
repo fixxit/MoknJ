@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("recordSaveActionChain")
 public class RecordSaveActionChain extends ModuleChainBaseBal<SaveAction> {
 
     @Autowired

@@ -1,7 +1,7 @@
 package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.user.User;
@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * This BAL is used to handle all user access related methods. Ideally all
+ * This BalBase is used to handle all user access related methods. Ideally all
  * business access layers should only have its main repository initialized as
  * class variable and only initialize the business layers it requires. The
  * reasoning behind this is if you change individual ball it will reflect on all
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class AccessBal extends BAL<AccessRepository> {
+public class AccessBal extends BalBase<AccessRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccessBal.class);
 

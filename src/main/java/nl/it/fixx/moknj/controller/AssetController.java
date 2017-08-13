@@ -1,12 +1,13 @@
 package nl.it.fixx.moknj.controller;
 
-import nl.it.fixx.moknj.bal.module.asset.AssetBal;
+import nl.it.fixx.moknj.bal.module.ModuleBal;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.response.AssetResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,8 +23,12 @@ public class AssetController {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssetController.class);
 
+    private final ModuleBal<Asset> assetBal;
+
     @Autowired
-    private AssetBal bal;
+    public AssetController(@Qualifier("assetBal") ModuleBal<Asset> bal) {
+        this.assetBal = bal;
+    }
 
     @RequestMapping(value = "/add/{menuId}/{id}", method = RequestMethod.POST)
     public AssetResponse add(@PathVariable String id,
@@ -36,7 +41,7 @@ public class AssetController {
                 throw new Exception("No menu id provided for the asset record");
             }
             response.setSuccess(true);
-            response.setAsset(bal.save(id, menuId, asset, access_token));
+            response.setAsset(assetBal.save(id, menuId, asset, access_token));
             response.setMessage("Successfully saved asset");
             return response;
         } catch (Exception ex) {
@@ -60,7 +65,7 @@ public class AssetController {
             @PathVariable String menuId, @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
         try {
-            response.setAssets(bal.getAll(templateId, menuId, access_token));
+            response.setAssets(assetBal.getAll(templateId, menuId, access_token));
             return response;
         } catch (BalException ex) {
             LOG.error("error", ex);
@@ -80,7 +85,7 @@ public class AssetController {
     public AssetResponse get(@PathVariable String id) {
         AssetResponse response = new AssetResponse();
         try {
-            response.setAsset(bal.get(id));
+            response.setAsset(assetBal.get(id));
         } catch (Exception ex) {
             LOG.error("error", ex);
             response.setSuccess(false);
@@ -103,7 +108,7 @@ public class AssetController {
             @RequestParam String access_token) {
         AssetResponse response = new AssetResponse();
         try {
-            bal.delete(asset, menuId, access_token, false);
+            assetBal.delete(asset, menuId, access_token, false);
             response.setSuccess(true);
             response.setMessage("Asset record was deleted successfully.");
         } catch (Exception ex) {

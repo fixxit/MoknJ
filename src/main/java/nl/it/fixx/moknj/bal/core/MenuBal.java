@@ -3,7 +3,7 @@ package nl.it.fixx.moknj.bal.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.exception.BalException;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.comparator.NullSafeComparator;
 
 @Service
-public class MenuBal extends BAL<MenuRepository> {
+public class MenuBal extends BalBase<MenuRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MenuBal.class);
 

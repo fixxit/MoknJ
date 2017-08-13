@@ -25,7 +25,7 @@ import nl.it.fixx.moknj.repository.wrapper.impl.EmployeeWrapper;
  *
  * @author adriaan
  */
-@Service
+@Service("employeeBal")
 public class EmployeeBal extends ModuleBaseBal<Employee, EmployeeRepository, EmployeeWrapper> {
 
     @Autowired

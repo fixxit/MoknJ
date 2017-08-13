@@ -1,5 +1,8 @@
 package nl.it.fixx.moknj.domain.core.field;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Objects;
 import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
 import org.springframework.data.annotation.Id;
@@ -8,7 +11,7 @@ import org.springframework.data.annotation.Id;
  *
  * @author adriaan
  */
-public class FieldDetail {
+public class FieldDetail implements Cloneable {
 
     @Id
     private String id;
@@ -17,11 +20,6 @@ public class FieldDetail {
     private boolean unique;
     private boolean mandatory;
     private boolean display;
-
-    @Override
-    public String toString() {
-        return "FieldDetail{" + "id=" + getId() + ", type=" + getType() + ", name=" + getName() + ", unique=" + isUnique() + ", mandatory=" + isMandatory() + ", display=" + isDisplay() + '}';
-    }
 
     /**
      * @return the id
@@ -139,10 +137,32 @@ public class FieldDetail {
         if (!Objects.equals(this.name, other.name)) {
             return false;
         }
-        if (this.type != other.type) {
-            return false;
+        return this.type == other.type;
+    }
+
+    @Override
+    public String toString() {
+        StringWriter sb = new StringWriter();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(sb, this);
+        } catch (IOException ex) {
+            throw new RuntimeException("could not genrate obj str[" + this + "]", ex);
         }
-        return true;
+        return sb.getBuffer().toString();
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    public static FieldDetail getCopy(FieldDetail obj) {
+        try {
+            return (FieldDetail) obj.clone();
+        } catch (CloneNotSupportedException ex) {
+            throw new RuntimeException("could not copy obj[" + obj.toString() + "]", ex);
+        }
     }
 
 }

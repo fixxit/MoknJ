@@ -2,7 +2,6 @@ package nl.it.fixx.moknj.bal.module.chainable.impl;
 
 import org.springframework.stereotype.Component;
 import nl.it.fixx.moknj.bal.module.chainable.ModuleChainBaseBal;
-import nl.it.fixx.moknj.bal.module.chainable.ModuleChainBaseBal;
 import nl.it.fixx.moknj.bal.module.validator.field.FieldModule;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @author SmarBullet
  */
-@Component
+@Component("fieldModuleValidationChain")
 public class FieldModuleValidationChain extends ModuleChainBaseBal<FieldModule> {
 
     @Autowired

@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import nl.it.fixx.moknj.properties.ApplicationProperties;
 import nl.it.fixx.moknj.properties.enums.Database;
+import static nl.it.fixx.moknj.properties.enums.Database.OpenShiftEnv.OPENSHIFT_MONGODB_DB_HOST;
+import static nl.it.fixx.moknj.properties.enums.Database.OpenShiftEnv.OPENSHIFT_MONGODB_DB_PASSWORD;
+import static nl.it.fixx.moknj.properties.enums.Database.OpenShiftEnv.OPENSHIFT_MONGODB_DB_PORT;
+import static nl.it.fixx.moknj.properties.enums.Database.OpenShiftEnv.OPENSHIFT_MONGODB_DB_USERNAME;
 import nl.it.fixx.moknj.repository.RepositoryPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +56,10 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
         LOG.debug("Starting up on environment: " + environment);
         if (environment != null
                 && environment.contains(Database.ENVIRONMENT_OPENSHIFT)) {
-            String openIp = System.getenv(Database.OPENSHIFT_MONGODB_DB_HOST);
-            String openPort = System.getenv(Database.OPENSHIFT_MONGODB_DB_PORT);
-            String openUserName = System.getenv(Database.OPENSHIFT_MONGODB_DB_USERNAME);
-            String openPassword = System.getenv(Database.OPENSHIFT_MONGODB_DB_PASSWORD);
+            String openIp = OPENSHIFT_MONGODB_DB_HOST.toString();
+            String openPort = OPENSHIFT_MONGODB_DB_PORT.toString();
+            String openUserName = OPENSHIFT_MONGODB_DB_USERNAME.toString();
+            String openPassword = OPENSHIFT_MONGODB_DB_PASSWORD.toString();
 
             if (openUserName != null && !openUserName.trim().isEmpty()
                     && openPassword != null && !openPassword.trim().isEmpty()) {
@@ -97,7 +101,7 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @Override
     protected String getMappingBasePackage() {
-        return "nl.fixx.data";
+        return "nl.it.fixx.moknj.repository";
     }
 
     @Bean

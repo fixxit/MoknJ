@@ -24,7 +24,7 @@ import nl.it.fixx.moknj.repository.wrapper.impl.AssetWrapper;
  *
  * @author adriaan
  */
-@Service
+@Service("assetBal")
 public class AssetBal extends ModuleBaseBal<Asset, AssetRepository, AssetWrapper> {
 
     @Autowired

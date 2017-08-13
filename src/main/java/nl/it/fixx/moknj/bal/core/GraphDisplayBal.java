@@ -299,7 +299,6 @@ public class GraphDisplayBal {
 
                             for (Object record : records) {
                                 Record recodValue = (Record) record;
-
                                 // y- axis value should come here
                                 String yAxisValue = null;
                                 if (null != graphInfo.getGraphFocus()) {

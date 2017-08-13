@@ -14,7 +14,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @author SmarBullet
  */
-@Component
+@Component("accessModuleValidationChain")
 public class AccessModuleValidationChain extends ModuleChainBaseBal<AccessModule> {
 
     @Autowired

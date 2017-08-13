@@ -1,12 +1,13 @@
 package nl.it.fixx.moknj.bal.module.recordaction.save;
 
-import nl.it.fixx.moknj.bal.module.chainable.impl.RecordSaveActionChain;
+import nl.it.fixx.moknj.bal.module.chainable.ModuleChainBal;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -18,7 +19,7 @@ public final class SaveActionExecution {
     private final SaveAction action;
 
     @Autowired
-    public SaveActionExecution(RecordSaveActionChain saveActionChain) {
+    public SaveActionExecution(@Qualifier("recordSaveActionChain") ModuleChainBal<SaveAction> saveActionChain) {
         action = saveActionChain.getChain();
     }
 

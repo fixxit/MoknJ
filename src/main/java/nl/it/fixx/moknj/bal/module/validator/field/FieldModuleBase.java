@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.bal.core.FieldBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class FieldModuleBase<DOMAIN extends Record, REPO extends RecordRepository<DOMAIN>>
-        extends BAL<REPO> implements FieldModule {
+        extends BalBase<REPO> implements FieldModule {
 
     private static final String HAS_CHANGE = "has_changes";
     private static final String NO_CHANGE = "no_changes";

@@ -1,12 +1,12 @@
 package nl.it.fixx.moknj.bal.module.recordaction.save;
 
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.bal.module.recordaction.Intercept;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public abstract class SaveActionBase<JOINDOMAIN, DOMAIN, REPO extends MongoRepository>
-        extends BAL<REPO> implements SaveAction<JOINDOMAIN, DOMAIN> {
+        extends BalBase<REPO> implements SaveAction<JOINDOMAIN, DOMAIN> {
 
     private SaveAction saveAction;
     private JOINDOMAIN join;

@@ -2,6 +2,8 @@ package nl.it.fixx.moknj.runner;
 
 import java.util.ArrayList;
 import java.util.List;
+import nl.it.fixx.moknj.domain.core.field.FieldDetail;
+import nl.it.fixx.moknj.domain.core.global.GlobalFieldType;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.properties.ApplicationProperties;
 import nl.it.fixx.moknj.repository.UserRepository;

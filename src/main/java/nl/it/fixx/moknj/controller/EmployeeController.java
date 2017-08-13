@@ -1,12 +1,13 @@
 package nl.it.fixx.moknj.controller;
 
-import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
+import nl.it.fixx.moknj.bal.module.ModuleBal;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.response.EmployeeResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,8 +27,12 @@ public class EmployeeController {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeController.class);
 
+    private final ModuleBal<Employee> employeeBal;
+
     @Autowired
-    private EmployeeBal employeeBal;
+    public EmployeeController(@Qualifier("employeeBal") ModuleBal employeeBal) {
+        this.employeeBal = employeeBal;
+    }
 
     @RequestMapping(value = "/add/{menuId}/{id}", method = RequestMethod.POST)
     public EmployeeResponse add(@PathVariable String id,

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class GraphBal extends BAL<GraphRepository> {
+public class GraphBal extends BalBase<GraphRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
 
@@ -69,8 +69,7 @@ public class GraphBal extends BAL<GraphRepository> {
                 }
             }
 
-            boolean exists = repository.existsByName(payload.getName());
-            if (!exists || bypassExists) {
+            if (!repository.existsByName(payload.getName()) || bypassExists) {
                 Graph graph = repository.save(payload);
                 return graph;
             } else {

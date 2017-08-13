@@ -1,19 +1,24 @@
 package nl.it.fixx.moknj.bal.module.recordaction.delete.impl;
 
-import nl.it.fixx.moknj.bal.module.asset.AssetLinkBal;
+import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
 import nl.it.fixx.moknj.bal.module.recordaction.delete.DeleteActionBase;
+import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.repository.AssetRepository;
+import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
+import nl.it.fixx.moknj.repository.RecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AssetDeleteAction extends DeleteActionBase<Void, Asset, AssetRepository> {
+public class AssetDeleteAction extends DeleteActionBase<Void, Record, RecordRepository<Asset>> {
 
-    private final AssetLinkBal assetLinkBal;
+    private final ModuleLinkBal<AssetLink> assetLinkBal;
 
     @Autowired
-    public AssetDeleteAction(AssetRepository repository, AssetLinkBal assetLinkBal) {
+    public AssetDeleteAction(
+            @Qualifier("assetRepository") RecordRepository<Asset> repository,
+            @Qualifier("assetLinkBal") ModuleLinkBal<AssetLink> assetLinkBal) {
         super(repository);
         this.assetLinkBal = assetLinkBal;
     }
@@ -24,7 +29,7 @@ public class AssetDeleteAction extends DeleteActionBase<Void, Asset, AssetReposi
     }
 
     @Override
-    public Void before(Asset domain) {
+    public Void before(Record domain) {
         Asset result = repository.findOne(domain.getId());
         if (result != null && domain.isCascade()) {
             // delete links

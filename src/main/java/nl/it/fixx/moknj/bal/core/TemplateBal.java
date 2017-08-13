@@ -1,7 +1,7 @@
 package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.TemplateRepository;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TemplateBal extends BAL<TemplateRepository> {
+public class TemplateBal extends BalBase<TemplateRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TemplateBal.class);
     private final FieldBal fieldBal;

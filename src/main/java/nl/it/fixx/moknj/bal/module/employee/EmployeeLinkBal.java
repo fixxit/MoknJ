@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.core.UserBal;
 import nl.it.fixx.moknj.bal.core.MainAccessBal;
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_EMPLOYEE;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
 
-@Service
-public class EmployeeLinkBal extends BAL<EmployeeLinkRepository>
+@Service("employeeLinkBal")
+public class EmployeeLinkBal extends BalBase<EmployeeLinkRepository>
         implements ModuleLinkBal<EmployeeLink> {
 
     private final UserBal userBal;

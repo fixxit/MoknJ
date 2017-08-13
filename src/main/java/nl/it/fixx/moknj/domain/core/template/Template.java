@@ -1,5 +1,6 @@
 package nl.it.fixx.moknj.domain.core.template;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
@@ -13,12 +14,12 @@ import org.springframework.data.annotation.Id;
 public class Template {
 
     @Id
-    protected String id;
-    protected String name;
-    protected GlobalTemplateType templateType;
+    private String id;
+    private String name;
+    private GlobalTemplateType templateType;
     // Fields names (etc <Sizeinteger>) and field type
-    protected List<FieldDetail> details;
-    protected boolean hidden;
+    private List<FieldDetail> details;
+    private boolean hidden;
     // This would allow you to bypass scope, scopes are set to the template entries.
     private boolean allowScopeChallenge;
 
@@ -32,7 +33,10 @@ public class Template {
         template.id = temp.id;
         template.name = temp.name;
         template.templateType = temp.templateType;
-        template.details = temp.details;
+        template.details = new ArrayList<>();
+        temp.getDetails().forEach((foo) -> {
+            template.details.add(FieldDetail.getCopy(foo));
+        });
         template.hidden = temp.hidden;
         template.allowScopeChallenge = temp.allowScopeChallenge;
         return template;

@@ -4,6 +4,5 @@ public interface ModuleChainBal<INTERFACE> {
 
     INTERFACE getChain();
     
-    
     Class<INTERFACE> getClazz();
 }

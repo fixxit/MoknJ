@@ -2,7 +2,7 @@ package nl.it.fixx.moknj.bal.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.domain.core.access.Access;
 import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class UserBal extends BAL<UserRepository> {
+public class UserBal extends BalBase<UserRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserBal.class);
 

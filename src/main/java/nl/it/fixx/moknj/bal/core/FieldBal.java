@@ -1,7 +1,7 @@
 package nl.it.fixx.moknj.bal.core;
 
 import java.util.List;
-import nl.it.fixx.moknj.bal.BAL;
+import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.repository.FieldDetailRepository;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class FieldBal extends BAL<FieldDetailRepository> {
+public class FieldBal extends BalBase<FieldDetailRepository> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldBal.class);
 
