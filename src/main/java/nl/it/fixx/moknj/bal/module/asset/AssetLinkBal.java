@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.BalBase;
-import nl.it.fixx.moknj.bal.core.MainAccessBal;
+import nl.it.fixx.moknj.bal.core.access.MainAccessCoreBal;
 import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
 import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.bal.module.ModuleBal;
@@ -36,12 +36,12 @@ public class AssetLinkBal extends BalBase<AssetLinkRepository> implements Module
     private final UserCoreBal userBal;
     private final ModuleBal<Asset> assetBal;
     private final AccessCoreBal accessBal;
-    private final MainAccessBal mainAccessBal;
+    private final MainAccessCoreBal mainAccessBal;
     private final AssetLinkAccess assetLinkAccess;
 
     @Autowired
     public AssetLinkBal(AssetLinkRepository assetLinkRepo, UserCoreBal userBal, @Qualifier("assetBal") ModuleBal<Asset> assetBal,
-            AccessCoreBal accessBal, MainAccessBal mainAccessBal, AssetLinkAccess assetLinkAccess) {
+            AccessCoreBal accessBal, MainAccessCoreBal mainAccessBal, AssetLinkAccess assetLinkAccess) {
         super(assetLinkRepo);
         this.userBal = userBal;
         this.assetBal = assetBal;

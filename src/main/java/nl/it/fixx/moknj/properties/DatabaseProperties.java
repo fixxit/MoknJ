@@ -1,6 +1,6 @@
-package nl.it.fixx.moknj.properties.enums;
+package nl.it.fixx.moknj.properties;
 
-public class Database {
+public class DatabaseProperties {
 
     public static final String ENVIRONMENT_OPENSHIFT = "openshift";
 

@@ -2,7 +2,7 @@ package nl.it.fixx.moknj.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import nl.it.fixx.moknj.bal.core.MainAccessBal;
+import nl.it.fixx.moknj.bal.core.access.MainAccessCoreBal;
 import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldType;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TemplateController {
 
     @Autowired
-    private MainAccessBal mainAccessBal;
+    private MainAccessCoreBal mainAccessBal;
     @Autowired
     private TemplateCoreBal templateBal;
 

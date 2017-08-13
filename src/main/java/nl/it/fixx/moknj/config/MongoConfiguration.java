@@ -7,11 +7,11 @@ import com.mongodb.ServerAddress;
 import java.util.ArrayList;
 import java.util.List;
 import nl.it.fixx.moknj.properties.ApplicationProperties;
-import nl.it.fixx.moknj.properties.enums.Database;
-import static nl.it.fixx.moknj.properties.enums.Database.OpenShiftEnv.OPENSHIFT_MONGODB_DB_HOST;
-import static nl.it.fixx.moknj.properties.enums.Database.OpenShiftEnv.OPENSHIFT_MONGODB_DB_PASSWORD;
-import static nl.it.fixx.moknj.properties.enums.Database.OpenShiftEnv.OPENSHIFT_MONGODB_DB_PORT;
-import static nl.it.fixx.moknj.properties.enums.Database.OpenShiftEnv.OPENSHIFT_MONGODB_DB_USERNAME;
+import nl.it.fixx.moknj.properties.DatabaseProperties;
+import static nl.it.fixx.moknj.properties.DatabaseProperties.OpenShiftEnv.OPENSHIFT_MONGODB_DB_HOST;
+import static nl.it.fixx.moknj.properties.DatabaseProperties.OpenShiftEnv.OPENSHIFT_MONGODB_DB_PASSWORD;
+import static nl.it.fixx.moknj.properties.DatabaseProperties.OpenShiftEnv.OPENSHIFT_MONGODB_DB_PORT;
+import static nl.it.fixx.moknj.properties.DatabaseProperties.OpenShiftEnv.OPENSHIFT_MONGODB_DB_USERNAME;
 import nl.it.fixx.moknj.repository.RepositoryPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
         final String environment = porperties.getEnvironment();
         LOG.debug("Starting up on environment: " + environment);
         if (environment != null
-                && environment.contains(Database.ENVIRONMENT_OPENSHIFT)) {
+                && environment.contains(DatabaseProperties.ENVIRONMENT_OPENSHIFT)) {
             String openIp = OPENSHIFT_MONGODB_DB_HOST.toString();
             String openPort = OPENSHIFT_MONGODB_DB_PORT.toString();
             String openUserName = OPENSHIFT_MONGODB_DB_USERNAME.toString();

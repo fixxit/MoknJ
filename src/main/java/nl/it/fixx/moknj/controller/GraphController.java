@@ -3,7 +3,7 @@ package nl.it.fixx.moknj.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import nl.it.fixx.moknj.bal.core.graph.GraphBal;
+import nl.it.fixx.moknj.bal.core.graph.GraphCoreBal;
 import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphFocus;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GraphController {
 
     @Autowired
-    private GraphBal graphBal;
+    private GraphCoreBal graphBal;
     @Autowired
     private TemplateCoreBal templateBal;
 

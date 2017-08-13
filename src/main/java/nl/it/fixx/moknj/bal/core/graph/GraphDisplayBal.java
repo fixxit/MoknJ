@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import nl.it.fixx.moknj.bal.core.MainAccessBal;
+import nl.it.fixx.moknj.bal.core.access.MainAccessCoreBal;
 import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.bal.module.asset.AssetBal;
 import nl.it.fixx.moknj.bal.module.employee.EmployeeBal;
@@ -54,14 +54,14 @@ public class GraphDisplayBal {
     private static final String MDL_ASSET_STATUS_IN = "In";
     private static final String MDL_ASSET_STATUS_OUT = "Out";
 
-    private final MainAccessBal mainAccessBal;
+    private final MainAccessCoreBal mainAccessBal;
     private final ModuleBal<Asset> assetBal;
     private final ModuleBal<Employee> employeeBal;
     private final AssetLinkBal linkBal;
     private final UserCoreBal userBal;
 
     @Autowired
-    public GraphDisplayBal(MainAccessBal mainAccessBal,
+    public GraphDisplayBal(MainAccessCoreBal mainAccessBal,
             @Qualifier("assetBal") ModuleBal<Asset> assetBal,
             @Qualifier("employeeBal") ModuleBal<Employee> employeeBal,
             AssetLinkBal linkBal, UserCoreBal userBal) {

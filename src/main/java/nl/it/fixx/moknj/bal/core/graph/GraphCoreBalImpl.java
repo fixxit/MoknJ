@@ -30,9 +30,9 @@ import org.springframework.stereotype.Service;
  * @author adriaan
  */
 @Service
-public class GraphBal extends BalBase<GraphRepository> {
+public class GraphCoreBalImpl extends BalBase<GraphRepository> implements GraphCoreBal {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphBal.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphCoreBalImpl.class);
 
     private final GraphDisplayBal graphBuilder;
     private final UserCoreBal userBal;
@@ -40,7 +40,7 @@ public class GraphBal extends BalBase<GraphRepository> {
     private final MenuCoreBal menuBal;
 
     @Autowired
-    public GraphBal(GraphDisplayBal graphBuilder, UserCoreBal userBal, TemplateCoreBal templateBal, MenuCoreBal menuBal, GraphRepository repository) {
+    public GraphCoreBalImpl(GraphDisplayBal graphBuilder, UserCoreBal userBal, TemplateCoreBal templateBal, MenuCoreBal menuBal, GraphRepository repository) {
         super(repository);
         this.graphBuilder = graphBuilder;
         this.userBal = userBal;
@@ -57,6 +57,7 @@ public class GraphBal extends BalBase<GraphRepository> {
      * @return
      * @throws Exception
      */
+    @Override
     public Graph save(Graph payload, String token) throws Exception {
         try {
             // For updates if the type has a id then bypass the exists
@@ -92,6 +93,7 @@ public class GraphBal extends BalBase<GraphRepository> {
      * @return list of graphs
      * @throws java.lang.Exception
      */
+    @Override
     public List<Graph> getAll(String token) throws Exception {
         try {
             User user = userBal.getUserByToken(token);
@@ -135,6 +137,7 @@ public class GraphBal extends BalBase<GraphRepository> {
      * @return
      * @throws Exception
      */
+    @Override
     public GraphData getGraphData(String graphId, String token) throws Exception {
         try {
             User user = userBal.getUserByToken(token);
@@ -157,6 +160,7 @@ public class GraphBal extends BalBase<GraphRepository> {
      * @return list of graph data
      * @throws Exception
      */
+    @Override
     public Map<String, List<GraphData>> getAllGraphData(String token) throws Exception {
         try {
             Map<String, List<GraphData>> allDataSets = new HashMap<>();
@@ -188,6 +192,7 @@ public class GraphBal extends BalBase<GraphRepository> {
      * @param token
      * @throws Exception
      */
+    @Override
     public void delete(String id, String token) throws Exception {
         try {
             if (repository.exists(id)) {

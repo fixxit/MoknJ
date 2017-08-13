@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.core;
+package nl.it.fixx.moknj.bal.core.access;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
 import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
 import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
 import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
@@ -35,9 +34,9 @@ import org.springframework.util.comparator.NullSafeComparator;
  * @author adriaan
  */
 @Service
-public class MainAccessBal {
+public class MainAccessCoreBal {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MainAccessBal.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MainAccessCoreBal.class);
 
     private final AccessCoreBal accessBal;
     private final UserCoreBal userBal;
@@ -47,7 +46,7 @@ public class MainAccessBal {
     private final ModuleBal<Employee> employeeBal;
 
     @Autowired
-    public MainAccessBal(AccessCoreBal accessBal, UserCoreBal userBal, MenuCoreBal menuBal,
+    public MainAccessCoreBal(AccessCoreBal accessBal, UserCoreBal userBal, MenuCoreBal menuBal,
             TemplateCoreBal tempBal, @Qualifier("assetBal") ModuleBal<Asset> assetBal,
             @Qualifier("employeeBal") ModuleBal<Employee> employeeBal) {
         this.accessBal = accessBal;

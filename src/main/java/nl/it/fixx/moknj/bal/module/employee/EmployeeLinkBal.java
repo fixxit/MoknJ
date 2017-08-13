@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import nl.it.fixx.moknj.bal.core.MainAccessBal;
+import nl.it.fixx.moknj.bal.core.access.MainAccessCoreBal;
 import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.bal.module.ModuleBal;
@@ -23,12 +23,12 @@ public class EmployeeLinkBal extends BalBase<EmployeeLinkRepository>
 
     private final UserCoreBal userBal;
     private final ModuleBal<Employee> employeeBal;
-    private final MainAccessBal mainAccessBal;
+    private final MainAccessCoreBal mainAccessBal;
     private final EmployeeLinkAccess empLinkAccess;
 
     @Autowired
     public EmployeeLinkBal(EmployeeLinkRepository employeeLinkRepo,
-            MainAccessBal mainAccessBal, UserCoreBal userBal,
+            MainAccessCoreBal mainAccessBal, UserCoreBal userBal,
             @Qualifier("employeeBal") ModuleBal<Employee> employeeBal,
             EmployeeLinkAccess empLinkAccess) {
         super(employeeLinkRepo);
