@@ -239,7 +239,7 @@ public class Asset implements Record {
 
     @Override
     public void setFreeValue(String freeValue) {
-        init().setFreeDate(freeValue);
+        init().setFreeValue(freeValue);
     }
 
     @Override

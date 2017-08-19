@@ -11,6 +11,8 @@ import nl.it.fixx.moknj.bal.BalBase;
 import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
 import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
 import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
+import nl.it.fixx.moknj.bal.module.chainable.ModuleChainBal;
+import nl.it.fixx.moknj.bal.module.graphfilter.GraphFilter;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphType;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
@@ -23,26 +25,24 @@ import nl.it.fixx.moknj.repository.GraphRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-/**
- *
- * @author adriaan
- */
 @Service
 public class GraphCoreBalImpl extends BalBase<GraphRepository> implements GraphCoreBal {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphCoreBalImpl.class);
 
-    private final GraphDisplayBal graphBuilder;
+    private final GraphFilter graphFilter;
     private final UserCoreBal userBal;
     private final TemplateCoreBal templateBal;
     private final MenuCoreBal menuBal;
 
     @Autowired
-    public GraphCoreBalImpl(GraphDisplayBal graphBuilder, UserCoreBal userBal, TemplateCoreBal templateBal, MenuCoreBal menuBal, GraphRepository repository) {
+    public GraphCoreBalImpl(@Qualifier("graphFilterChain") ModuleChainBal<GraphFilter> graphFilter,
+            UserCoreBal userBal, TemplateCoreBal templateBal, MenuCoreBal menuBal, GraphRepository repository) {
         super(repository);
-        this.graphBuilder = graphBuilder;
+        this.graphFilter = graphFilter.getChain();
         this.userBal = userBal;
         this.templateBal = templateBal;
         this.menuBal = menuBal;
@@ -143,7 +143,7 @@ public class GraphCoreBalImpl extends BalBase<GraphRepository> implements GraphC
             User user = userBal.getUserByToken(token);
             Graph graph = repository.findOne(graphId);
             if (user.getId().equals(graph.getCreatorId())) {
-                return graphBuilder.buildGraphData(graph, token);
+                return graphFilter.execute(graph, token);
             }
         } catch (Exception e) {
             LOG.error("Could no get graph data", e);

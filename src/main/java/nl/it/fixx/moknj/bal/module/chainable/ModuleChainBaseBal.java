@@ -30,9 +30,9 @@ public abstract class ModuleChainBaseBal<ACTION extends ChainBal> implements Mod
         Iterator<Map.Entry<String, ACTION>> actions = types.entrySet().iterator();
         while (actions.hasNext()) {
             Map.Entry<String, ACTION> pair = actions.next();
-            log.info("Discovered " + pair.getKey() + ", adding [" + cls.getSimpleName() + "] record chain...");
+            log.info("Discovered " + pair.getKey() + "...");
             if (focus != null && !focus.hasNext()) {
-                log.info("[" + cls.getSimpleName() + "] Chaining " + pair.getKey() + " to " + focus.getClass().getSimpleName());
+                log.info("Chaining " + pair.getKey() + " to " + focus.getClass().getSimpleName());
                 focus.setNextIn(pair.getValue());
             }
             focus = pair.getValue();

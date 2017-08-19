@@ -8,18 +8,18 @@ import org.joda.time.LocalDate;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class DateUtil {
+public final class DateUtil {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DateUtil.class);
+    private final static DateTimeFormatter JSTF = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private final static String MONTH = "MMM";
+    private final static String DAY = "EEE";
 
-    public static String JS_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private DateUtil() {
+    }
 
     public static DateTime parseJavaScriptDateTime(String date) {
-        DateTimeFormatter jsfmt = DateTimeFormat.forPattern(JS_DATE_FORMAT);
-        return jsfmt.parseDateTime(date);
+        return JSTF.parseDateTime(date);
     }
 
     public static Date parseJavaScriptDate(String date) {
@@ -32,44 +32,37 @@ public class DateUtil {
     }
 
     public static List<String> geMonthsForYear(int year) throws Exception {
-        String time1 = year + "-01-01";
-        String time2 = year + "-12-31";
-        LocalDate date1 = new LocalDate(time1);
-        LocalDate date2 = new LocalDate(time2);
-        List<String> months = new ArrayList<>();
-        while (date1.isBefore(date2)) {
-            months.add(date1.toString("MMM"));
-            date1 = date1.plus(Period.months(1));
-        }
+        return getDateList(year + "-01-01", year + "-12-31", MONTH);
+    }
 
-        return months;
+    private static List<String> getDateList(String start, String end, String df) {
+        LocalDate startDate = new LocalDate(start);
+        LocalDate endDate = new LocalDate(end);
+        return getDateList(startDate, endDate, df);
+    }
+
+    private static List<String> getDateList(LocalDate startDate, LocalDate endDate, String df) {
+        final List<String> dates = new ArrayList<>();
+        while (startDate.isBefore(endDate)) {
+            dates.add(startDate.toString(df));
+            if (MONTH.equals(df)) {
+                startDate = startDate.plus(Period.months(1));
+            } else if (DAY.equals(df)) {
+                startDate = startDate.plusDays(1);
+            }
+        }
+        return dates;
     }
 
     public static List<String> geMonthsForDate(DateTime date) throws Exception {
-        String time1 = date.getYear() + "-01-01";
-        String time2 = date.getYear() + "-" + date.getMonthOfYear() + "-" + date.getDayOfMonth();
-        LocalDate date1 = new LocalDate(time1);
-        LocalDate date2 = new LocalDate(time2);
-        List<String> months = new ArrayList<>();
-        while (date1.isBefore(date2)) {
-            months.add(date1.toString("MMM"));
-            date1 = date1.plus(Period.months(1));
-        }
-
-        return months;
+        String end = date.getYear() + "-" + date.getMonthOfYear() + "-" + date.getDayOfMonth();
+        return getDateList(date.getYear() + "-01-01", end, MONTH);
     }
 
     public static List<String> getDaysOfWeek(DateTime date) {
-        // add labels
-        List<String> daysInMonthLabels = new ArrayList<>();
-        LocalDate firstDay = date.toLocalDate().dayOfWeek().withMinimumValue();
-        LocalDate nextMonthFirstDay = date.toLocalDate().dayOfWeek().withMaximumValue();
-        while (firstDay.isBefore(nextMonthFirstDay)) {
-            daysInMonthLabels.add(firstDay.toString("EEE"));
-            firstDay = firstDay.plusDays(1);
-        }
-
-        return daysInMonthLabels;
+        LocalDate start = date.toLocalDate().dayOfWeek().withMinimumValue();
+        LocalDate end = date.toLocalDate().dayOfWeek().withMaximumValue();
+        return getDateList(start, end, DAY);
     }
 
 }

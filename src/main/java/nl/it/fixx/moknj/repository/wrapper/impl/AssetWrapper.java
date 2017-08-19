@@ -6,9 +6,9 @@ import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.repository.AssetRepository;
 import nl.it.fixx.moknj.repository.wrapper.BaseWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class AssetWrapper extends BaseWrapper<Asset, AssetRepository> {
 
     @Autowired
