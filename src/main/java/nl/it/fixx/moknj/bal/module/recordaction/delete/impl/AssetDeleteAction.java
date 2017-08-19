@@ -1,6 +1,6 @@
 package nl.it.fixx.moknj.bal.module.recordaction.delete.impl;
 
-import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
+import nl.it.fixx.moknj.bal.module.link.ModuleLinkBal;
 import nl.it.fixx.moknj.bal.module.recordaction.delete.DeleteActionBase;
 import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;

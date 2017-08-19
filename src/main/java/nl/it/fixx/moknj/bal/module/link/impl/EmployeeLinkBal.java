@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.module.employee;
+package nl.it.fixx.moknj.bal.module.link.impl;
 
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +14,8 @@ import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;
 import nl.it.fixx.moknj.repository.EmployeeLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
+import nl.it.fixx.moknj.bal.module.link.ModuleLinkBal;
+import nl.it.fixx.moknj.bal.module.linkaccess.impl.EmployeeLinkAccess;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service("employeeLinkBal")

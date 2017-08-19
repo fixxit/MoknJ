@@ -25,7 +25,7 @@ import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import nl.it.fixx.moknj.bal.module.ModuleBal;
-import nl.it.fixx.moknj.bal.module.asset.AssetLinkBal;
+import nl.it.fixx.moknj.bal.module.link.impl.AssetLinkBal;
 
 /**
  * This class is used to group the graph data for display in the UI

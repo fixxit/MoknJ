@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.module.employee;
+package nl.it.fixx.moknj.bal.module.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

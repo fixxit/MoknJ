@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.module;
+package nl.it.fixx.moknj.bal.module.linkaccess;
 
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
 import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
 import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
+import nl.it.fixx.moknj.bal.module.ModuleBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import nl.it.fixx.moknj.domain.core.link.Link;
 import nl.it.fixx.moknj.domain.core.template.Template;

@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.module;
+package nl.it.fixx.moknj.bal.module.link;
 
 import java.util.List;
 import nl.it.fixx.moknj.domain.core.link.Link;

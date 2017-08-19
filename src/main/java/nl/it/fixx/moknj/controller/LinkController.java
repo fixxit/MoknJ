@@ -1,7 +1,7 @@
 package nl.it.fixx.moknj.controller;
 
-import nl.it.fixx.moknj.bal.module.asset.AssetLinkBal;
-import nl.it.fixx.moknj.bal.module.employee.EmployeeLinkBal;
+import nl.it.fixx.moknj.bal.module.link.impl.AssetLinkBal;
+import nl.it.fixx.moknj.bal.module.link.impl.EmployeeLinkBal;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.response.LinkResponse;

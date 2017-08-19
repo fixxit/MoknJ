@@ -1,9 +1,10 @@
-package nl.it.fixx.moknj.bal.module.employee;
+package nl.it.fixx.moknj.bal.module.linkaccess.impl;
 
 import nl.it.fixx.moknj.bal.core.access.AccessCoreBal;
 import nl.it.fixx.moknj.bal.core.menu.MenuCoreBal;
 import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
-import nl.it.fixx.moknj.bal.module.ModuleLinkAccessBal;
+import nl.it.fixx.moknj.bal.module.impl.EmployeeBal;
+import nl.it.fixx.moknj.bal.module.linkaccess.ModuleLinkAccessBal;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.employee.Employee;
 import nl.it.fixx.moknj.domain.modules.employee.EmployeeLink;

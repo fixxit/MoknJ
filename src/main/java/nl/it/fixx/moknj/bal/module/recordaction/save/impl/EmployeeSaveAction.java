@@ -4,7 +4,7 @@ import java.util.Objects;
 import nl.it.fixx.moknj.bal.core.field.FieldCoreBal;
 import nl.it.fixx.moknj.bal.core.template.TemplateCoreBal;
 import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
-import nl.it.fixx.moknj.bal.module.employee.EmployeeLinkBal;
+import nl.it.fixx.moknj.bal.module.link.impl.EmployeeLinkBal;
 import nl.it.fixx.moknj.bal.module.recordaction.save.SaveActionBase;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;

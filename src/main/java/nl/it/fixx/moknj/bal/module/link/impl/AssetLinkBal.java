@@ -1,4 +1,4 @@
-package nl.it.fixx.moknj.bal.module.asset;
+package nl.it.fixx.moknj.bal.module.link.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,7 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import nl.it.fixx.moknj.bal.module.ModuleLinkBal;
+import nl.it.fixx.moknj.bal.module.link.ModuleLinkBal;
+import nl.it.fixx.moknj.bal.module.linkaccess.impl.AssetLinkAccess;
 import nl.it.fixx.moknj.exception.AccessException;
 import org.springframework.beans.factory.annotation.Qualifier;
 
