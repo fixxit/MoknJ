@@ -13,8 +13,6 @@ import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.bal.module.ModuleBal;
 import nl.it.fixx.moknj.domain.core.global.GlobalAccessRights;
 import static nl.it.fixx.moknj.domain.core.global.GlobalMenuType.GBL_MT_ASSET;
-import nl.it.fixx.moknj.domain.core.menu.Menu;
-import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
@@ -122,26 +120,26 @@ public class AssetLinkBal extends BalBase<AssetLinkRepository> implements Module
     public List<AssetLink> getAllLinks(String token) throws BalException {
         try {
             Set<AssetLink> results = new HashSet<>();
-            for (Menu menu : mainAccessBal.getUserMenus(token)) {
-                if (GBL_MT_ASSET.equals(menu.getMenuType())) {
-                    for (Template temp : menu.getTemplates()) {
-                        List<Asset> assets = assetBal.getAll(temp.getId(), menu.getId(), token);
-                        for (Asset asset : assets) {
-                            results.addAll(assetLinkAccess.filterRecordAccess(
-                                    getAllAssetLinksByAssetId(
-                                            asset.getId(),
-                                            menu.getId(),
-                                            temp.getId(),
-                                            token),
-                                    menu.getId(),
-                                    temp.getId(),
-                                    userBal.getUserByToken(token)));
-                        }
-                    }
-                }
-            }
+            mainAccessBal.getUserMenus(token).stream().filter((menu)
+                    -> (GBL_MT_ASSET.equals(menu.getMenuType()))).forEachOrdered((menu)
+                    -> {
+                menu.getTemplates().forEach((temp) -> {
+                    List<Asset> assets = assetBal.getAll(temp.getId(), menu.getId(), token);
+                    assets.forEach((asset) -> {
+                        results.addAll(assetLinkAccess.filterRecordAccess(
+                                getAllAssetLinksByAssetId(
+                                        asset.getId(),
+                                        menu.getId(),
+                                        temp.getId(),
+                                        token),
+                                menu.getId(),
+                                temp.getId(),
+                                userBal.getUserByToken(token)));
+                    });
+                });
+            });
             return results.stream().collect(Collectors.toList());
-        } catch (Exception e) {
+        } catch (BalException e) {
             throw new BalException("Error while trying to find all asset links", e);
         }
     }
@@ -183,9 +181,8 @@ public class AssetLinkBal extends BalBase<AssetLinkRepository> implements Module
      * @param templateId
      * @param token
      * @return
-     * @throws Exception
      */
-    public List<AssetLink> getAllAssetLinksByAssetId(String assetId, String menuId, String templateId, String token) throws Exception {
+    public List<AssetLink> getAllAssetLinksByAssetId(String assetId, String menuId, String templateId, String token) {
         try {
             return assetLinkAccess.filterRecordAccess(
                     repository.getAllByAssetId(assetId),

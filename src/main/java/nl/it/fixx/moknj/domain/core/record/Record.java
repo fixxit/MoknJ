@@ -95,6 +95,16 @@ public interface Record {
     void setCreatedBy(String createdBy);
 
     /**
+     * @return the resourceId
+     */
+    String getResourceId();
+
+    /**
+     * @param resourceId the resourceId to set
+     */
+    void setResourceId(String resourceId);
+
+    /**
      * @return the freeDate
      */
     String getFreeDate();

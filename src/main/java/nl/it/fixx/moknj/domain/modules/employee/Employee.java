@@ -76,6 +76,7 @@ public class Employee implements Record {
     /**
      * @return the resourceId
      */
+    @Override
     public String getResourceId() {
         return resourceId;
     }
@@ -83,6 +84,7 @@ public class Employee implements Record {
     /**
      * @param resourceId the resourceId to set
      */
+    @Override
     public void setResourceId(String resourceId) {
         this.resourceId = resourceId;
     }

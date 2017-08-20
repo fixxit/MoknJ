@@ -15,8 +15,6 @@ import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
-import nl.it.fixx.moknj.domain.modules.asset.Asset;
-import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
 import nl.it.fixx.moknj.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -24,16 +22,14 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import nl.it.fixx.moknj.bal.module.ModuleBal;
-import nl.it.fixx.moknj.bal.module.link.impl.AssetLinkBal;
 
 /**
  * This class is used to group the graph data for display in the UI
  *
  * @author adriaan
- * @param <MODULE>
+ * @param <DOMAIN>
  */
-public abstract class GraphFilterBase<MODULE extends ModuleBal> implements GraphFilter {
+public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphFilterBase.class);
 
@@ -41,26 +37,22 @@ public abstract class GraphFilterBase<MODULE extends ModuleBal> implements Graph
     private DateTime startDate;
     private GraphFilter nextIn;
 
-    private static final String IN = "In";
-    private static final String OUT = "Out";
+    protected static final String IN = "In";
+    protected static final String OUT = "Out";
 
     protected final MainAccessCoreBal mainAccessBal;
-    protected final MODULE module;
-    protected final AssetLinkBal linkBal;
     protected final UserCoreBal userBal;
 
-    public GraphFilterBase(MainAccessCoreBal mainAccessBal, MODULE module,
-            AssetLinkBal linkBal, UserCoreBal userBal) {
+    public GraphFilterBase(MainAccessCoreBal mainAccessBal,
+            UserCoreBal userBal) {
         this.mainAccessBal = mainAccessBal;
-        this.module = module;
-        this.linkBal = linkBal;
         this.userBal = userBal;
     }
 
-    private final String FMT_CREATED_DATE = "yyyy-MM-dd HH:mm";
-    private final String FMT_FILTER_DATE = "yyyy-MM-dd";
-    private final String FMT_MONTH_NAME = "MMM";
-    private final String FMT_DAY_NAME = "EEE";
+    protected final String FMT_CREATED_DATE = "yyyy-MM-dd HH:mm";
+    protected final String FMT_FILTER_DATE = "yyyy-MM-dd";
+    protected final String FMT_MONTH_NAME = DateUtil.MONTH;
+    protected final String FMT_DAY_NAME = DateUtil.DAY;
 
     @Override
     public void setNextIn(GraphFilter graphSearch) {
@@ -83,6 +75,8 @@ public abstract class GraphFilterBase<MODULE extends ModuleBal> implements Graph
         }
         return new GraphData();
     }
+
+    public abstract List<DOMAIN> getData(Graph graphInfo, Menu menu, Template template, String token);
 
     /**
      * Generates the graph data!
@@ -113,12 +107,8 @@ public abstract class GraphFilterBase<MODULE extends ModuleBal> implements Graph
                         boolean xAxisSwapped = false;
                         List<String> xAxisLabels = new ArrayList<>();
                         List<String> yAxisLabels = new ArrayList<>();
-                        List records = module.getAll(template.getId(), menu.getId(), token);
-                        // duplicate records for all entries which have the same id.
-                        // Basically a left join...
-                        if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
-                            records = getAssetCheckOutAndInRecords(records, menu, template, token);
-                        }
+                        List<DOMAIN> records = getData(graphInfo, menu, template, token);
+
                         // This is used to bypass the filterdate and filter rule logic
                         boolean bypassDateRulle = false;
                         if (GlobalGraphDate.GBL_FOCUS_NO_DATE_RULE.equals(graphInfo.getGraphDateType())) {
@@ -235,24 +225,23 @@ public abstract class GraphFilterBase<MODULE extends ModuleBal> implements Graph
                         final String[] yAxis = yAxisLabels.toArray(new String[yAxisLabels.size()]);
                         final String[] xAxis = xAxisLabels.toArray(new String[xAxisLabels.size()]);
 
-                        for (Object record : records) {
-                            final Record recodValue = (Record) record;
+                        for (DOMAIN record : records) {
                             // y- axis value should come here
                             String yAxisValue = null;
                             if (null != graphInfo.getGraphFocus()) {
                                 switch (graphInfo.getGraphFocus()) {
                                     case GBL_FOCUS_CREATED_BY:
-                                        String createdBy = recodValue.getCreatedBy();
+                                        String createdBy = record.getCreatedBy();
                                         yAxisValue = createdBy;
                                         break;
                                     case GBL_FOCUS_FREE_FIELD:
-                                        for (FieldValue field : recodValue.getDetails()) {
+                                        for (FieldValue field : record.getDetails()) {
                                             if (field.getId().equals(graphInfo.getFreefieldId())) {
                                                 String value = field.getValue();
                                                 if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
-                                                    if (IN.equals(recodValue.getFreeValue())) {
+                                                    if (IN.equals(record.getFreeValue())) {
                                                         yAxisValue = value + "-" + IN;
-                                                    } else if (OUT.equals(recodValue.getFreeValue())) {
+                                                    } else if (OUT.equals(record.getFreeValue())) {
                                                         yAxisValue = value + "-" + OUT;
                                                     }
                                                 } else {
@@ -266,22 +255,20 @@ public abstract class GraphFilterBase<MODULE extends ModuleBal> implements Graph
                                     case GBL_FOCUS_IN_AND_OUT:
                                         // use record object as value (asset) lost its
                                         // asset fields in casting.
-                                        if (record instanceof Asset) {
-                                            final Asset asset = (Asset) record;
-                                            // null check for assignment
-                                            // null == in
-                                            // not null == out
-                                            if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
-                                                yAxisValue = asset.getFreeValue();
-                                            } else if (!GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
-                                                if (asset.getResourceId() != null
-                                                        && !asset.getResourceId().trim().isEmpty()) {
-                                                    yAxisValue = OUT;
-                                                } else {
-                                                    yAxisValue = IN;
-                                                }
+                                        // null check for assignment
+                                        // null == in
+                                        // not null == out
+                                        if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                            yAxisValue = record.getFreeValue();
+                                        } else if (!GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                            if (record.getResourceId() != null
+                                                    && !record.getResourceId().trim().isEmpty()) {
+                                                yAxisValue = OUT;
+                                            } else {
+                                                yAxisValue = IN;
                                             }
                                         }
+
                                         break;
                                     case GBL_FOCUS_DEFAULT:
                                     default:
@@ -299,16 +286,16 @@ public abstract class GraphFilterBase<MODULE extends ModuleBal> implements Graph
                             if (null != graphInfo.getGraphDateType()) {
                                 switch (graphInfo.getGraphDateType()) {
                                     case GBL_FOCUS_LAST_MODIFIED:
-                                        recodDateTime = DateUtil.parseDate(recodValue.getLastModifiedDate(), FMT_CREATED_DATE);
+                                        recodDateTime = DateUtil.parseDate(record.getLastModifiedDate(), FMT_CREATED_DATE);
                                         break;
                                     case GBL_FOCUS_ASSET_IN_OUT_DATE:
-                                        recodDateTime = DateUtil.parseDate(recodValue.getFreeDate(), FMT_CREATED_DATE);
+                                        recodDateTime = DateUtil.parseDate(record.getFreeDate(), FMT_CREATED_DATE);
                                         break;
                                     case GBL_FOCUS_CREATED_DATE:
-                                        recodDateTime = DateUtil.parseDate(recodValue.getCreatedDate(), FMT_CREATED_DATE);
+                                        recodDateTime = DateUtil.parseDate(record.getCreatedDate(), FMT_CREATED_DATE);
                                         break;
                                     case GBL_FOCUS_FREE_FIELD:
-                                        for (FieldValue field : recodValue.getDetails()) {
+                                        for (FieldValue field : record.getDetails()) {
                                             if (field.getId().equals(graphInfo.getFreeDateFieldId())) {
                                                 recodDateTime = DateUtil.parseJavaScriptDateTime(field.getValue());
                                                 break;
@@ -316,11 +303,11 @@ public abstract class GraphFilterBase<MODULE extends ModuleBal> implements Graph
                                         }
                                         break;
                                     default:
-                                        recodDateTime = DateUtil.parseDate(recodValue.getCreatedDate(), FMT_CREATED_DATE);
+                                        recodDateTime = DateUtil.parseDate(record.getCreatedDate(), FMT_CREATED_DATE);
                                         break;
                                 }
                             } else {
-                                recodDateTime = DateUtil.parseDate(recodValue.getCreatedDate(), FMT_CREATED_DATE);
+                                recodDateTime = DateUtil.parseDate(record.getCreatedDate(), FMT_CREATED_DATE);
                             }
 
                             final String recordDateStr = new SimpleDateFormat(FMT_FILTER_DATE).format(recodDateTime.toDate());
@@ -503,38 +490,6 @@ public abstract class GraphFilterBase<MODULE extends ModuleBal> implements Graph
             LOG.error("error while month dates", e);
             throw e;
         }
-    }
-
-    private List<Asset> getAssetCheckOutAndInRecords(List records, Menu menu, Template template, String token) throws Exception {
-        final List<Asset> results = new ArrayList<>();
-        for (final Object record : records) {
-            if (record instanceof Asset) {
-                final Asset asset = (Asset) record;
-                // gets all the checked in/out records for asset.
-                final List<AssetLink> links = linkBal.getAllAssetLinksByAssetId(
-                        asset.getId(), menu.getId(), template.getId(), token);
-
-                links.forEach((link) -> {
-                    // create new instance of asset... prototype pattern would be nice here...
-                    final Asset newAsset = new Asset();
-                    if (link.getAssetId().equals(asset.getId())) {
-                        DateTime date = DateUtil.parseJavaScriptDateTime(link.getDate());
-                        newAsset.setFreeDate(new SimpleDateFormat(FMT_CREATED_DATE).format(date.plusDays(1).toDate()));
-                        newAsset.setFreeValue(link.isChecked() ? OUT : IN);
-                        newAsset.setCreatedBy(asset.getCreatedBy());
-                        newAsset.setCreatedDate(asset.getCreatedDate());
-                        newAsset.setDetails(asset.getDetails());
-                        newAsset.setLastModifiedBy(asset.getLastModifiedBy());
-                        newAsset.setLastModifiedDate(asset.getLastModifiedDate());
-                        newAsset.setMenuScopeIds(asset.getMenuScopeIds());
-                        newAsset.setResourceId(asset.getResourceId());
-                        newAsset.setTypeId(asset.getTypeId());
-                        results.add(newAsset);
-                    }
-                });
-            }
-        }
-        return results;
     }
 
 }

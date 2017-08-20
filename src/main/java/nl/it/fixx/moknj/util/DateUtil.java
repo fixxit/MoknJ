@@ -12,8 +12,8 @@ import org.joda.time.format.DateTimeFormatter;
 public final class DateUtil {
 
     private final static DateTimeFormatter JSTF = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    private final static String MONTH = "MMM";
-    private final static String DAY = "EEE";
+    public final static String MONTH = "MMM";
+    public final static String DAY = "EEE";
 
     private DateUtil() {
     }
