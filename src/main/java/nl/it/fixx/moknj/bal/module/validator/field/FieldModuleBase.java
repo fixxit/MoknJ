@@ -37,7 +37,7 @@ public abstract class FieldModuleBase<DOMAIN extends Record, REPO extends Record
     }
 
     @Override
-    public void setNextIn(FieldModule nextFieldValidation) {
+    public void setNext(FieldModule nextFieldValidation) {
         this.nextFieldValidation = nextFieldValidation;
     }
 

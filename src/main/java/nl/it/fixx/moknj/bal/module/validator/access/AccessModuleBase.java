@@ -32,7 +32,7 @@ public abstract class AccessModuleBase<DOMAIN extends Record> implements AccessM
     }
 
     @Override
-    public void setNextIn(AccessModule next) {
+    public void setNext(AccessModule next) {
         this.nextAccessValidation = next;
     }
 

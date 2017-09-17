@@ -1,10 +1,10 @@
 package nl.it.fixx.moknj.bal.module.graphfilter;
 
-import nl.it.fixx.moknj.bal.module.chainable.ChainBal;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
+import nl.it.fixx.moknj.bal.module.chainable.ModuleChainPointer;
 
-public interface GraphFilter extends ChainBal<GraphFilter> {
+public interface GraphFilter extends ModuleChainPointer<GraphFilter> {
 
     String getDefaultValueForModule();
 
@@ -14,7 +14,7 @@ public interface GraphFilter extends ChainBal<GraphFilter> {
     boolean hasNext();
 
     @Override
-    void setNextIn(GraphFilter graphSearch);
+    void setNext(GraphFilter graphSearch);
 
     GraphData execute(Graph graphInfo, String token) throws Exception;
 }

@@ -1,12 +1,12 @@
 package nl.it.fixx.moknj.bal.module.recordaction.save;
 
-import nl.it.fixx.moknj.bal.module.chainable.ChainBal;
 import org.aspectj.lang.ProceedingJoinPoint;
+import nl.it.fixx.moknj.bal.module.chainable.ModuleChainPointer;
 
-public interface SaveAction<JOINDOMAIN, DOMAIN> extends ChainBal<SaveAction> {
+public interface SaveAction<JOINDOMAIN, DOMAIN> extends ModuleChainPointer<SaveAction> {
 
     @Override
-    void setNextIn(SaveAction saveAction);
+    void setNext(SaveAction saveAction);
 
     JOINDOMAIN before(DOMAIN domain);
 

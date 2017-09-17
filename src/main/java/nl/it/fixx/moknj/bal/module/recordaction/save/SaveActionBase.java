@@ -55,7 +55,7 @@ public abstract class SaveActionBase<JOINDOMAIN, DOMAIN, REPO extends MongoRepos
     }
 
     @Override
-    public void setNextIn(SaveAction saveAction) {
+    public void setNext(SaveAction saveAction) {
         this.saveAction = saveAction;
     }
 

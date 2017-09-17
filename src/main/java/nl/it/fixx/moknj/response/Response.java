@@ -1,8 +1,5 @@
 package nl.it.fixx.moknj.response;
 
-/**
- * Created by colin on 07/10/16 14:42
- */
 public abstract class Response {
     protected boolean success;
     protected String action;

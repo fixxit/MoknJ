@@ -42,7 +42,6 @@ public abstract class ModuleLinkAccessBal<DOMAIN extends Link, MODBAL extends Mo
                         if (template == null) {
                             continue;
                         }
-
                         if (!template.isAllowScopeChallenge()) {
                             if (accessBal.hasAccess(
                                     user,

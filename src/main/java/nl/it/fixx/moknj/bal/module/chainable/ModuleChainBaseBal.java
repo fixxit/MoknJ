@@ -5,7 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.springframework.context.ApplicationContext;
 
-public abstract class ModuleChainBaseBal<ACTION extends ChainBal> implements ModuleChainBal<ACTION> {
+public abstract class ModuleChainBaseBal<POINTER extends ModuleChainPointer> implements ModuleChainBal<POINTER> {
 
     private final Logger log;
 
@@ -22,27 +22,27 @@ public abstract class ModuleChainBaseBal<ACTION extends ChainBal> implements Mod
      * @return Action chain
      */
     @Override
-    public ACTION getChain() {
-        ACTION action = null;
-        ACTION focus = null;
-        Class<ACTION> cls = getClazz();
-        Map<String, ACTION> types = context.getBeansOfType(cls);
-        Iterator<Map.Entry<String, ACTION>> actions = types.entrySet().iterator();
-        while (actions.hasNext()) {
-            Map.Entry<String, ACTION> pair = actions.next();
-            log.info("Discovered " + pair.getKey() + "...");
-            if (focus != null && !focus.hasNext()) {
-                log.info("Chaining " + pair.getKey() + " to " + focus.getClass().getSimpleName());
-                focus.setNextIn(pair.getValue());
+    public POINTER getChain() {
+        POINTER head = null;
+        POINTER pointer = null;
+        Class<POINTER> cls = getClazz();
+        Map<String, POINTER> types = context.getBeansOfType(cls);
+        Iterator<Map.Entry<String, POINTER>> pointers = types.entrySet().iterator();
+        while (pointers.hasNext()) {
+            Map.Entry<String, POINTER> entry = pointers.next();
+            log.info("Discovered " + entry.getKey() + "...");
+            if (pointer != null && !pointer.hasNext()) {
+                log.info("Chaining " + entry.getKey() + " to " + pointer.getClass().getSimpleName());
+                pointer.setNext(entry.getValue());
             }
-            focus = pair.getValue();
-            if (action == null) {
-                action = pair.getValue();
+            pointer = entry.getValue();
+            if (head == null) {
+                head = entry.getValue();
             }
         }
-        if (action != null) {
-            log.info("{} is the 1st in the chain", action.getClass().getSimpleName());
+        if (head != null) {
+            log.info("{} is the 1st in the chain", head.getClass().getSimpleName());
         }
-        return action;
+        return head;
     }
 }

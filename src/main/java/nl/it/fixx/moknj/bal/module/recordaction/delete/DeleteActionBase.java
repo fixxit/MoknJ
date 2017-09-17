@@ -55,7 +55,7 @@ public abstract class DeleteActionBase<JOINDOMAIN, DOMAIN, REPO extends MongoRep
     }
 
     @Override
-    public void setNextIn(DeleteAction deleteAction) {
+    public void setNext(DeleteAction deleteAction) {
         this.deleteAction = deleteAction;
     }
 

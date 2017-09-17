@@ -7,7 +7,8 @@ import nl.it.fixx.moknj.bal.core.access.MainAccessCoreBal;
 import nl.it.fixx.moknj.bal.core.user.UserCoreBal;
 import nl.it.fixx.moknj.domain.core.field.FieldDetail;
 import nl.it.fixx.moknj.domain.core.field.FieldValue;
-import nl.it.fixx.moknj.domain.core.global.GlobalGraphDate;
+import static nl.it.fixx.moknj.domain.core.global.GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE;
+import static nl.it.fixx.moknj.domain.core.global.GlobalGraphDate.GBL_FOCUS_NO_DATE_RULE;
 import nl.it.fixx.moknj.domain.core.global.GlobalGraphView;
 import nl.it.fixx.moknj.domain.core.graph.Graph;
 import nl.it.fixx.moknj.domain.core.graph.GraphData;
@@ -55,7 +56,7 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
     protected final String FMT_DAY_NAME = DateUtil.DAY;
 
     @Override
-    public void setNextIn(GraphFilter graphSearch) {
+    public void setNext(GraphFilter graphSearch) {
         this.nextIn = graphSearch;
     }
 
@@ -105,19 +106,19 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                          */
                         // X-AXIS Label Logic
                         boolean xAxisSwapped = false;
-                        List<String> xAxisLabels = new ArrayList<>();
-                        List<String> yAxisLabels = new ArrayList<>();
+                        final List<String> xAxisLabels = new ArrayList<>();
+                        final List<String> yAxisLabels = new ArrayList<>();
                         List<DOMAIN> records = getData(graphInfo, menu, template, token);
 
                         // This is used to bypass the filterdate and filter rule logic
-                        boolean bypassDateRulle = false;
-                        if (GlobalGraphDate.GBL_FOCUS_NO_DATE_RULE.equals(graphInfo.getGraphDateType())) {
+                        boolean bypassDateRule = false;
+                        if (GBL_FOCUS_NO_DATE_RULE.equals(graphInfo.getGraphDateType())) {
                             if (!GlobalGraphView.GBL_OFTD.equals(graphInfo.getGraphView())) {
-                                bypassDateRulle = true;
+                                bypassDateRule = true;
                             }
                         }
 
-                        if (!bypassDateRulle) {
+                        if (!bypassDateRule) {
                             endDate = DateUtil.parseJavaScriptDateTime(graphInfo.getGraphDate());
                             startDate = today;
                             //javascript is one day off todo with date type UCT
@@ -130,22 +131,22 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                         if (null != graphInfo.getGraphView()) {
                             switch (graphInfo.getGraphView()) {
                                 case GBL_MTMTFY: {
-                                    xAxisLabels = DateUtil.geMonthsForYear(endDate.getYear());
+                                    xAxisLabels.addAll(DateUtil.geMonthsForYear(endDate.getYear()));
                                     initialiseYearDates();
                                 }
                                 break;
                                 case GBL_MTMFD: {
-                                    xAxisLabels = DateUtil.geMonthsForDate(endDate);
+                                    xAxisLabels.addAll(DateUtil.geMonthsForDate(endDate));
                                     initialiseMonthDates();
                                 }
                                 break;
                                 case GBL_DOWFY: {
-                                    xAxisLabels = DateUtil.getDaysOfWeek(endDate);
+                                    xAxisLabels.addAll(DateUtil.getDaysOfWeek(endDate));
                                     initialiseYearDates();
                                 }
                                 break;
                                 case GBL_DOWFM: {
-                                    xAxisLabels = DateUtil.getDaysOfWeek(endDate);
+                                    xAxisLabels.addAll(DateUtil.getDaysOfWeek(endDate));
                                     initialiseMonthDates();
                                 }
                                 break;
@@ -157,24 +158,22 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                                 }
                                 break;
                                 case GBL_SMTEOM: {
-                                    getXAxisLabels(xAxisLabels, graphInfo, template, token);
+                                    getXAxisLabels(xAxisLabels, graphInfo, template);
                                     xAxisSwapped = true;
                                     initialiseMonthDates();
                                 }
                                 break;
                                 case GBL_SYTEOY: {
-                                    getXAxisLabels(xAxisLabels, graphInfo, template, token);
+                                    getXAxisLabels(xAxisLabels, graphInfo, template);
                                     xAxisSwapped = true;
                                     initialiseYearDates();
                                 }
                                 break;
                                 case GBL_SYTD: {
                                     // SWOPS THE data set for x axis labels
-                                    getXAxisLabels(xAxisLabels, graphInfo, template, token);
+                                    getXAxisLabels(xAxisLabels, graphInfo, template);
                                     xAxisSwapped = true;
-
-                                    String startDateStr = endDate.getYear() + "-01-01";
-                                    LocalDate localstratDate = new LocalDate(startDateStr);
+                                    LocalDate localstratDate = new LocalDate(endDate.getYear() + "-01-01");
                                     startDate = localstratDate.toDateTimeAtStartOfDay();
                                 }
                                 break;
@@ -217,7 +216,7 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                         }
 
                         if (xAxisSwapped) {
-                            yAxisLabels = new ArrayList<>();
+                            yAxisLabels.clear();
                             addDefaultValueForModule(yAxisLabels);
                         }
 
@@ -238,7 +237,7 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                                         for (FieldValue field : record.getDetails()) {
                                             if (field.getId().equals(graphInfo.getFreefieldId())) {
                                                 String value = field.getValue();
-                                                if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                                if (GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
                                                     if (IN.equals(record.getFreeValue())) {
                                                         yAxisValue = value + "-" + IN;
                                                     } else if (OUT.equals(record.getFreeValue())) {
@@ -247,7 +246,6 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                                                 } else {
                                                     yAxisValue = value;
                                                 }
-
                                                 break;
                                             }
                                         }
@@ -258,9 +256,9 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                                         // null check for assignment
                                         // null == in
                                         // not null == out
-                                        if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                        if (GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
                                             yAxisValue = record.getFreeValue();
-                                        } else if (!GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                                        } else if (!GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
                                             if (record.getResourceId() != null
                                                     && !record.getResourceId().trim().isEmpty()) {
                                                 yAxisValue = OUT;
@@ -268,7 +266,6 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                                                 yAxisValue = IN;
                                             }
                                         }
-
                                         break;
                                     case GBL_FOCUS_DEFAULT:
                                     default:
@@ -323,10 +320,9 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                                     (recordDate.isAfter(startDateRule)
                                     || recordDate.isEqual(startDateRule))
                                     // Bypass date
-                                    || bypassDateRulle) {
+                                    || bypassDateRule) {
 
                                 final LocalDate local = recordDate.toLocalDate();
-
                                 String xAxisValue = "";
                                 if (null != graphInfo.getGraphView()) {
                                     switch (graphInfo.getGraphView()) {
@@ -385,7 +381,7 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
         }
     }
 
-    private void getXAxisLabels(List<String> xAxis, Graph graphInfo, Template temp, String token) throws Exception {
+    private void getXAxisLabels(final List<String> xAxis, final Graph graphInfo, final Template temp) throws Exception {
         try {
             if (null != graphInfo.getGraphFocus()) {
                 switch (graphInfo.getGraphFocus()) {
@@ -414,7 +410,7 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
         }
     }
 
-    private void addFreeFieldLabels(List<String> list, Graph graphInfo, Template temp) {
+    private void addFreeFieldLabels(final List<String> list, final Graph graphInfo, final Template temp) {
         if (graphInfo.getFreefieldId() != null) {
             for (FieldDetail field : temp.getDetails()) {
                 if (field.getId().equals(graphInfo.getFreefieldId())) {
@@ -426,7 +422,7 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
                     final JSONObject json = (JSONObject) JSONValue.parse(jsonStr);
                     final List<String> labels = (List<String>) json.get(name);
 
-                    if (GlobalGraphDate.GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
+                    if (GBL_FOCUS_ASSET_IN_OUT_DATE.equals(graphInfo.getGraphDateType())) {
                         labels.forEach((value) -> {
                             list.add(value + "-" + IN);
                             list.add(value + "-" + OUT);
