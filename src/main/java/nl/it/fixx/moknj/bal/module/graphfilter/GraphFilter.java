@@ -16,5 +16,5 @@ public interface GraphFilter extends ModuleChainPointer<GraphFilter> {
     @Override
     void setNext(GraphFilter graphSearch);
 
-    GraphData execute(Graph graphInfo, String token) throws Exception;
+    GraphData execute(Graph graphInfo, String token);
 }

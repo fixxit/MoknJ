@@ -3,7 +3,6 @@ package nl.it.fixx.moknj.controller;
 import nl.it.fixx.moknj.bal.module.link.impl.AssetLinkBal;
 import nl.it.fixx.moknj.bal.module.link.impl.EmployeeLinkBal;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
-import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.response.LinkResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,15 +33,10 @@ public class LinkController {
             @PathVariable String menuId,
             @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
-        try {
-            response.setLink(assetLinkBal.linkAssetToUser(menuId, templateId,
-                    payload, access_token));
-            response.setSuccess(true);
-            response.setMessage("Saved link successfully");
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setLink(assetLinkBal.linkAssetToUser(menuId, templateId,
+                payload, access_token));
+        response.setSuccess(true);
+        response.setMessage("Saved link successfully");
         return response;
     }
 
@@ -55,13 +49,8 @@ public class LinkController {
     @RequestMapping(value = "/asset/all", method = RequestMethod.POST)
     public LinkResponse getAllAssetLinks(@RequestParam String access_token) {
         final LinkResponse response = new LinkResponse();
-        try {
-            response.setLinks(assetLinkBal.getAllLinks(access_token));
-            response.setSuccess(true);
-        } catch (BalException ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setLinks(assetLinkBal.getAllLinks(access_token));
+        response.setSuccess(true);
         return response;
     }
 
@@ -74,13 +63,8 @@ public class LinkController {
     @RequestMapping(value = "/employee/all", method = RequestMethod.POST)
     public LinkResponse getAllEmployeeLinks(@RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
-        try {
-            response.setEmployeeLinks(employeeLinkBal.getAllLinks(access_token));
-            response.setSuccess(true);
-        } catch (BalException ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setEmployeeLinks(employeeLinkBal.getAllLinks(access_token));
+        response.setSuccess(true);
         return response;
     }
 
@@ -94,13 +78,8 @@ public class LinkController {
     @RequestMapping(value = "/employee/all/{id}/employee", method = RequestMethod.POST)
     public LinkResponse getAllEmployeeLinksByEmployeeId(@PathVariable String id, @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
-        try {
-            response.setEmployeeLinks(employeeLinkBal.getAllLinksByRecordId(id, access_token));
-            response.setSuccess(true);
-        } catch (BalException ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setEmployeeLinks(employeeLinkBal.getAllLinksByRecordId(id, access_token));
+        response.setSuccess(true);
         return response;
     }
 
@@ -114,13 +93,8 @@ public class LinkController {
     @RequestMapping(value = "/asset/all/{id}/asset", method = RequestMethod.POST)
     public LinkResponse getAllAssetLinksByAssetId(@PathVariable String id, @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
-        try {
-            response.setLinks(assetLinkBal.getAllLinksByRecordId(id, access_token));
-            response.setSuccess(true);
-        } catch (BalException ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setLinks(assetLinkBal.getAllLinksByRecordId(id, access_token));
+        response.setSuccess(true);
         return response;
     }
 
@@ -134,13 +108,8 @@ public class LinkController {
     @RequestMapping(value = "/asset/all/{id}/resource", method = RequestMethod.POST)
     public LinkResponse getAllAssetLinksByRecourceId(@PathVariable String id, @RequestParam String access_token) {
         LinkResponse response = new LinkResponse();
-        try {
-            response.setLinks(assetLinkBal.getAllAssetLinksByResourceId(id, access_token));
-            response.setSuccess(true);
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setLinks(assetLinkBal.getAllAssetLinksByResourceId(id, access_token));
+        response.setSuccess(true);
         return response;
     }
 

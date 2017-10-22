@@ -5,17 +5,17 @@ import nl.it.fixx.moknj.domain.core.template.Template;
 
 public interface TemplateCoreBal {
 
-    public Template saveTemplate(Template payload) throws Exception;
+    public Template saveTemplate(Template payload);
 
     public Template getTemplateById(String id);
 
     public boolean exists(String id);
 
-    public String getDispayName(Template template) throws Exception;
+    public String getDispayName(Template template);
 
-    public String getDispayName(String templateId) throws Exception;
+    public String getDispayName(String templateId);
 
-    public List<Template> getAllTemplates() throws Exception;
+    public List<Template> getAllTemplates();
 
-    public void deleteTemplate(String id, boolean cascade) throws Exception;
+    public void deleteTemplate(String id, boolean cascade);
 }

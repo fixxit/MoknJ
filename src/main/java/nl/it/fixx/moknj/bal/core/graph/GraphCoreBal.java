@@ -7,13 +7,13 @@ import nl.it.fixx.moknj.domain.core.graph.GraphData;
 
 public interface GraphCoreBal {
 
-    public Graph save(Graph payload, String token) throws Exception;
+    public Graph save(Graph payload, String token);
 
-    public List<Graph> getAll(String token) throws Exception;
+    public List<Graph> getAll(String token);
 
-    public GraphData getGraphData(String graphId, String token) throws Exception;
+    public GraphData getGraphData(String graphId, String token);
 
-    public Map<String, List<GraphData>> getAllGraphData(String token) throws Exception;
+    public Map<String, List<GraphData>> getAllGraphData(String token);
 
-    public void delete(String id, String token) throws Exception;
+    public void delete(String id, String token);
 }

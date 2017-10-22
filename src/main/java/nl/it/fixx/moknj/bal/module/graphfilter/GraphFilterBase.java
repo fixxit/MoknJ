@@ -16,6 +16,7 @@ import nl.it.fixx.moknj.domain.core.menu.Menu;
 import nl.it.fixx.moknj.domain.core.record.Record;
 import nl.it.fixx.moknj.domain.core.template.Template;
 import nl.it.fixx.moknj.domain.core.user.User;
+import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.util.DateUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -66,7 +67,7 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
     }
 
     @Override
-    public GraphData execute(Graph graphInfo, String token) throws Exception {
+    public GraphData execute(Graph graphInfo, String token) {
         if (valid(graphInfo, token)) {
             return filter(graphInfo, token);
         } else {
@@ -87,7 +88,7 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
      * @return
      * @throws Exception
      */
-    private GraphData filter(Graph graphInfo, String token) throws Exception {
+    private GraphData filter(Graph graphInfo, String token) {
         try {
             final DateTime today = new DateTime();
             final GraphData data = new GraphData();
@@ -377,7 +378,7 @@ public abstract class GraphFilterBase<DOMAIN extends Record> implements GraphFil
             return data;
         } catch (Exception e) {
             LOG.error("error while get graph data", e);
-            throw e;
+            throw new BalException(e);
         }
     }
 

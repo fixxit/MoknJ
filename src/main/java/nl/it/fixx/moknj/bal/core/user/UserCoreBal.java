@@ -5,15 +5,15 @@ import nl.it.fixx.moknj.domain.core.user.User;
 
 public interface UserCoreBal {
 
-    List<User> getAll() throws Exception;
+    List<User> getAll();
 
-    List<User> getAll(String token) throws Exception;
+    List<User> getAll(String token);
 
-    List<User> getAll(boolean isAdmin, String token) throws Exception;
+    List<User> getAll(boolean isAdmin, String token);
 
-    void delete(String userId, String token) throws Exception;
+    void delete(String userId, String token);
 
-    User save(User payload, String token) throws Exception;
+    User save(User payload, String token);
 
     User getUserById(String id);
 
@@ -21,6 +21,6 @@ public interface UserCoreBal {
 
     String getFullName(User user);
 
-    String getFullName(String userId) throws Exception;
+    String getFullName(String userId);
 
 }

@@ -55,10 +55,9 @@ public class GraphCoreBalImpl extends BalBase<GraphRepository> implements GraphC
      * @param payload
      * @param token
      * @return
-     * @throws Exception
      */
     @Override
-    public Graph save(Graph payload, String token) throws Exception {
+    public Graph save(Graph payload, String token) {
         try {
             // For updates if the type has a id then bypass the exists
             boolean bypassExists = false;
@@ -91,10 +90,9 @@ public class GraphCoreBalImpl extends BalBase<GraphRepository> implements GraphC
      *
      * @param token
      * @return list of graphs
-     * @throws java.lang.Exception
      */
     @Override
-    public List<Graph> getAll(String token) throws Exception {
+    public List<Graph> getAll(String token) {
         try {
             User user = userBal.getUserByToken(token);
             Set<Graph> graphs = new HashSet();
@@ -135,19 +133,13 @@ public class GraphCoreBalImpl extends BalBase<GraphRepository> implements GraphC
      * @param graphId
      * @param token
      * @return
-     * @throws Exception
      */
     @Override
-    public GraphData getGraphData(String graphId, String token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            Graph graph = repository.findOne(graphId);
-            if (user.getId().equals(graph.getCreatorId())) {
-                return graphFilter.execute(graph, token);
-            }
-        } catch (Exception e) {
-            LOG.error("Could no get graph data", e);
-            throw e;
+    public GraphData getGraphData(String graphId, String token) {
+        User user = userBal.getUserByToken(token);
+        Graph graph = repository.findOne(graphId);
+        if (user.getId().equals(graph.getCreatorId())) {
+            return graphFilter.execute(graph, token);
         }
         return null;
     }
@@ -158,10 +150,10 @@ public class GraphCoreBalImpl extends BalBase<GraphRepository> implements GraphC
      *
      * @param token
      * @return list of graph data
-     * @throws Exception
+     *
      */
     @Override
-    public Map<String, List<GraphData>> getAllGraphData(String token) throws Exception {
+    public Map<String, List<GraphData>> getAllGraphData(String token) {
         try {
             Map<String, List<GraphData>> allDataSets = new HashMap<>();
             for (Graph graph : getAll(token)) {
@@ -190,10 +182,9 @@ public class GraphCoreBalImpl extends BalBase<GraphRepository> implements GraphC
      *
      * @param id
      * @param token
-     * @throws Exception
      */
     @Override
-    public void delete(String id, String token) throws Exception {
+    public void delete(String id, String token) {
         try {
             if (repository.exists(id)) {
                 Graph graph = repository.findOne(id);

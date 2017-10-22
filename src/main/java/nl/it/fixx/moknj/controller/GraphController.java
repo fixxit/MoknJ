@@ -54,15 +54,9 @@ public class GraphController {
     GraphResponse add(@RequestBody Graph payload,
             @RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
-        try {
-            response.setGraphTemplate(graphBal.save(payload, access_token));
-            response.setSuccess(true);
-            response.setMessage("Saved graph successfully");
-
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setGraphTemplate(graphBal.save(payload, access_token));
+        response.setSuccess(true);
+        response.setMessage("Saved graph successfully");
         return response;
     }
 
@@ -187,14 +181,9 @@ public class GraphController {
     public @ResponseBody
     GraphResponse getAllGraphsData(@RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
-        try {
-            response.setAllGraphsData(graphBal.getAllGraphData(access_token));
-            response.setSuccess(true);
-            response.setMessage("found all user graphs data");
-        } catch (Exception e) {
-            response.setSuccess(false);
-            response.setMessage(e.getMessage());
-        }
+        response.setAllGraphsData(graphBal.getAllGraphData(access_token));
+        response.setSuccess(true);
+        response.setMessage("found all user graphs data");
         return response;
     }
 
@@ -211,14 +200,9 @@ public class GraphController {
     GraphResponse getGraphData(@PathVariable String id,
             @RequestParam String access_token) throws Exception {
         GraphResponse response = new GraphResponse();
-        try {
-            response.setGraphData(graphBal.getGraphData(id, access_token));
-            response.setSuccess(true);
-            response.setMessage("Graph data found");
-        } catch (Exception e) {
-            response.setSuccess(false);
-            response.setMessage(e.getMessage());
-        }
+        response.setGraphData(graphBal.getGraphData(id, access_token));
+        response.setSuccess(true);
+        response.setMessage("Graph data found");
         return response;
     }
 
@@ -233,15 +217,9 @@ public class GraphController {
     public @ResponseBody
     GraphResponse delete(@PathVariable String id, @RequestParam String access_token) {
         GraphResponse response = new GraphResponse();
-        try {
-            graphBal.delete(id, access_token);
-            response.setSuccess(true);
-            response.setMessage("Graph successfully deleted from system");
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
-
+        graphBal.delete(id, access_token);
+        response.setSuccess(true);
+        response.setMessage("Graph successfully deleted from system");
         return response;
     }
 

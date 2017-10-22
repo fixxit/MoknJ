@@ -50,21 +50,20 @@ public class AccessCoreBalImpl extends BalBase<AccessRepository> implements Acce
      * @param userId
      * @param newList
      * @param token
-     * @throws Exception
      */
     @Override
-    public void addAccess(String userId, List<Access> newList, String token) throws Exception {
+    public void addAccess(String userId, List<Access> newList, String token) {
         try {
             List<Access> currentList = getAccessList(userId);
 
             // Update and delete record which exist in db
-            for (Access access : currentList) {
+            currentList.forEach((access) -> {
                 if (!newList.contains(access)) {
                     deleteAccess(access.getId(), token);
                 } else {
                     updateAccess(access, token);
                 }
-            }
+            });
             // find record which are new and not in the db
             for (Access access : newList) {
                 if (!currentList.contains(access)) {
@@ -83,10 +82,9 @@ public class AccessCoreBalImpl extends BalBase<AccessRepository> implements Acce
      *
      * @param access
      * @param token
-     * @throws Exception on db related issues.
      */
     @Override
-    public void addAccess(Access access, String token) throws Exception {
+    public void addAccess(Access access, String token) {
         if (!repository.hasAccess(access.getUserId(), access.getMenuId(), access.getTemplateId())) {
             User loginUser = userBal.getUserByToken(token);
             if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
@@ -115,10 +113,9 @@ public class AccessCoreBalImpl extends BalBase<AccessRepository> implements Acce
      *
      * @param id
      * @param token
-     * @throws Exception
      */
     @Override
-    public void deleteAccess(String id, String token) throws Exception {
+    public void deleteAccess(String id, String token) {
         User loginUser = userBal.getUserByToken(token);
         if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
             throw new AccessException("This user does not have " + ALL_ACCESS.toString());
@@ -198,10 +195,9 @@ public class AccessCoreBalImpl extends BalBase<AccessRepository> implements Acce
      * @param menuId
      * @param templateId
      * @return true if user has access
-     * @throws java.lang.Exception
      */
     @Override
-    public boolean hasAccess(User user, String menuId, String templateId) throws Exception {
+    public boolean hasAccess(User user, String menuId, String templateId) {
         return repository.hasAccess(user.getId(), menuId, templateId)
                 || user.getAuthorities().contains(ALL_ACCESS.toString());
     }
@@ -241,10 +237,9 @@ public class AccessCoreBalImpl extends BalBase<AccessRepository> implements Acce
      *
      * @param userId
      * @return list of user access.
-     * @throws Exception
      */
     @Override
-    public List<Access> getAccessList(String userId) throws Exception {
+    public List<Access> getAccessList(String userId) {
         List<Access> accessList = repository.getAccessList(userId);
         if (accessList == null || accessList.isEmpty()) {
             LOG.debug("This user[" + userBal.getFullName(userId) + "] seems to "

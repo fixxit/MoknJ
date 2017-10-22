@@ -25,8 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/employee")
 public class EmployeeController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EmployeeController.class);
-
     private final ModuleBal<Employee> employeeBal;
 
     @Autowired
@@ -40,21 +38,13 @@ public class EmployeeController {
             @RequestBody Employee employee,
             @RequestParam String access_token) {
         EmployeeResponse response = new EmployeeResponse();
-        try {
-            if (employee == null || employee.getMenuScopeIds().isEmpty()) {
-                throw new Exception("No menu id provided for the employee record");
-            }
-
-            response.setSuccess(true);
-            response.setEmployee(employeeBal.save(id, menuId, employee, access_token));
-            response.setMessage("Successfully saved employee");
-            return response;
-        } catch (Exception ex) {
-            LOG.error("error", ex);
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-            return response;
+        if (employee == null || employee.getMenuScopeIds().isEmpty()) {
+            throw new BalException("No menu id provided for the employee record");
         }
+        response.setSuccess(true);
+        response.setEmployee(employeeBal.save(id, menuId, employee, access_token));
+        response.setMessage("Successfully saved employee");
+        return response;
     }
 
     /**
@@ -69,14 +59,7 @@ public class EmployeeController {
     public EmployeeResponse getAllEmployes(@PathVariable String templateId,
             @PathVariable String menuId, @RequestParam String access_token) {
         EmployeeResponse response = new EmployeeResponse();
-        try {
-            response.setEmployees(employeeBal.getAll(templateId, menuId, access_token));
-        } catch (BalException ex) {
-            LOG.error("error", ex);
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-            return response;
-        }
+        response.setEmployees(employeeBal.getAll(templateId, menuId, access_token));
         return response;
     }
 
@@ -89,14 +72,7 @@ public class EmployeeController {
     @RequestMapping(value = "/get/{id}", method = RequestMethod.POST)
     public EmployeeResponse get(@PathVariable String id) {
         EmployeeResponse response = new EmployeeResponse();
-        try {
-            response.setEmployee(employeeBal.get(id));
-        } catch (Exception ex) {
-            LOG.error("error", ex);
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-            return response;
-        }
+        response.setEmployee(employeeBal.get(id));
         return response;
     }
 
@@ -114,15 +90,9 @@ public class EmployeeController {
             @RequestParam String access_token) {
         // to insure that the below fields have no influence on find all.
         EmployeeResponse response = new EmployeeResponse();
-        try {
-            employeeBal.delete(employee, menuId, access_token, false);
-            response.setMessage("Removed employee record successfully.");
-            response.setSuccess(true);
-        } catch (BalException ex) {
-            LOG.error("error", ex);
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        employeeBal.delete(employee, menuId, access_token, false);
+        response.setMessage("Removed employee record successfully.");
+        response.setSuccess(true);
         return response;
     }
 }

@@ -35,16 +35,10 @@ public class TemplateController {
     public @ResponseBody
     TemplateResponse add(@RequestBody Template payload, @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        try {
-            Template template = mainAccessBal.saveTemplate(payload, access_token);
-            response.setSuccess(template != null);
-            response.setMessage("Saved " + template.getName());
-            response.setType(template);
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
-
+        Template template = mainAccessBal.saveTemplate(payload, access_token);
+        response.setSuccess(template != null);
+        response.setMessage("Saved " + template.getName());
+        response.setType(template);
         return response;
     }
 
@@ -52,14 +46,8 @@ public class TemplateController {
     public @ResponseBody
     TemplateResponse get(@PathVariable String id, @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        try {
-            response.setType(mainAccessBal.getTemplate(id, access_token));
-            response.setSuccess(true);
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
-
+        response.setType(mainAccessBal.getTemplate(id, access_token));
+        response.setSuccess(true);
         return response;
     }
 
@@ -67,13 +55,8 @@ public class TemplateController {
     public @ResponseBody
     TemplateResponse all(@RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        try {
-            response.setTypes(mainAccessBal.getAllTemplatesForToken(access_token));
-            response.setSuccess(true);
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setTypes(mainAccessBal.getAllTemplatesForToken(access_token));
+        response.setSuccess(true);
         return response;
     }
 
@@ -81,18 +64,13 @@ public class TemplateController {
     public @ResponseBody
     TemplateResponse hidden(@RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        try {
-            List<Template> templates = templateBal.getAllTemplates();
-            List<Template> types = new ArrayList<>();
-            templates.stream().filter((type) -> (type.isHidden())).forEach((type) -> {
-                types.add(type);
-            });
-            response.setTypes(types);
-            response.setSuccess(true);
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        List<Template> templates = templateBal.getAllTemplates();
+        List<Template> types = new ArrayList<>();
+        templates.stream().filter((type) -> (type.isHidden())).forEach((type) -> {
+            types.add(type);
+        });
+        response.setTypes(types);
+        response.setSuccess(true);
         return response;
     }
 
@@ -107,18 +85,13 @@ public class TemplateController {
     public TemplateResponse unhide(@PathVariable String id,
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        try {
-            Template template = templateBal.getTemplateById(id);
-            template.setHidden(false);
-            mainAccessBal.saveTemplate(template, access_token);
-            response.setMessage("Template [" + template.getName() + "] "
-                    + " set to visible!");
-            response.setType(template);
-            response.setSuccess(true);
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        Template template = templateBal.getTemplateById(id);
+        template.setHidden(false);
+        mainAccessBal.saveTemplate(template, access_token);
+        response.setMessage("Template [" + template.getName() + "] "
+                + " set to visible!");
+        response.setType(template);
+        response.setSuccess(true);
         return response;
     }
 
@@ -136,15 +109,9 @@ public class TemplateController {
             @RequestParam boolean cascade,
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        try {
-            mainAccessBal.deleteTemplate(id, cascade, access_token);
-            response.setSuccess(true);
-            response.setMessage("Deleted template");
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
-
+        mainAccessBal.deleteTemplate(id, cascade, access_token);
+        response.setSuccess(true);
+        response.setMessage("Deleted template");
         return response;
     }
 
@@ -179,22 +146,14 @@ public class TemplateController {
     TemplateResponse getTemplateDropdownFields(@PathVariable String id,
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        try {
-            Template template = mainAccessBal.getTemplate(id, access_token);
-            List<FieldDetail> fields = new ArrayList<>();
-
-            template.getDetails().stream().filter((field)
-                    -> (GlobalFieldType.GBL_INPUT_DRP_TYPE.equals(field.getType())))
-                    .forEach((field) -> {
-                        fields.add(field);
-                    });
-
-            response.setFields(fields);
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
-
+        Template template = mainAccessBal.getTemplate(id, access_token);
+        List<FieldDetail> fields = new ArrayList<>();
+        template.getDetails().stream().filter((field)
+                -> (GlobalFieldType.GBL_INPUT_DRP_TYPE.equals(field.getType())))
+                .forEach((field) -> {
+                    fields.add(field);
+                });
+        response.setFields(fields);
         return response;
     }
 
@@ -203,21 +162,14 @@ public class TemplateController {
     TemplateResponse getTemplateDateFieldFields(@PathVariable String id,
             @RequestParam String access_token) {
         TemplateResponse response = new TemplateResponse();
-        try {
-            Template template = mainAccessBal.getTemplate(id, access_token);
-            List<FieldDetail> fields = new ArrayList<>();
-
-            template.getDetails().stream().filter((field)
-                    -> (GlobalFieldType.GBL_INPUT_DAT_TYPE.equals(field.getType())))
-                    .forEach((field) -> {
-                        fields.add(field);
-                    });
-
-            response.setFields(fields);
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        Template template = mainAccessBal.getTemplate(id, access_token);
+        List<FieldDetail> fields = new ArrayList<>();
+        template.getDetails().stream().filter((field)
+                -> (GlobalFieldType.GBL_INPUT_DAT_TYPE.equals(field.getType())))
+                .forEach((field) -> {
+                    fields.add(field);
+                });
+        response.setFields(fields);
         return response;
     }
 

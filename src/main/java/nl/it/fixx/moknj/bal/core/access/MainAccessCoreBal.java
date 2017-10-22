@@ -63,19 +63,13 @@ public class MainAccessCoreBal {
      * @param payload
      * @param token
      * @return
-     * @throws Exception
      */
-    public Menu saveMenu(Menu payload, String token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                return menuBal.saveMenu(payload);
-            }
-            throw new AccessException("This user does not have " + ALL_ACCESS.toString());
-        } catch (AccessException e) {
-            LOG.error("Error on saving menu", e);
-            throw e;
+    public Menu saveMenu(Menu payload, String token) {
+        User user = userBal.getUserByToken(token);
+        if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
+            return menuBal.saveMenu(payload);
         }
+        throw new AccessException("This user does not have " + ALL_ACCESS.toString());
     }
 
     /**
@@ -84,19 +78,13 @@ public class MainAccessCoreBal {
      * @param payload
      * @param token
      * @return
-     * @throws Exception
      */
-    public Template saveTemplate(Template payload, String token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                return tempBal.saveTemplate(payload);
-            }
-            throw new AccessException("This user does not have " + ALL_ACCESS.toString());
-        } catch (Exception e) {
-            LOG.error("Error on saving template", e);
-            throw e;
+    public Template saveTemplate(Template payload, String token) {
+        User user = userBal.getUserByToken(token);
+        if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
+            return tempBal.saveTemplate(payload);
         }
+        throw new AccessException("This user does not have " + ALL_ACCESS.toString());
     }
 
     /**
@@ -144,7 +132,7 @@ public class MainAccessCoreBal {
      * @return list of templates
      * @throws Exception
      */
-    private List<Template> getAllTemplates() throws Exception {
+    private List<Template> getAllTemplates() {
         List<Template> templates = new ArrayList<>();
         for (Template temp : tempBal.getAllTemplates()) {
 //            LOG.info("found Temp [" + temp.getName() + "] with no menu");
@@ -171,18 +159,12 @@ public class MainAccessCoreBal {
      * @param templateId
      * @param token
      * @return
-     * @throws Exception
      */
-    public Template getTemplate(String templateId, String token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            return !(user.getAuthorities().contains(ALL_ACCESS.toString()))
-                    ? findTemplateByTokenAndId(templateId, user)
-                    : tempBal.getTemplateById(templateId);
-        } catch (Exception e) {
-            LOG.error("Error on saving template", e);
-            throw e;
-        }
+    public Template getTemplate(String templateId, String token) {
+        User user = userBal.getUserByToken(token);
+        return !(user.getAuthorities().contains(ALL_ACCESS.toString()))
+                ? findTemplateByTokenAndId(templateId, user)
+                : tempBal.getTemplateById(templateId);
     }
 
     /**
@@ -236,9 +218,8 @@ public class MainAccessCoreBal {
      *
      * @param id
      * @param token
-     * @throws java.lang.Exception
      */
-    public void deleteMenu(String id, String token) throws Exception {
+    public void deleteMenu(String id, String token) {
         try {
             User user = userBal.getUserByToken(token);
             if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
@@ -257,32 +238,26 @@ public class MainAccessCoreBal {
      *
      * @param token
      * @return
-     * @throws java.lang.Exception
      */
-    public List<Template> getAllTemplatesForToken(String token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            Set<Template> values = new HashSet<>();
-            List<Menu> menus = menuBal.getAllMenus();
-            menus.stream().map((menu)
-                    -> getMenuTemplates(menu, user, false)).forEachOrdered((tempates)
-                    -> {
-                tempates.stream().forEach((template) -> {
-                    values.add(template);
-                });
+    public List<Template> getAllTemplatesForToken(String token) {
+        User user = userBal.getUserByToken(token);
+        Set<Template> values = new HashSet<>();
+        List<Menu> menus = menuBal.getAllMenus();
+        menus.stream().map((menu)
+                -> getMenuTemplates(menu, user, false)).forEachOrdered((tempates)
+                -> {
+            tempates.stream().forEach((template) -> {
+                values.add(template);
             });
+        });
 
-            if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                getAllTemplates().stream().forEach((template) -> {
-                    values.add(template);
-                });
-            }
-
-            return values.stream().collect(Collectors.toList());
-        } catch (Exception e) {
-            LOG.error("Error while all templates for user token[" + token + "]");
-            throw e;
+        if (user.getAuthorities().contains(ALL_ACCESS.toString())) {
+            getAllTemplates().stream().forEach((template) -> {
+                values.add(template);
+            });
         }
+
+        return values.stream().collect(Collectors.toList());
     }
 
     /**
@@ -315,47 +290,41 @@ public class MainAccessCoreBal {
      * @param id
      * @param cascade
      * @param token
-     * @throws java.lang.Exception
      */
-    public void deleteTemplate(String id, boolean cascade, String token) throws Exception {
-        try {
-            User user = userBal.getUserByToken(token);
-            if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
-                throw new AccessException("Unable to delete template. "
-                        + "This user does not have " + ALL_ACCESS.toString());
-            }
+    public void deleteTemplate(String id, boolean cascade, String token) {
+        User user = userBal.getUserByToken(token);
+        if (!user.getAuthorities().contains(ALL_ACCESS.toString())) {
+            throw new AccessException("Unable to delete template. "
+                    + "This user does not have " + ALL_ACCESS.toString());
+        }
 
-            if (cascade) {
-                List<Menu> menus = menuBal.getMenusForTemplateId(id);
-                menus.forEach((menu) -> {
-                    for (Iterator<Template> iterator = menu.getTemplates().iterator(); iterator.hasNext();) {
-                        Template template = iterator.next();
-                        if (template.getId().equals(id)) {
-                            if (GlobalTemplateType.GBL_TT_ASSET.equals(template.getTemplateType())) {
-                                List<Asset> assets = assetBal.getAll(template.getId(), menu.getId(), token);
-                                for (Asset asset : assets) {
-                                    assetBal.delete(asset, menu.getId(), token, true);
-                                    iterator.remove();
-                                    menuBal.saveMenu(menu);
-                                }
-                            } else if (GlobalTemplateType.GBL_TT_EMPLOYEE.equals(template.getTemplateType())) {
-                                List<Employee> employees = employeeBal.getAll(template.getId(), menu.getId(), token);
-                                for (Employee emp : employees) {
-                                    employeeBal.delete(emp, menu.getId(), token, true);
-                                    iterator.remove();
-                                    menuBal.saveMenu(menu);
-                                }
+        if (cascade) {
+            List<Menu> menus = menuBal.getMenusForTemplateId(id);
+            menus.forEach((menu) -> {
+                for (Iterator<Template> iterator = menu.getTemplates().iterator(); iterator.hasNext();) {
+                    Template template = iterator.next();
+                    if (template.getId().equals(id)) {
+                        if (GlobalTemplateType.GBL_TT_ASSET.equals(template.getTemplateType())) {
+                            List<Asset> assets = assetBal.getAll(template.getId(), menu.getId(), token);
+                            for (Asset asset : assets) {
+                                assetBal.delete(asset, menu.getId(), token, true);
+                                iterator.remove();
+                                menuBal.saveMenu(menu);
+                            }
+                        } else if (GlobalTemplateType.GBL_TT_EMPLOYEE.equals(template.getTemplateType())) {
+                            List<Employee> employees = employeeBal.getAll(template.getId(), menu.getId(), token);
+                            for (Employee emp : employees) {
+                                employeeBal.delete(emp, menu.getId(), token, true);
+                                iterator.remove();
+                                menuBal.saveMenu(menu);
                             }
                         }
                     }
-                });
-            }
-//            LOG.info("deleting template[" + id + "]");
-            tempBal.deleteTemplate(id, cascade);
-        } catch (Exception e) {
-            LOG.error("Error while trying to delete template[" + id + "]", e);
-            throw e;
+                }
+            });
         }
+//            LOG.info("deleting template[" + id + "]");
+        tempBal.deleteTemplate(id, cascade);
     }
 
 }

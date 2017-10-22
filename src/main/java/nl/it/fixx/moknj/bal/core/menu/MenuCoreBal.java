@@ -16,9 +16,9 @@ public interface MenuCoreBal {
 
     String getDispayName(Menu menu);
 
-    String getDispayName(String menuId) throws Exception;
+    String getDispayName(String menuId);
 
     void deleteMenu(String id);
 
-    Template getMenuTemplate(String menuId, String templateId) throws Exception;
+    Template getMenuTemplate(String menuId, String templateId);
 }

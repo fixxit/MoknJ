@@ -8,6 +8,7 @@ import nl.it.fixx.moknj.domain.core.user.User;
 import static nl.it.fixx.moknj.domain.core.user.UserAuthority.ALL_ACCESS;
 import nl.it.fixx.moknj.domain.modules.asset.Asset;
 import nl.it.fixx.moknj.domain.modules.asset.AssetLink;
+import nl.it.fixx.moknj.exception.AccessException;
 import nl.it.fixx.moknj.exception.BalException;
 import nl.it.fixx.moknj.properties.ApplicationProperties;
 import nl.it.fixx.moknj.repository.AccessRepository;
@@ -53,10 +54,10 @@ public class UserCoreBalImpl extends BalBase<UserRepository> implements UserCore
     /**
      * Gets all users. Skips the admin user fixxit
      *
-     * @return @throws Exception
+     * @return
      */
     @Override
-    public List<User> getAll() throws Exception {
+    public List<User> getAll() {
         try {
             List<User> users = new ArrayList<>();
             if (repository != null) {
@@ -80,16 +81,11 @@ public class UserCoreBalImpl extends BalBase<UserRepository> implements UserCore
      * Gets all user the current user has access to.
      *
      * @param token
-     * @return @throws Exception
+     * @return
      */
     @Override
-    public List<User> getAll(String token) throws Exception {
-        try {
-            return getAll(false, token);
-        } catch (Exception ex) {
-            LOG.error("Error while getting all users", ex);
-            throw ex;
-        }
+    public List<User> getAll(String token) {
+        return getAll(false, token);
     }
 
     /**
@@ -98,10 +94,10 @@ public class UserCoreBalImpl extends BalBase<UserRepository> implements UserCore
      *
      * @param isAdmin
      * @param token
-     * @return @throws Exception
+     * @return
      */
     @Override
-    public List<User> getAll(boolean isAdmin, String token) throws Exception {
+    public List<User> getAll(boolean isAdmin, String token) {
         User loginUser = getUserByToken(token);
         List<User> users = new ArrayList<>();
         if (repository != null) {
@@ -134,34 +130,28 @@ public class UserCoreBalImpl extends BalBase<UserRepository> implements UserCore
      *
      * @param userId
      * @param token
-     * @throws Exception
      */
     @Override
-    public void delete(String userId, String token) throws Exception {
-        try {
-            User loginUser = getUserByToken(token);
-            if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
-                throw new BalException("This user does not have " + ALL_ACCESS.toString());
-            }
+    public void delete(String userId, String token) {
+        User loginUser = getUserByToken(token);
+        if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
+            throw new BalException("This user does not have " + ALL_ACCESS.toString());
+        }
 
-            User resource = repository.findById(userId);
-            List<Asset> assets = assetRepo.getAllByResourceId(userId);
-            List<AssetLink> links = assetLinkRepo.getAllByResourceId(userId);
+        User resource = repository.findById(userId);
+        List<Asset> assets = assetRepo.getAllByResourceId(userId);
+        List<AssetLink> links = assetLinkRepo.getAllByResourceId(userId);
 
-            if (!assets.isEmpty() || !links.isEmpty()) {
-                resource.setHidden(true);
-                save(resource, token);
-            } else {
-                // Delete all access rules relating to this user.
-                List<Access> accessRules = accessRepo.getAccessList(userId);
-                accessRules.forEach((access) -> {
-                    accessRepo.delete(access);
-                });
-                repository.delete(resource);
-            }
-        } catch (Exception e) {
-            LOG.error("Error while deleting user [" + userId + "]", e);
-            throw e;
+        if (!assets.isEmpty() || !links.isEmpty()) {
+            resource.setHidden(true);
+            save(resource, token);
+        } else {
+            // Delete all access rules relating to this user.
+            List<Access> accessRules = accessRepo.getAccessList(userId);
+            accessRules.forEach((access) -> {
+                accessRepo.delete(access);
+            });
+            repository.delete(resource);
         }
     }
 
@@ -170,10 +160,9 @@ public class UserCoreBalImpl extends BalBase<UserRepository> implements UserCore
      * @param payload
      * @param token
      * @return
-     * @throws Exception
      */
     @Override
-    public User save(User payload, String token) throws Exception {
+    public User save(User payload, String token) {
         User loginUser = getUserByToken(token);
         if (!loginUser.getAuthorities().contains(ALL_ACCESS.toString())) {
             throw new BalException("This user does not have " + ALL_ACCESS.toString());
@@ -266,13 +255,13 @@ public class UserCoreBalImpl extends BalBase<UserRepository> implements UserCore
     public User getUserByToken(String token) {
         if (token == null || token.isEmpty()) {
             LOG.debug("No token recieved to find user");
-            throw new BalException("No user found, no token provided!");
+            throw new AccessException("No user found, no token provided!");
         }
         // Get user details who logged this employee using the token.
         User user = repository.findByUserName(OAuth2SecurityConfig.getUserForToken(token));
         if (user == null) {
             LOG.debug("no user found for token[" + token + "]");
-            throw new BalException("No user found by this token[" + token + "]");
+            throw new AccessException("No user found by this token[" + token + "]");
         }
         return user;
     }
@@ -304,10 +293,9 @@ public class UserCoreBalImpl extends BalBase<UserRepository> implements UserCore
      *
      * @param userId
      * @return
-     * @throws Exception
      */
     @Override
-    public String getFullName(String userId) throws Exception {
+    public String getFullName(String userId) {
         return getFullName(getUserById(userId));
     }
 

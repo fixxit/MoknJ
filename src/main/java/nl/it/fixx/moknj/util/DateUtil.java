@@ -19,7 +19,11 @@ public final class DateUtil {
     }
 
     public static DateTime parseJavaScriptDateTime(String date) {
-        return JSTF.parseDateTime(date);
+        try {
+            return JSTF.parseDateTime(date);
+        } catch (Exception e) {
+            return new DateTime();
+        }
     }
 
     public static Date parseJavaScriptDate(String date) {

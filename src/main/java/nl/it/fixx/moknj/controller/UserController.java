@@ -36,26 +36,14 @@ public class UserController {
     @RequestMapping(value = "/get/all", method = RequestMethod.POST)
     public UserResponse all(@RequestParam String access_token) {
         UserResponse userResponse = new UserResponse();
-        try {
-            userResponse.setResources(userBal.getAll(true, access_token));
-        } catch (Exception ex) {
-            userResponse.setSuccess(false);
-            userResponse.setMessage(ex.getMessage());
-            LOG.error("Error while geting all user", ex);
-        }
+        userResponse.setResources(userBal.getAll(true, access_token));
         return userResponse;
     }
 
     @RequestMapping(value = "/get/employee/all", method = RequestMethod.POST)
     public UserResponse getAllUsersForEmployee() {
         UserResponse userResponse = new UserResponse();
-        try {
-            userResponse.setResources(userBal.getAll());
-        } catch (Exception ex) {
-            userResponse.setSuccess(false);
-            userResponse.setMessage(ex.getMessage());
-            LOG.error("Error while geting all user", ex);
-        }
+        userResponse.setResources(userBal.getAll());
         return userResponse;
     }
 
@@ -63,17 +51,10 @@ public class UserController {
     public UserResponse add(@RequestBody User payload,
             @RequestParam String access_token) {
         UserResponse userResponse = new UserResponse();
-        try {
-            User user = userBal.save(payload, access_token);
-            userResponse.setSuccess(user != null);
-            userResponse.setMessage("Saved user[" + user.getId() + "]");
-            userResponse.setResource(user);
-        } catch (Exception ex) {
-            userResponse.setSuccess(false);
-            userResponse.setMessage(ex.getMessage());
-            LOG.error("Error while saving resource", ex);
-        }
-
+        User user = userBal.save(payload, access_token);
+        userResponse.setSuccess(user != null);
+        userResponse.setMessage("Saved user[" + user.getId() + "]");
+        userResponse.setResource(user);
         return userResponse;
     }
 
@@ -95,7 +76,6 @@ public class UserController {
         for (UserAuthority auth : auths) {
             userResponse.getAuthorities().add(auth.toString());
         }
-
         return userResponse;
     }
 
@@ -113,7 +93,6 @@ public class UserController {
             rights.add(new AccessRight(right.name(), right.getDisplayValue()));
         }
         userResponse.setRights(rights);
-
         return userResponse;
     }
 
@@ -121,15 +100,9 @@ public class UserController {
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
     public UserResponse delete(@PathVariable String id, @RequestParam String access_token) {
         UserResponse userResponse = new UserResponse();
-        try {
-            userBal.delete(id, access_token);
-            userResponse.setSuccess(true);
-            userResponse.setMessage("User deleted");
-        } catch (Exception ex) {
-            userResponse.setSuccess(false);
-            userResponse.setMessage(ex.getMessage());
-            LOG.error("Error while deleting resource", ex);
-        }
+        userBal.delete(id, access_token);
+        userResponse.setSuccess(true);
+        userResponse.setMessage("User deleted");
         return userResponse;
     }
 
@@ -139,16 +112,9 @@ public class UserController {
             RequestBody List<Access> access,
             @RequestParam String access_token) {
         final UserResponse userResponse = new UserResponse();
-        try {
-            accessBal.addAccess(id, access, access_token);
-            userResponse.setSuccess(true);
-            userResponse.setMessage("Added user access");
-        } catch (Exception ex) {
-            userResponse.setSuccess(false);
-            userResponse.setMessage(ex.getMessage());
-            LOG.error("Error while adding user access rights");
-            LOG.error("Exception", ex);
-        }
+        accessBal.addAccess(id, access, access_token);
+        userResponse.setSuccess(true);
+        userResponse.setMessage("Added user access");
         return userResponse;
     }
 
@@ -157,15 +123,8 @@ public class UserController {
     public UserResponse getAccessList(@PathVariable String id,
             @RequestParam String access_token) {
         final UserResponse userResponse = new UserResponse();
-        try {
-            userResponse.setAccessRules(accessBal.getAccessList(id));
-            userResponse.setSuccess(true);
-        } catch (Exception ex) {
-            userResponse.setSuccess(false);
-            userResponse.setMessage(ex.getMessage());
-            LOG.error("Error while adding user access rights");
-            LOG.error("Exception", ex);
-        }
+        userResponse.setAccessRules(accessBal.getAccessList(id));
+        userResponse.setSuccess(true);
         return userResponse;
     }
 

@@ -69,7 +69,7 @@ public class AssetLinkBal extends BalBase<AssetLinkRepository> implements Module
      * @return
      * @throws Exception
      */
-    public AssetLink linkAssetToUser(String menuId, String templateId, AssetLink payload, String token) throws Exception {
+    public AssetLink linkAssetToUser(String menuId, String templateId, AssetLink payload, String token) {
         try {
             User user = userBal.getUserByToken(token);
 
@@ -203,7 +203,7 @@ public class AssetLinkBal extends BalBase<AssetLinkRepository> implements Module
      * @return
      * @throws Exception
      */
-    public List<AssetLink> getAllAssetLinksByResourceId(String userId, String token) throws Exception {
+    public List<AssetLink> getAllAssetLinksByResourceId(String userId, String token) {
         try {
             Set<AssetLink> results = new HashSet<>();
             mainAccessBal.getUserMenus(token).stream().filter((menu)

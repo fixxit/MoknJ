@@ -29,10 +29,9 @@ public class TemplateCoreBalImpl extends BalBase<TemplateRepository> implements 
      *
      * @param payload Template
      * @return Template
-     * @throws Exception
      */
     @Override
-    public Template saveTemplate(Template payload) throws Exception {
+    public Template saveTemplate(Template payload) {
         try {
             if (payload.getDetails() == null && payload.getDetails().isEmpty()) {
                 throw new BalException("No field types recieved to save. " + "Aborting insert due to empty type!");
@@ -86,10 +85,9 @@ public class TemplateCoreBalImpl extends BalBase<TemplateRepository> implements 
      *
      * @param template
      * @return
-     * @throws Exception
      */
     @Override
-    public String getDispayName(Template template) throws Exception {
+    public String getDispayName(Template template) {
         if (template == null) {
             throw new BalException("No template object provided");
         }
@@ -102,10 +100,9 @@ public class TemplateCoreBalImpl extends BalBase<TemplateRepository> implements 
      *
      * @param templateId
      * @return
-     * @throws Exception
      */
     @Override
-    public String getDispayName(String templateId) throws Exception {
+    public String getDispayName(String templateId) {
         return getDispayName(getTemplateById(templateId));
     }
 
@@ -113,10 +110,9 @@ public class TemplateCoreBalImpl extends BalBase<TemplateRepository> implements 
      * Gets all the menu's
      *
      * @return list of menus.
-     * @throws Exception
      */
     @Override
-    public List<Template> getAllTemplates() throws Exception {
+    public List<Template> getAllTemplates() {
         try {
             return repository.findAll();
         } catch (Exception e) {
@@ -130,10 +126,9 @@ public class TemplateCoreBalImpl extends BalBase<TemplateRepository> implements 
      *
      * @param id
      * @param cascade
-     * @throws Exception
      */
     @Override
-    public void deleteTemplate(String id, boolean cascade) throws Exception {
+    public void deleteTemplate(String id, boolean cascade) {
         try {
             Template template = getTemplateById(id);
             if (!cascade) {

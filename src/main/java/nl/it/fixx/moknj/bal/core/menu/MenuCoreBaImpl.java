@@ -147,10 +147,9 @@ public class MenuCoreBaImpl extends BalBase<MenuRepository> implements MenuCoreB
      *
      * @param menuId
      * @return
-     * @throws Exception
      */
     @Override
-    public String getDispayName(String menuId) throws Exception {
+    public String getDispayName(String menuId) {
         return getDispayName(getMenuById(menuId));
     }
 
@@ -181,10 +180,9 @@ public class MenuCoreBaImpl extends BalBase<MenuRepository> implements MenuCoreB
      * @param menuId
      * @param templateId
      * @return
-     * @throws Exception
      */
     @Override
-    public Template getMenuTemplate(String menuId, String templateId) throws Exception {
+    public Template getMenuTemplate(String menuId, String templateId) {
         Menu menu = getMenuById(menuId);
         List<Template> menuTemplates = menu.getTemplates();
         for (Template menuTemplate : menuTemplates) {

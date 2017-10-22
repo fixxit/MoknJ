@@ -35,15 +35,10 @@ public class MenuContoller {
     public @ResponseBody
     MenuResponse add(@RequestBody Menu payload, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
-        try {
-            Menu menu = mainAccessBal.saveMenu(payload, access_token);
-            response.setSuccess(menu != null);
-            response.setMessage("Saved " + menu.getName());
-            response.setMenu(menu);
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        Menu menu = mainAccessBal.saveMenu(payload, access_token);
+        response.setSuccess(menu != null);
+        response.setMessage("Saved " + menu.getName());
+        response.setMenu(menu);
         return response;
     }
 
@@ -58,12 +53,7 @@ public class MenuContoller {
     public @ResponseBody
     MenuResponse get(@PathVariable String id, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
-        try {
-            response.setMenu(mainAccessBal.getMenu(id, access_token));
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setMenu(mainAccessBal.getMenu(id, access_token));
         return response;
     }
 
@@ -77,12 +67,7 @@ public class MenuContoller {
     public @ResponseBody
     MenuResponse all(@RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
-        try {
-            response.setMenus(mainAccessBal.getUserMenus(access_token));
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        response.setMenus(mainAccessBal.getUserMenus(access_token));
         return response;
     }
 
@@ -97,14 +82,9 @@ public class MenuContoller {
     public @ResponseBody
     MenuResponse delete(@PathVariable String id, @RequestParam String access_token) {
         MenuResponse response = new MenuResponse();
-        try {
-            mainAccessBal.deleteMenu(id, access_token);
-            response.setSuccess(true);
-            response.setMessage("Menu deleted from active menu list");
-        } catch (Exception ex) {
-            response.setSuccess(false);
-            response.setMessage(ex.getMessage());
-        }
+        mainAccessBal.deleteMenu(id, access_token);
+        response.setSuccess(true);
+        response.setMessage("Menu deleted from active menu list");
         return response;
     }
 
