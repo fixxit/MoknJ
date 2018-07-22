@@ -108,8 +108,3 @@ security:
 * System settings contains the db settings.
 * Admin is for you system administrator (All access, used for installation/mapping of system)
 * Security settings contains all OAuth settings.
-
-### Who do I talk to? ###
-Riaan Schoeman (Devin Alrighty) (riaan.schoeman@fixx.it)
-
-![funny_footer.gif](https://github.com/fixxit/MoknJ/blob/master/images/funny%20footer.gif?raw=true)
