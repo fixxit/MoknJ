@@ -1,13 +1,10 @@
 # MoknJ 0.0.1 API #
 
 ## Notice ##
-Version 0.0.1 is a quick and dirty prototype and yet to implement proper GOF patterns. Development branch is latest, you should slowly start to see dev using better patterns and design and less black box design. 
+Version 0.0.1 is a quick and dirty prototype. 
 
 ## Mission ##
-MoknJ started as an idea to move data from excel sheets to an customizable platform which creates an environment where it is easy for the user to build custom data templates that behave like predefined business components. 
-
-* The platform should make it easy and less of a effort for business to consolidate its spreadsheet business data. 
-* Business must save time when doing nitty-gritty administration work.
+MoknJ started as an idea to move data from excel sheets to an customizable platform. 
 
 ## Technology Stack ##
 HTML5, CSS, Bootstrap, AngularJS, AngularUI, Angular Routing, Node, Express, Spring Boot, Spring Security (OAuth 2), Mongo DB, Java 8, Rest (Jersey with Jackson), Maven, Junit
